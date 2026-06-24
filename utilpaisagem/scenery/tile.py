@@ -1,34 +1,82 @@
+from numbers import Number
 from decimal import Decimal
+from pathlib import Path
 import math
 
-class Tile(object):
-    """Scenery tiles with the corresponding index and coordinates.
+from utilpaisagem.scenery.common import Coordinates
 
-    Index, coordinates and width "stolen" from
-    https://web.archive.org/web/20170526193251/http://fgphotoscenery.square7.ch/#howto
+class Tile(object):
     """
+    Scenery tiles with the corresponding index and coordinates.
+    """
+    # Index, coordinates and width based on
+    # https://web.archive.org/web/20170526193251/http://fgphotoscenery.square7.ch/#howto
+    
     index: int
-    lat1: Decimal
-    lon1: Decimal
-    lat2: Decimal
-    lon2: Decimal
+    coordinates: Coordinates
 
     def __init__(self, index:int=0, lat:Decimal=Decimal('NaN'), lon:Decimal=Decimal('NaN')):
-        """New Tile object defined by either index or by coordinates.
+        """
+        New Tile object defined by either index or by coordinates.
         """
         try:
             if index:
                 self.index = index
             else:
                 self.index = Tile.coordinates_to_index(lat, lon)
-            self.lat1, self.lat2, self.lon1, self.lon2 = Tile.index_to_coordinates(self.index)[:4]
+            self.coordinates = Coordinates(Tile.index_to_coordinates(self.index))
         except:
             raise ValueError
 
+    # TODO
+    def _divide(n:int):
+        """
+        Subdivide a tile for download.
+        
+        Returns:
+            tuple: a tuple of tuples withcoordinate quadrants
+                ((lat1, lat2, lon1, lon2), (lat1, lat2, lon1, lon2), ...).
+        """
+        pass
+
+    # TODO
+    def _glue(path:Path) -> tuple:
+        """
+        Join images into a single file.
+        
+        Args:
+            path (Path): path to the orthophotos folder, including it.
+        """
+        pass
+
+    # TODO
+    def retrieve(path:Path, lat:Decimal, lon:Decimal, downloader, threads:int=1):
+        """
+        Tests if the image exists and is not needed to regenerate it. If Ok, touch the
+        file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
+        resolution or there was an error in the previous processing.
+        
+        Args:
+            path (Path): path to the orthophotos folder, including it.
+            lat (Decimal): a latitude at the tile.
+            lon (Decimal): a longitude at the tile.
+            downloader (Downloader): image downloader (TODO)
+            threads (int): downloading threads
+        """
+
+        # Ok? Touch it.
+        # Else:
+            # divide
+            # download parts
+            # attempt to sanitize download errors
+            # glue
+        pass
+
     @classmethod
     def tile_width(cls, lat):
-        """Tile width in degrees
-        FlightGear has a variable tile width according to the latitutde).
+        """
+        Tile width in degrees according to the latitude
+        (FlightGear uses a variable tile width according to the latitude).
         """
         width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[88,8],[89,360],[90,360]]
         for i in range(len(width_table)):
@@ -37,21 +85,35 @@ class Tile(object):
 
     @classmethod
     def index_to_coordinates(cls, tile_index):
+        """
+        Converts FlightGear scenery indexes into geographical coordinates.
+
+        Args:
+            tile_index (int): scenery tile index
+
+        Returns:
+            list: coordinate values as [lat1, lat2, lon1, lon2, middle_lat, middle_lon]
+        """
         base_x    = (tile_index>>14) - 180
         base_y    = ((tile_index-((base_x+180)<<14)) >>6) - 90
         y         =  (tile_index-(((base_x+180)<<14)+ ((base_y+90) << 6))) >> 3
         x         =  tile_index-(((((base_x+180)<<14)+ ((base_y+90) << 6))) + (y << 3))
         tile_width = cls.tile_width(base_y)
-        return [
+        return Coordinates(
             (base_y + 0.125 * y),
             base_y + 0.125 * (y+1),
             base_x + x * tile_width,
-            base_x + (x+1) * tile_width,
-            0.5 * (base_y+0.125*y + base_y + 0.125*(y+1)),
-            0.5 * (base_x + x * tile_width + base_x + (x+1) * tile_width)]
+            base_x + (x+1) * tile_width
+        )
     
     @classmethod
-    def coordinates_to_index(cls, lat, lon):
+    def coordinates_to_index(cls, lat:Number, lon:Number):
+        """Converts a coordinate pair into a FlightGear scenery tile index.
+
+        Args:
+            lat: latitude
+            lon: longitude
+        """
         base_y    = math.floor(lat)
         y         = int((lat-base_y)*8)
         tile_width = cls.tile_width(lat)
