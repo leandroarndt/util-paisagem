@@ -7,9 +7,12 @@ Constants (a tile is 0.125 degree high):
     RESOLUTIONS: resolution in meters/pixel, from 0.84 (16384 px) to 108 (128 px)
 """
 from decimal import Decimal
+from decimal import getcontext as decimal_context
+
+decimal_context().prec = 4
 
 METER_RESOLUTION = 14 # One tile height has circa 13892 meters, thus 2**14 (16384 pixels)
-METER = 1/Decimal(13892.375) # One meter converted to tile units
+METER = 1/13892.375 # One meter converted to tile units
 
 # meters/pixel, from 0.84 (16384 px) to 108 (128 px)
 RESOLUTIONS = {
