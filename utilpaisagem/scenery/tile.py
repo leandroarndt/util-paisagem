@@ -1,6 +1,7 @@
 from numbers import Number
 from decimal import Decimal
 from pathlib import Path
+from urllib.error import URLError, ContentTooShortError
 import math, tempfile, shutil
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
@@ -77,9 +78,18 @@ class Tile(object):
             # attempt to sanitize download errors (TODO)
             # glue (TODO)
             # compress (TODO)
-        with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
-            image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
-            shutil.copy(Path(cache) / f'{self.index}.png', path)
+        try:
+            with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
+                image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+                shutil.copy(Path(cache) / f'{self.index}.png', path)
+        except (URLError, ContentTooShortError) as e:
+            if self.resolution > MIN_RES:
+                print(f'Error downloading tile {self.index}: {e}. Will retry with reduced resolution.')
+                self.resolution -= 1
+                self.retrieve(path, image_service, compile, threads)
+            else:
+                print(f'Error downloading tile {self.index}: {e}.')
+                # TODO: download wider area and crop; use neighboring image, if any
 
     @classmethod
     def tile_width(cls, lat):
