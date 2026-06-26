@@ -1,9 +1,10 @@
 from numbers import Number
 from decimal import Decimal
 from pathlib import Path
-import math
+import math, tempfile, shutil
 
-from utilpaisagem.scenery.common import Coordinates
+from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
+from utilpaisagem.scenery.downloader import ImageService
 
 class Tile(object):
     """
@@ -14,8 +15,9 @@ class Tile(object):
     
     index: int
     coordinates: Coordinates
+    resolution:int
 
-    def __init__(self, index:int=0, lat:Decimal=Decimal('NaN'), lon:Decimal=Decimal('NaN')):
+    def __init__(self, index:int=0, lat:Decimal=Decimal('NaN'), lon:Decimal=Decimal('NaN'), resolution:int=DOWNLOAD_RES):
         """
         New Tile object defined by either index or by coordinates.
         """
@@ -24,12 +26,16 @@ class Tile(object):
                 self.index = index
             else:
                 self.index = Tile.coordinates_to_index(lat, lon)
-            self.coordinates = Coordinates(Tile.index_to_coordinates(self.index))
+            self.coordinates = Tile.index_to_coordinates(self.index)
         except:
-            raise ValueError
+            raise ValueError('Invalid parameters. Should be given either index or lat and lon.')
+        if  MIN_RES <= resolution <= MAX_RES:
+            self.resolution = resolution
+        else:
+            raise ValueError(f'Invalid resolution. Should be at least {MIN_RES} and at most {MAX_RES}.')
 
     # TODO
-    def _divide(n:int):
+    def _divide(self, n:int):
         """
         Subdivide a tile for download.
         
@@ -40,7 +46,7 @@ class Tile(object):
         pass
 
     # TODO
-    def _glue(path:Path) -> tuple:
+    def _glue(self, path:Path) -> tuple:
         """
         Join images into a single file.
         
@@ -50,7 +56,7 @@ class Tile(object):
         pass
 
     # TODO
-    def retrieve(path:Path, lat:Decimal, lon:Decimal, downloader, threads:int=1):
+    def retrieve(self, path:Path, image_service:ImageService, compress=False, threads:int=1):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -60,17 +66,20 @@ class Tile(object):
             path (Path): path to the orthophotos folder, including it.
             lat (Decimal): a latitude at the tile.
             lon (Decimal): a longitude at the tile.
-            downloader (Downloader): image downloader (TODO)
+            image_service (ImagerService): image downloader
             threads (int): downloading threads
         """
 
         # Ok? Touch it.
         # Else:
-            # divide
+            # divide(TODO)
             # download parts
-            # attempt to sanitize download errors
-            # glue
-        pass
+            # attempt to sanitize download errors (TODO)
+            # glue (TODO)
+            # compress (TODO)
+        with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
+            image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+            shutil.copy(Path(cache) / f'{self.index}.png', path)
 
     @classmethod
     def tile_width(cls, lat):

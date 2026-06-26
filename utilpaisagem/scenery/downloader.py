@@ -1,6 +1,6 @@
 from pathlib import Path
 from urllib import request
-from urllib.error import URLError
+from urllib.error import URLError, ContentTooShortError
 from utilpaisagem.scenery.common import Coordinates
 
 class ImageService(object):
@@ -57,8 +57,10 @@ class ImageService(object):
             assert response[1]['Content-Type'] == 'image/png'
         except URLError as e:
             print('URLError:', e)
+        except ContentTooShortError:
+            print(f'Content too short: "{url}" did not return its full contents.')
         except AssertionError:
-            print(f'Failed to download PNG image into "{file}".')
+            print(f'Failed to download PNG image from "{url}" into "{file}".')
 
 class _ArcGIS(ImageService):
     def __init__(self):
