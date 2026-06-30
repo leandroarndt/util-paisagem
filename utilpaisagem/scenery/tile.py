@@ -57,7 +57,7 @@ class Tile(object):
         pass
 
     # TODO
-    def retrieve(self, path:Path, image_service:ImageService, compress=False, threads:int=1):
+    def retrieve(self, path:Path, image_service:ImageService, compress=False):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
