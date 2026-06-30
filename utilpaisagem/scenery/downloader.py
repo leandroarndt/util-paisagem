@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib import request
 from urllib.error import URLError, ContentTooShortError
-from utilpaisagem.scenery.common import Coordinates
+from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES
 
 class ImageService(object):
     """
@@ -14,7 +14,7 @@ class ImageService(object):
     description:str
     license_link:str
     availability_area:str
-    _max_size:int = 1024
+    max_size:int = DOWNLOAD_RES
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int):
         """
@@ -25,15 +25,15 @@ class ImageService(object):
 
     def _trim(self, coordinates, height:int) -> list:
         """
-        Trims image dimensions to be at most self._max_size.
+        Trims image dimensions to be at most self.max_size.
         Returns (width, height).
         """
 
-        if height > self._max_size: height = self._max_size
+        if height > self.max_size: height = self.max_size
         width = abs(height * (coordinates.lon_left - coordinates.lon_right) / (coordinates.lat_top - coordinates.lat_bottom))
-        if width > self._max_size:
-            height = height * self._max_size / width
-            width = self._max_size
+        if width > self.max_size:
+            height = height * self.max_size / width
+            width = self.max_size
         
         return width, height
 
@@ -67,7 +67,14 @@ class _ArcGIS(ImageService):
         self.description = 'Worldwide service under restrictive license'
         self.license_link = 'https://www.esri.com/en-us/legal/terms/full-master-agreement'
         self.availability_area = 'Worldwide'
-        self._max_size = 4096
+        self.max_size = 4096
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
         return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&size={width},{height}&format=png24&f=image'
+
+# There is no need for a singleton. This dictionary is only a centralized place
+# for image service classes stored along with their names. This may facilitate
+# GUI development.
+Downloaders = {
+    'ArcGIS': _ArcGIS,
+}
