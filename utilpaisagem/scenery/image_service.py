@@ -75,6 +75,6 @@ class _ArcGIS(ImageService):
 # There is no need for a singleton. This dictionary is only a centralized place
 # for image service classes stored along with their names. This may facilitate
 # GUI development.
-Downloaders = {
-    'ArcGIS': _ArcGIS,
+IMAGE_SERVICES = {
+    'ArcGIS': _ArcGIS(),
 }
