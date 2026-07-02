@@ -1,11 +1,10 @@
-from numbers import Number
 from decimal import Decimal
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
 import math, tempfile, shutil
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
-from utilpaisagem.scenery.downloader import ImageService
+from utilpaisagem.scenery.image_service import ImageService
 
 class Tile(object):
     """
@@ -22,18 +21,29 @@ class Tile(object):
         """
         New Tile object defined by either index or by coordinates.
         """
-        try:
-            if index:
-                self.index = index
-            else:
-                self.index = Tile.coordinates_to_index(lat, lon)
-            self.coordinates = Tile.index_to_coordinates(self.index)
-        except:
+        lat, lon = Decimal(lat), Decimal(lon)
+        if not index and (Decimal.is_nan(lat) or Decimal.is_nan(lon)):
             raise ValueError('Invalid parameters. Should be given either index or lat and lon.')
+        if index:
+            self.index = index
+        else:
+            self.index = Tile.coordinates_to_index(lat, lon)
+        self.coordinates = Tile.index_to_coordinates(self.index)
         if  MIN_RES <= resolution <= MAX_RES:
             self.resolution = resolution
         else:
             raise ValueError(f'Invalid resolution. Should be at least {MIN_RES} and at most {MAX_RES}.')
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(lat={self.coordinates.lat_median}, lon={self.coordinates.lon_median})>'
+    
+    def __hash__(self):
+        return self.index
+    
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.index == other.index
+        return False
 
     # TODO
     def _divide(self, n:int):
@@ -70,7 +80,19 @@ class Tile(object):
             image_service (ImagerService): image downloader
             threads (int): downloading threads
         """
-
+        # Path directions
+        if self.coordinates.lat_median > 0:
+            lat_dir = 'n'
+        else:
+            lat_dir = 's'
+        if self.coordinates.lon_median > 0:
+            lon_dir = 'e'
+        else:
+            lon_dir = 'w'
+        path = path / Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left/10)) * 10:03}' + \
+            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom / 10) * 10)}') / \
+            Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left)):03}' + \
+            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom))}')
         # Ok? Touch it.
         # Else:
             # divide(TODO)
@@ -81,7 +103,10 @@ class Tile(object):
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
                 image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+                if not path.is_dir():
+                    path.mkdir(parents=True)
                 shutil.copy(Path(cache) / f'{self.index}.png', path)
+                print(f'Downloaded tile {self.index} into {path}.')
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
                 print(f'Error downloading tile {self.index}: {e}. Will retry with reduced resolution.')
@@ -100,7 +125,7 @@ class Tile(object):
         width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[88,8],[89,360],[90,360]]
         for i in range(len(width_table)):
             if abs(lat)>=width_table[i][0] and abs(lat)<width_table[i+1][0]:
-                return float (width_table[i][1])
+                return Decimal(width_table[i][1])
 
     @classmethod
     def index_to_coordinates(cls, tile_index):
@@ -126,7 +151,7 @@ class Tile(object):
         )
     
     @classmethod
-    def coordinates_to_index(cls, lat:Number, lon:Number):
+    def coordinates_to_index(cls, lat:Decimal, lon:Decimal):
         """Converts a coordinate pair into a FlightGear scenery tile index.
 
         Args:
