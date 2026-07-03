@@ -1,7 +1,8 @@
 from pathlib import Path
 from urllib import request
+from decimal import Decimal
 from urllib.error import URLError, ContentTooShortError
-from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES
+from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 
 class ImageService(object):
     """
@@ -51,17 +52,26 @@ class ImageService(object):
         width, height = self._trim(coordinates, height)
 
         url = self._get_url(coordinates, width, height)
-        print(url)
 
+        exception = None
         try:
             response = request.urlretrieve(url, filename=file)
             assert response[1]['Content-Type'] == 'image/png'
         except URLError as e:
+            exception = e
             print('URLError:', e)
-        except ContentTooShortError:
+        except ContentTooShortError as e:
+            exception = e
             print(f'Content too short: "{url}" did not return its full contents.')
-        except AssertionError:
+        except AssertionError as e:
+            exception = e
             print(f'Failed to download PNG image from "{url}" into "{file}".')
+        else:
+            return file
+        if height > 2**MIN_RES:
+            print('Retrying download with lower resolution...')
+            return self.download(file, coordinates, Decimal(height/2))
+        raise e
 
 class _ArcGIS(ImageService):
     def __init__(self):
