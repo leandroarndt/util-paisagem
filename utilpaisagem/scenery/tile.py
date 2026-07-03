@@ -1,6 +1,7 @@
 from decimal import Decimal
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
+from PIL import Image
 import math, tempfile, shutil
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
@@ -45,7 +46,7 @@ class Tile(object):
             return self.index == other.index
         return False
 
-    def _divide(self, image_service:ImageService, download_res:int) -> tuple:
+    def _divide(self, image_service:ImageService, download_res:int) -> list:
         """
         Subdivide a tile for download based on image_service's maximum resolution
         and default download resolution. Each resulting cell will have at most
@@ -57,7 +58,7 @@ class Tile(object):
                 download_res will be 10)
 
         Returns:
-            tuple: a tuple of tuples of Coordinate objects in an xy grid
+            list: a list of lists of Coordinate objects in an xy grid
                 ((coord1x1, coord1x2 ...), (coord2x1, coord2x2 ...), ...)
         """
         if download_res > self.resolution: download_res = self.resolution
@@ -71,6 +72,8 @@ class Tile(object):
             horizontal = vertical
         print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
         height = Decimal(0.125) / vertical
+        if self.coordinates.lat_top <= 0:
+            height = -height
         width = tw / horizontal
         return [[Coordinates (
             lat1=self.coordinates.lat_top + y*height,
@@ -80,17 +83,28 @@ class Tile(object):
             ) for x in range(horizontal)] for y in range(vertical)]
 
     # TODO
-    def _glue(self, path:Path) -> tuple:
+    def _glue(self, path:Path, base_name:str, lines:int, columns:int) -> tuple:
         """
         Join images into a single file.
         
         Args:
-            path (Path): path to the orthophotos folder, including it.
+            path(Path): path to the orthophotos folder, including it.
+            base_name(str): base of the file name.
+            lines(int): number of image lines.
+            columns: number of image columns.
         """
-        pass
+        with Image.open(path / f'{base_name}-0-0.png') as first:
+            cell_size = first.size
+        dimensions = (cell_size[1] * columns, cell_size[0] * lines)
+        result = Image.new('RGB', dimensions)
+        for line in range(lines):
+            for column in range(columns):
+                with Image.open(path / f'{base_name}-{line}-{column}.png') as image:
+                    result.paste(image, (dimensions[1]*column, dimensions[0]*line))
+        result.save(path / f'{base_name}.png')
 
     # TODO
-    def retrieve(self, path:Path, image_service:ImageService, compress=False):
+    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress=False):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -123,21 +137,34 @@ class Tile(object):
             # attempt to sanitize download errors (TODO)
             # glue (TODO)
             # compress (TODO)
-        
+        print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
+        divisions = self._divide(image_service, download_res)
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
-                image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+                # Download
+                for line in range(len(divisions)):
+                    for cell in range(len(divisions[line])):
+                        image_service.download(
+                            Path(cache) / f'{self.index}-{line}-{cell}.png',
+                            divisions[line][cell],
+                            2**download_res
+                        )
+                #image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+
+                self._glue(path=Path(cache), base_name=str(self.index), lines=len(divisions), columns=len(divisions[0]))
+
+                #Move
                 if not path.is_dir():
                     path.mkdir(parents=True)
                 shutil.copy(Path(cache) / f'{self.index}.png', path)
                 print(f'Downloaded tile {self.index} into {path}.')
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
-                print(f'Error downloading tile {self.index}: {e}. Will retry with reduced resolution.')
-                self.resolution -= 1
-                self.retrieve(path, image_service, compile, threads)
+                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                #self.resolution -= 1
+                #self.retrieve(path, image_service, download_res-1, compress)
             else:
-                print(f'Error downloading tile {self.index}: {e}.')
+                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
                 # TODO: download wider area and crop; use neighboring image, if any
 
     @classmethod
