@@ -14,7 +14,7 @@ class ImageService(object):
     description:str
     license_link:str
     availability_area:str
-    max_size:int = DOWNLOAD_RES
+    max_size:int = 2**DOWNLOAD_RES
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int):
         """
@@ -35,7 +35,7 @@ class ImageService(object):
             height = height * self.max_size / width
             width = self.max_size
         
-        return width, height
+        return int(width), int(height)
 
     def download(self, file:Path, coordinates:Coordinates, height:int):
         """
@@ -51,6 +51,7 @@ class ImageService(object):
         width, height = self._trim(coordinates, height)
 
         url = self._get_url(coordinates, width, height)
+        print(url)
 
         try:
             response = request.urlretrieve(url, filename=file)

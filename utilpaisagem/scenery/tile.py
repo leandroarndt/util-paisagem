@@ -13,8 +13,8 @@ class Tile(object):
     # Index, coordinates and width based on
     # https://web.archive.org/web/20170526193251/http://fgphotoscenery.square7.ch/#howto
     
-    index: int
-    coordinates: Coordinates
+    index:int
+    coordinates:Coordinates
     resolution:int
 
     def __init__(self, index:int=0, lat:Decimal=Decimal('NaN'), lon:Decimal=Decimal('NaN'), resolution:int=DOWNLOAD_RES):
@@ -45,16 +45,39 @@ class Tile(object):
             return self.index == other.index
         return False
 
-    # TODO
-    def _divide(self, n:int):
+    def _divide(self, image_service:ImageService, download_res:int) -> tuple:
         """
-        Subdivide a tile for download.
-        
+        Subdivide a tile for download based on image_service's maximum resolution
+        and default download resolution. Each resulting cell will have at most
+        default resolution height and image services's maximum resolution width.
+
+        Arguments:
+            image_service(ImageService): an object with max_size as resolution limit
+            download_res: the exponent of two of the resolution (e.g. 1024 = 2**10;
+                download_res will be 10)
+
         Returns:
-            tuple: a tuple of tuples withcoordinate quadrants
-                ((lat1, lat2, lon1, lon2), (lat1, lat2, lon1, lon2), ...).
+            tuple: a tuple of tuples of Coordinate objects in an xy grid
+                ((coord1x1, coord1x2 ...), (coord2x1, coord2x2 ...), ...)
         """
-        pass
+        if download_res > self.resolution: download_res = self.resolution
+        vertical = 2 ** (self.resolution - download_res)
+        tw = self.coordinates.lon_right - self.coordinates.lon_left # This tile width
+        proportion = tw / Decimal(0.125) # Width / height
+        full_width = proportion * 2**self.resolution # Full image width
+        if full_width / vertical > image_service.max_size:
+            horizontal = int(full_width // image_service.max_size)
+        else:
+            horizontal = vertical
+        print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
+        height = Decimal(0.125) / vertical
+        width = tw / horizontal
+        return [[Coordinates (
+            lat1=self.coordinates.lat_top + y*height,
+            lon1=self.coordinates.lon_left + x*width,
+            lat2=self.coordinates.lat_top + y*height + height,
+            lon2=self.coordinates.lon_left + x*width + width
+            ) for x in range(horizontal)] for y in range(vertical)]
 
     # TODO
     def _glue(self, path:Path) -> tuple:
@@ -100,6 +123,7 @@ class Tile(object):
             # attempt to sanitize download errors (TODO)
             # glue (TODO)
             # compress (TODO)
+        
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
                 image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
