@@ -82,7 +82,7 @@ class _ArcGIS(ImageService):
         self.max_size = 4096
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
-        return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&size={width},{height}&format=png24&f=image'
+        return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&imageSR=4326&size={width},{height}&format=png24&f=image'
 
 # There is no need for a singleton. This dictionary is only a centralized place
 # for image service classes stored along with their names. This may facilitate
