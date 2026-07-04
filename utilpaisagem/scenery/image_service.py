@@ -52,7 +52,6 @@ class ImageService(object):
         width, height = self._trim(coordinates, height)
 
         url = self._get_url(coordinates, width, height)
-        print(url)
 
         exception = None
         try:
@@ -68,11 +67,11 @@ class ImageService(object):
             exception = e
             print(f'Failed to download PNG image from "{url}" into "{file}".')
         else:
-            return file
+            return None, True
         if height > 2**MIN_RES:
             print('Retrying download with lower resolution...')
-            return self.download(file, coordinates, height/2)
-        raise e
+            return exception, self.download(file, coordinates, height/2)[1]
+        return exception, False
 
 class _ArcGIS(ImageService):
     def __init__(self):

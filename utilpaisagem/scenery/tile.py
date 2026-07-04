@@ -141,14 +141,26 @@ class Tile(object):
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
                 # Download
+                total = len(divisions) * len(divisions[0])
+                current = 1
+                errors = 0
+                failures = []
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        image_service.download(
+                        print(f'Downloading image {current:2}/{total:2}...', end='')
+                        exception, done = image_service.download(
                             Path(cache) / f'{self.index}-{line}-{cell}.png',
                             divisions[line][cell],
                             2**download_res
                         )
-                #image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+                        current += 1
+                        if exception is not None:
+                            errors += 1
+                            if not done:
+                                failures.append((line, cell))
+                        else:
+                            print('\b'*26, end='')
+                print(f'Downloaded {self.index}.')
 
                 self._glue(path=Path(cache), base_name=str(self.index), lines=len(divisions), columns=len(divisions[0]))
 
@@ -156,7 +168,7 @@ class Tile(object):
                 if not path.is_dir():
                     path.mkdir(parents=True)
                 shutil.copy(Path(cache) / f'{self.index}.png', path)
-                print(f'Downloaded tile {self.index} into {path}.')
+                print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
                 print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
