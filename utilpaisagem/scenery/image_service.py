@@ -1,6 +1,6 @@
 from pathlib import Path
 from urllib import request
-from decimal import Decimal
+from numbers import Number
 from urllib.error import URLError, ContentTooShortError
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 
@@ -52,6 +52,7 @@ class ImageService(object):
         width, height = self._trim(coordinates, height)
 
         url = self._get_url(coordinates, width, height)
+        print(url)
 
         exception = None
         try:
@@ -70,7 +71,7 @@ class ImageService(object):
             return file
         if height > 2**MIN_RES:
             print('Retrying download with lower resolution...')
-            return self.download(file, coordinates, Decimal(height/2))
+            return self.download(file, coordinates, height/2)
         raise e
 
 class _ArcGIS(ImageService):

@@ -7,10 +7,7 @@ Constants (a tile is 0.125 degree high):
     RESOLUTIONS: resolution in meters/pixel, from 0.84 (16384 px) to 108 (128 px)
 """
 import math
-from decimal import Decimal
-from decimal import getcontext as decimal_context
-
-decimal_context().prec = 4
+from numbers import Number
 
 METER_RESOLUTION = 14 # One tile height has circa 13892 meters, thus 2**14 (16384 pixels)
 METER = 1/13892.375 # One meter converted to tile units
@@ -29,9 +26,8 @@ RESOLUTIONS = {
 MAX_RES = 14
 DOWNLOAD_RES = 10 # Preferred download resolution to compose high-res tiles
 MIN_RES = 7
-PI = Decimal(math.pi)
 
-def distance(lat1, lon1, lat2, lon2):
+def distance(lat1:Number, lon1:Number, lat2:Number, lon2:Number):
     """
     Returns the great-circle distance between two coordinates in kilometers.
 
@@ -41,41 +37,41 @@ def distance(lat1, lon1, lat2, lon2):
         lat2: latitude of coordinate 2
         lon2: latitude of coordinate 2
     """
-    lat1, lon1, lat2, lon2 = Decimal(lat1), Decimal(lon1), Decimal(lat2), Decimal(lon2)
-    r = Decimal(6378.137) # Radius of earth
-    d_lat = lat2 * PI / 180 - lat1 * PI / 180
-    d_lon = lon2 * PI / 180 - lon1 * PI / 180
-    a = Decimal(
-        math.sin(d_lat/2)**2 + math.cos(lat1 * PI / 180) \
-        * math.cos(lat2 * PI / 180) * math.sin(d_lon/2) ** 2
-    )
-    c = Decimal(2 * math.atan2(math.sqrt(a), math.sqrt(1-a)))
+    r = 6378.137 # Radius of earth
+    d_lat = lat2 * math.pi / 180 - lat1 * math.pi / 180
+    d_lon = lon2 * math.pi / 180 - lon1 * math.pi / 180
+    a = math.sin(d_lat/2)**2 + math.cos(lat1 * math.pi / 180) \
+        * math.cos(lat2 * math.pi / 180) * math.sin(d_lon/2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return r * c
 
 class Coordinates(object):
     """
     Class used to store tile coordinates.
     """
-    lat_top: Decimal
-    lat_bottom: Decimal
-    lon_left: Decimal
-    lon_right: Decimal
-    lat_median: Decimal
-    lon_median: Decimal
+    lat_top:Number
+    lat_bottom:Number
+    lon_left:Number
+    lon_right:Number
+    lat_median:Number
+    lon_median:Number
 
-    def __init__(self, lat1:Decimal, lat2:Decimal, lon1:Decimal, lon2:Decimal):
+    def __init__(self, lat1:Number, lat2:Number, lon1:Number, lon2:Number):
         if lat1 > lat2:
-            self.lat_top, self.lat_bottom = Decimal(lat1), Decimal(lat2)
+            self.lat_top, self.lat_bottom = lat1, lat2
         else:
-            self.lat_top, self.lat_bottom = Decimal(lat2), Decimal(lat1)
-        self.lat_median = Decimal((lat1 + lat2) / 2)
+            self.lat_top, self.lat_bottom = lat2, lat1
+        self.lat_median = (lat1 + lat2) / 2
         if lon1 < lon2:
-            self.lon_left, self.lon_right = Decimal(lon1), Decimal(lon2)
+            self.lon_left, self.lon_right = lon1, lon2
         else:
-            self.lon_left, self.lon_right = Decimal(lon2), Decimal(lon1)
-        self. lon_median = Decimal((lon1 + lon2) / 2)
+            self.lon_left, self.lon_right = lon2, lon1
+        self.lon_median = (lon1 + lon2) / 2
     
     def __str__(self):
         s = f"Latitude: {self.lat_top} to {self.lat_bottom} (median: {self.lat_median})\n"
         s = s + f"Longitude: {self.lon_left} to {self.lon_right} (median: {self.lon_median})"
         return s
+    
+    def __repr__(self):
+        return f'<Coordinates(lat1={self.lat_top}, lat2={self.lat_bottom}, lon1={self.lon_left}, lon2={self.lon_right})>'
