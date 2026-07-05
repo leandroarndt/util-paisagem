@@ -1,6 +1,7 @@
-from decimal import Decimal
+from numbers import Number
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
+from PIL import Image
 import math, tempfile, shutil
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
@@ -13,22 +14,22 @@ class Tile(object):
     # Index, coordinates and width based on
     # https://web.archive.org/web/20170526193251/http://fgphotoscenery.square7.ch/#howto
     
-    index: int
-    coordinates: Coordinates
+    index:int
+    coordinates:Coordinates
     resolution:int
 
-    def __init__(self, index:int=0, lat:Decimal=Decimal('NaN'), lon:Decimal=Decimal('NaN'), resolution:int=DOWNLOAD_RES):
+    def __init__(self, index:int=0, lat:Number=float('nan'), lon:Number=float('nan'), resolution:int=DOWNLOAD_RES):
         """
         New Tile object defined by either index or by coordinates.
         """
-        lat, lon = Decimal(lat), Decimal(lon)
-        if not index and (Decimal.is_nan(lat) or Decimal.is_nan(lon)):
+        if not index and (math.isnan(lat) or math.isnan(lon)):
             raise ValueError('Invalid parameters. Should be given either index or lat and lon.')
         if index:
             self.index = index
         else:
             self.index = Tile.coordinates_to_index(lat, lon)
         self.coordinates = Tile.index_to_coordinates(self.index)
+        self.proportion = (self.coordinates.lon_right - self.coordinates.lon_left) / 0.125 # Width / height
         if  MIN_RES <= resolution <= MAX_RES:
             self.resolution = resolution
         else:
@@ -38,36 +39,68 @@ class Tile(object):
         return f'<{self.__class__.__name__}(lat={self.coordinates.lat_median}, lon={self.coordinates.lon_median})>'
     
     def __hash__(self):
-        return self.index
+        return self.index * 100 + self.resolution
     
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.index == other.index
+            return self.index == other.index and self.resolution == other.resolution
         return False
 
-    # TODO
-    def _divide(self, n:int):
+    def _divide(self, image_service:ImageService, download_res:int) -> list:
         """
-        Subdivide a tile for download.
-        
+        Subdivide a tile for download based on image_service's maximum resolution
+        and default download resolution. Each resulting cell will have at most
+        default resolution height and image services's maximum resolution width.
+
+        Arguments:
+            image_service(ImageService): an object with max_size as resolution limit
+            download_res: the exponent of two of the resolution (e.g. 1024 = 2**10;
+                download_res will be 10)
+
         Returns:
-            tuple: a tuple of tuples withcoordinate quadrants
-                ((lat1, lat2, lon1, lon2), (lat1, lat2, lon1, lon2), ...).
+            list: a list of lists of Coordinate objects in an xy grid
+                ((coord1x1, coord1x2 ...), (coord2x1, coord2x2 ...), ...)
         """
-        pass
+        if download_res > self.resolution: download_res = self.resolution
+        vertical = 2 ** (self.resolution - download_res)
+        full_width = self.proportion * 2**self.resolution # Full image width
+        if full_width / vertical > image_service.max_size:
+            horizontal = int(full_width // image_service.max_size)
+        else:
+            horizontal = vertical
+        print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
+        height = 0.125 / vertical
+        if self.coordinates.lat_top <= 0:
+            height = -height
+        width = (self.coordinates.lon_right - self.coordinates.lon_left) / horizontal
+        return [[Coordinates (
+            lat1=self.coordinates.lat_top + y*height,
+            lon1=self.coordinates.lon_left + x*width,
+            lat2=self.coordinates.lat_top + y*height + height,
+            lon2=self.coordinates.lon_left + x*width + width
+            ) for x in range(horizontal)] for y in range(vertical)]
 
     # TODO
-    def _glue(self, path:Path) -> tuple:
+    def _glue(self, path:Path, base_name:str, lines:int, columns:int, size:[tuple,list]) -> tuple:
         """
         Join images into a single file.
         
         Args:
-            path (Path): path to the orthophotos folder, including it.
+            path(Path): path to the orthophotos folder, including it.
+            base_name(str): base of the file name.
+            lines(int): number of image lines.
+            columns: number of image columns.
+            size: image size (integer width x height)
         """
-        pass
+        result = Image.new('RGB', size)
+        for line in range(lines):
+            for column in range(columns):
+                with Image.open(path / f'{base_name}-{line}-{column}.png') as image:
+                    result.paste(image, (int(size[0]/columns*column), int(size[1]/lines*line)))
+        result.save(path / f'{base_name}.png')
 
     # TODO
-    def retrieve(self, path:Path, image_service:ImageService, compress=False):
+    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress=False):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -75,8 +108,8 @@ class Tile(object):
         
         Args:
             path (Path): path to the orthophotos folder, including it.
-            lat (Decimal): a latitude at the tile.
-            lon (Decimal): a longitude at the tile.
+            lat (Number): a latitude at the tile.
+            lon (Number): a longitude at the tile.
             image_service (ImagerService): image downloader
             threads (int): downloading threads
         """
@@ -100,20 +133,52 @@ class Tile(object):
             # attempt to sanitize download errors (TODO)
             # glue (TODO)
             # compress (TODO)
+        print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
+        divisions = self._divide(image_service, download_res)
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
-                image_service.download(Path(cache) / f'{self.index}.png', self.coordinates, 2**self.resolution)
+                # Download
+                total = len(divisions) * len(divisions[0])
+                current = 1
+                errors = 0
+                failures = []
+                for line in range(len(divisions)):
+                    for cell in range(len(divisions[line])):
+                        print(f'Downloading image {current:03}/{total:03}...', end='', flush=True)
+                        exception, done = image_service.download(
+                            Path(cache) / f'{self.index}-{line}-{cell}.png',
+                            divisions[line][cell],
+                            2**download_res
+                        )
+                        current += 1
+                        if exception is not None:
+                            errors += 1
+                            if not done:
+                                failures.append((line, cell))
+                        else:
+                            print('\b'*28, end='', flush=True)
+                print(f'Downloaded tile {self.index}.     ')
+
+                self._glue(
+                    path=Path(cache),
+                    base_name=str(self.index),
+                    lines=len(divisions),
+                    columns=len(divisions[0]),
+                    size=(int(2**self.resolution*self.proportion), int(2**self.resolution))
+                )
+
+                #Move
                 if not path.is_dir():
                     path.mkdir(parents=True)
                 shutil.copy(Path(cache) / f'{self.index}.png', path)
-                print(f'Downloaded tile {self.index} into {path}.')
+                print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
-                print(f'Error downloading tile {self.index}: {e}. Will retry with reduced resolution.')
-                self.resolution -= 1
-                self.retrieve(path, image_service, compile, threads)
+                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                #self.resolution -= 1
+                #self.retrieve(path, image_service, download_res-1, compress)
             else:
-                print(f'Error downloading tile {self.index}: {e}.')
+                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
                 # TODO: download wider area and crop; use neighboring image, if any
 
     @classmethod
@@ -125,7 +190,7 @@ class Tile(object):
         width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[88,8],[89,360],[90,360]]
         for i in range(len(width_table)):
             if abs(lat)>=width_table[i][0] and abs(lat)<width_table[i+1][0]:
-                return Decimal(width_table[i][1])
+                return width_table[i][1]
 
     @classmethod
     def index_to_coordinates(cls, tile_index):
@@ -136,7 +201,7 @@ class Tile(object):
             tile_index (int): scenery tile index
 
         Returns:
-            list: coordinate values as [lat1, lat2, lon1, lon2, middle_lat, middle_lon]
+            Coordinates instance
         """
         base_x    = (tile_index>>14) - 180
         base_y    = ((tile_index-((base_x+180)<<14)) >>6) - 90
@@ -144,14 +209,14 @@ class Tile(object):
         x         =  tile_index-(((((base_x+180)<<14)+ ((base_y+90) << 6))) + (y << 3))
         tile_width = cls.tile_width(base_y)
         return Coordinates(
-            (base_y + 0.125 * y),
-            base_y + 0.125 * (y+1),
-            base_x + x * tile_width,
-            base_x + (x+1) * tile_width
+            lat1=(base_y + 0.125 * y),
+            lat2=base_y + 0.125 * (y+1),
+            lon1=base_x + x * tile_width,
+            lon2=base_x + (x+1) * tile_width
         )
     
     @classmethod
-    def coordinates_to_index(cls, lat:Decimal, lon:Decimal):
+    def coordinates_to_index(cls, lat:Number, lon:Number):
         """Converts a coordinate pair into a FlightGear scenery tile index.
 
         Args:

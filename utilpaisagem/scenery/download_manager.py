@@ -4,7 +4,7 @@ Manages download jobs:
   - manage tiles to retrieve
 """
 from pathlib import Path
-from decimal import Decimal
+from numbers import Number
 from utilpaisagem.scenery.image_service import IMAGE_SERVICES, ImageService
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.common import Coordinates, distance
@@ -16,13 +16,13 @@ class DownloadManager(object):
     Attributes:
         queue(list): list of tile indexes to download
         radius(int): range in kilometers of photo scenery to download
-        center_lat(Decimal): center latitude
-        center_lon(Decimal): center longitude
+        center_lat(Number): center latitude
+        center_lon(Number): center longitude
     """
     queue:list
     radius:int
-    center_lat:Decimal
-    center_lon:Decimal
+    center_lat:Number
+    center_lon:Number
 
     def __init__(self, center_lat, center_lon, radius=50):
         self.queue = []
@@ -42,14 +42,14 @@ class DownloadManager(object):
             self.queue.pop(tile)
         self.queue.insert(order, tile)
         
-    def recenter(self, lat:Decimal, lon:Decimal):
+    def recenter(self, lat:Number, lon:Number):
         """
         Recenters the download manager, attributing greater priority to
         the new center and its adjacent tiles.
 
         Arguments:
-            lat(Decimal): new center latitude
-            lon(Decimal): new center longitude
+            lat(Number): new center latitude
+            lon(Number): new center longitude
         """
         self.center_lat, self.center_lon = lat, lon
         center_tile = Tile(lat=lat, lon=lon)
@@ -59,8 +59,8 @@ class DownloadManager(object):
         todo = [center_tile]
         while todo:
             current = todo[0]
-            dif_lat = Decimal(0.07) # Another tile from the center
-            dif_lon = abs(current.coordinates.lon_left - current.coordinates.lon_median) + Decimal(0.01)
+            dif_lat = 0.07 # Another tile from the center
+            dif_lon = abs(current.coordinates.lon_left - current.coordinates.lon_median) + 0.01
             for m in ((-1,0), (0,1), (1,0), (0, -1)):
                 next_lat = current.coordinates.lat_median + m[0] * dif_lat
                 next_lon = current.coordinates.lon_median + m[1] * dif_lon

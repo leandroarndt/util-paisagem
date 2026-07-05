@@ -1,7 +1,8 @@
 from pathlib import Path
 from urllib import request
+from numbers import Number
 from urllib.error import URLError, ContentTooShortError
-from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES
+from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 
 class ImageService(object):
     """
@@ -14,7 +15,7 @@ class ImageService(object):
     description:str
     license_link:str
     availability_area:str
-    max_size:int = DOWNLOAD_RES
+    max_size:int = 2**DOWNLOAD_RES
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int):
         """
@@ -35,7 +36,7 @@ class ImageService(object):
             height = height * self.max_size / width
             width = self.max_size
         
-        return width, height
+        return int(width), int(height)
 
     def download(self, file:Path, coordinates:Coordinates, height:int):
         """
@@ -52,15 +53,25 @@ class ImageService(object):
 
         url = self._get_url(coordinates, width, height)
 
+        exception = None
         try:
             response = request.urlretrieve(url, filename=file)
             assert response[1]['Content-Type'] == 'image/png'
         except URLError as e:
+            exception = e
             print('URLError:', e)
-        except ContentTooShortError:
+        except ContentTooShortError as e:
+            exception = e
             print(f'Content too short: "{url}" did not return its full contents.')
-        except AssertionError:
+        except AssertionError as e:
+            exception = e
             print(f'Failed to download PNG image from "{url}" into "{file}".')
+        else:
+            return None, True
+        if height > 2**MIN_RES:
+            print('Retrying download with lower resolution...')
+            return exception, self.download(file, coordinates, height/2)[1]
+        return exception, False
 
 class _ArcGIS(ImageService):
     def __init__(self):
@@ -70,7 +81,7 @@ class _ArcGIS(ImageService):
         self.max_size = 4096
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
-        return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&size={width},{height}&format=png24&f=image'
+        return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&imageSR=4326&size={width},{height}&format=png24&f=image'
 
 # There is no need for a singleton. This dictionary is only a centralized place
 # for image service classes stored along with their names. This may facilitate
