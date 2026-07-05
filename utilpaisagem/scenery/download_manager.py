@@ -5,9 +5,10 @@ Manages download jobs:
 """
 from pathlib import Path
 from numbers import Number
+from collections import OrderedDict
 from utilpaisagem.scenery.image_service import IMAGE_SERVICES, ImageService
 from utilpaisagem.scenery.tile import Tile
-from utilpaisagem.scenery.common import Coordinates, distance
+from utilpaisagem.scenery.common import Coordinates, distance, DOWNLOAD_RES, MIN_RES
 
 class DownloadManager(object):
     """
@@ -23,10 +24,18 @@ class DownloadManager(object):
     radius:int
     center_lat:Number
     center_lon:Number
+    resolutions:dict
 
-    def __init__(self, center_lat, center_lon, radius=50):
+    def __init__(
+        self,
+        center_lat,
+        center_lon,
+        radius=50,
+        resolutions={8: DOWNLOAD_RES+2, 20: DOWNLOAD_RES+1, 40075017: DOWNLOAD_RES}
+    ):
         self.queue = []
         self.radius = radius
+        self.resolutions = resolutions
         self.recenter(center_lat, center_lon)
 
     def add(self, tile:Tile, order:int):
@@ -64,8 +73,13 @@ class DownloadManager(object):
             for m in ((-1,0), (0,1), (1,0), (0, -1)):
                 next_lat = current.coordinates.lat_median + m[0] * dif_lat
                 next_lon = current.coordinates.lon_median + m[1] * dif_lon
-                if distance(lat, lon, next_lat, next_lon) <= self.radius:
-                    next_tile = Tile(lat=next_lat, lon=next_lon)
+                dist = distance(lat, lon, next_lat, next_lon)
+                if dist <= self.radius:
+                    res = MIN_RES
+                    for d, r in self.resolutions.items():
+                        if dist <= d and r > res:
+                            res = r
+                    next_tile = Tile(lat=next_lat, lon=next_lon, resolution=res)
                     if next_tile not in done and next_tile not in todo:
                         todo.append(next_tile)
                     if next_tile not in self.queue:
@@ -74,7 +88,7 @@ class DownloadManager(object):
             done.append(todo[0])
             todo.pop(0)
 
-    def download_next(self, path:Path, image_service:ImageService):
+    def download_next(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart'):
         """
         Downloads next queued tile into `path` using `downloader`.
 
@@ -83,5 +97,5 @@ class DownloadManager(object):
             image_service(ImageService): image service from which to download the tile.
         """
         tile:Tile = self.queue.pop(0)
-        tile.retrieve(path, image_service)
+        tile.retrieve(path=path, image_service=image_service, download_res=download_res, compress=compress)
 

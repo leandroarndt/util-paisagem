@@ -145,7 +145,7 @@ class Tile(object):
 
         # Verify if exists, resolution is equal or higher and there were no failures
         logpath = Path(path / f'{self.index}.log')
-        if logpath.exists:
+        if logpath.exists():
             log = configparser.ConfigParser()
             log.read(logpath)
             try:
@@ -165,13 +165,16 @@ class Tile(object):
                     print('Previous download was not found where expected. Downloading again.')
                     raise AssertionError
                 print(f'Tile {self.index} has already been downloaded. Skipping.')
+                Path(path / f"{self.index}.{log['INFO']['format']}").touch(exist_ok=True)
                 return # skips processing if everything is fine
             except (AssertionError, ValueError, KeyError, FileNotFoundError) as e:
                 if not isinstance(e, AssertionError):
                     print(f'Failed to check previous download ("{e}"). Downloading again.')
                 # Remove previously downloaded file
-                if Path(path / f"{self.index}.{log['INFO']['format']}").exists():
-                    Path(path / f"{self.index}.{log['INFO']['format']}").unlink()
+                if Path(path / f'{self.index}.png').exists():
+                    Path(path / f'{self.index}.png').unlink()
+                if Path(path / f'{self.index}.dds').exists():
+                    Path(path / f'{self.index}.dds').unlink()
 
         # Download
         divisions = self._divide(image_service, download_res)
