@@ -29,6 +29,7 @@ class Tile(object):
         else:
             self.index = Tile.coordinates_to_index(lat, lon)
         self.coordinates = Tile.index_to_coordinates(self.index)
+        self.proportion = (self.coordinates.lon_right - self.coordinates.lon_left) / 0.125 # Width / height
         if  MIN_RES <= resolution <= MAX_RES:
             self.resolution = resolution
         else:
@@ -62,9 +63,7 @@ class Tile(object):
         """
         if download_res > self.resolution: download_res = self.resolution
         vertical = 2 ** (self.resolution - download_res)
-        tw = self.coordinates.lon_right - self.coordinates.lon_left # This tile width
-        proportion = tw / 0.125 # Width / height
-        full_width = proportion * 2**self.resolution # Full image width
+        full_width = self.proportion * 2**self.resolution # Full image width
         if full_width / vertical > image_service.max_size:
             horizontal = int(full_width // image_service.max_size)
         else:
@@ -73,7 +72,7 @@ class Tile(object):
         height = 0.125 / vertical
         if self.coordinates.lat_top <= 0:
             height = -height
-        width = tw / horizontal
+        width = (self.coordinates.lon_right - self.coordinates.lon_left) / horizontal
         return [[Coordinates (
             lat1=self.coordinates.lat_top + y*height,
             lon1=self.coordinates.lon_left + x*width,
@@ -82,7 +81,7 @@ class Tile(object):
             ) for x in range(horizontal)] for y in range(vertical)]
 
     # TODO
-    def _glue(self, path:Path, base_name:str, lines:int, columns:int) -> tuple:
+    def _glue(self, path:Path, base_name:str, lines:int, columns:int, size:[tuple,list]) -> tuple:
         """
         Join images into a single file.
         
@@ -91,15 +90,13 @@ class Tile(object):
             base_name(str): base of the file name.
             lines(int): number of image lines.
             columns: number of image columns.
+            size: image size (integer width x height)
         """
-        with Image.open(path / f'{base_name}-0-0.png') as first:
-            cell_size = first.size
-        dimensions = (cell_size[1] * columns, cell_size[0] * lines)
-        result = Image.new('RGB', dimensions)
+        result = Image.new('RGB', size)
         for line in range(lines):
             for column in range(columns):
                 with Image.open(path / f'{base_name}-{line}-{column}.png') as image:
-                    result.paste(image, (dimensions[1]*column, dimensions[0]*line))
+                    result.paste(image, (int(size[0]/columns*column), int(size[1]/lines*line)))
         result.save(path / f'{base_name}.png')
 
     # TODO
@@ -147,7 +144,7 @@ class Tile(object):
                 failures = []
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        print(f'Downloading image {current:2}/{total:2}...', end='')
+                        print(f'Downloading image {current:03}/{total:03}...', end='', flush=True)
                         exception, done = image_service.download(
                             Path(cache) / f'{self.index}-{line}-{cell}.png',
                             divisions[line][cell],
@@ -159,10 +156,16 @@ class Tile(object):
                             if not done:
                                 failures.append((line, cell))
                         else:
-                            print('\b'*26, end='')
-                print(f'Downloaded {self.index}.')
+                            print('\b'*28, end='', flush=True)
+                print(f'Downloaded tile {self.index}.     ')
 
-                self._glue(path=Path(cache), base_name=str(self.index), lines=len(divisions), columns=len(divisions[0]))
+                self._glue(
+                    path=Path(cache),
+                    base_name=str(self.index),
+                    lines=len(divisions),
+                    columns=len(divisions[0]),
+                    size=(int(2**self.resolution*self.proportion), int(2**self.resolution))
+                )
 
                 #Move
                 if not path.is_dir():
