@@ -2,7 +2,7 @@ from numbers import Number
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
 from PIL import Image
-import math, tempfile, shutil, os
+import math, tempfile, shutil, os, configparser, ast
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
@@ -142,14 +142,46 @@ class Tile(object):
             # glue
             # compress
         print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
+
+        # Verify if exists, resolution is equal or higher and there were no failures
+        logpath = Path(path / f'{self.index}.log')
+        if logpath.exists:
+            log = configparser.ConfigParser()
+            log.read(logpath)
+            try:
+                if int(log['INFO']['resolution']) < self.resolution:
+                    print('Previously downloaded file has smaller resolution. Downloading again.')
+                    raise AssertionError
+                if log['INFO']['success'] != 'True' or ast.literal_eval(log['INFO']['failures']) != []:
+                    print('Failure on previous download. Downloading again.')
+                    raise AssertionError
+                if compress != 'smart':
+                    if log['INFO']['format'] != compress:
+                        print(f'Tile {self.index} has not been saved as a {compress.upper()} file. Downloading again.')
+                        Path(path / f'{self.index}.{log["INFO"]["format"]}').unlink()
+                        raise AssertionError
+                if not Path(path / f"{self.index}.{log['INFO']['format']}").exists():
+                    print(Path(path / f"{self.index}.{log['INFO']['format']}"))
+                    print('Previous download was not found where expected. Downloading again.')
+                    raise AssertionError
+                print(f'Tile {self.index} has already been downloaded. Skipping.')
+                return # skips processing if everything is fine
+            except (AssertionError, ValueError, KeyError, FileNotFoundError) as e:
+                if not isinstance(e, AssertionError):
+                    print(f'Failed to check previous download ("{e}"). Downloading again.')
+                # Remove previously downloaded file
+                if Path(path / f"{self.index}.{log['INFO']['format']}").exists():
+                    Path(path / f"{self.index}.{log['INFO']['format']}").unlink()
+
+        # Download
         divisions = self._divide(image_service, download_res)
+        errors = 0
+        failures = []
         try:
             with tempfile.TemporaryDirectory(prefix='util-paisagem-') as cache:
                 # Download
                 total = len(divisions) * len(divisions[0])
                 current = 1
-                errors = 0
-                failures = []
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
                         text = f'Downloading image {current}/{total}...'
@@ -182,6 +214,20 @@ class Tile(object):
                     path.mkdir(parents=True)
                 shutil.copy(filename, path)
                 print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+
+                # Write log
+                log = configparser.ConfigParser()
+                log['INFO'] = {
+                    'resolution': self.resolution,
+                    'format': filename.suffix[1:],
+                    'success': errors == 0,
+                    'lines': len(divisions),
+                    'columns': len(divisions[0]),
+                    'failures': failures,
+                }
+                with open(path / f'{self.index}.log', 'w') as logfile:
+                    log.write(logfile)
+
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
                 print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
