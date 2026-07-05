@@ -2,7 +2,7 @@ from numbers import Number
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
 from PIL import Image
-import math, tempfile, shutil
+import math, tempfile, shutil, os
 
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
@@ -80,10 +80,9 @@ class Tile(object):
             lon2=self.coordinates.lon_left + x*width + width
             ) for x in range(horizontal)] for y in range(vertical)]
 
-    # TODO
-    def _glue(self, path:Path, base_name:str, lines:int, columns:int, size:[tuple,list]) -> tuple:
+    def _glue(self, path:Path, base_name:str, lines:int, columns:int, size:[tuple,list], compress='smart') -> Path:
         """
-        Join images into a single file.
+        Join images into a single file. Returns path to file.
         
         Args:
             path(Path): path to the orthophotos folder, including it.
@@ -92,15 +91,25 @@ class Tile(object):
             columns: number of image columns.
             size: image size (integer width x height)
         """
-        result = Image.new('RGB', size)
+        result:Image = Image.new('RGB', size)
         for line in range(lines):
             for column in range(columns):
                 with Image.open(path / f'{base_name}-{line}-{column}.png') as image:
                     result.paste(image, (int(size[0]/columns*column), int(size[1]/lines*line)))
-        result.save(path / f'{base_name}.png')
+        if compress == 'smart' or compress == 'png':
+            filename = path / f'{base_name}.png'
+            result.save(path / f'{base_name}.png', optimize = True)
+            if compress == 'smart' and os.path.getsize(filename) > result.size[0] * result.size[1] * 3 / 6: # DXT1 has a 6:1 compression ratio
+                compress = 'dds'
+                print('DDS is smaller than optimized PNG.')
+            elif compress == 'smart':
+                print('Optimized PNG is smaller than DDS.')
+        if compress == 'dds':
+            filename = path / f'{base_name}.dds'
+            result.save(filename, pixel_format='DXT1')
+        return Path(filename)
 
-    # TODO
-    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress=False):
+    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart'):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -108,10 +117,9 @@ class Tile(object):
         
         Args:
             path (Path): path to the orthophotos folder, including it.
-            lat (Number): a latitude at the tile.
-            lon (Number): a longitude at the tile.
             image_service (ImagerService): image downloader
-            threads (int): downloading threads
+            download_res(int): exponent of two representing vertical image size
+            compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
         """
         # Path directions
         if self.coordinates.lat_median > 0:
@@ -128,11 +136,11 @@ class Tile(object):
             f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom))}')
         # Ok? Touch it.
         # Else:
-            # divide(TODO)
+            # divide
             # download parts
-            # attempt to sanitize download errors (TODO)
-            # glue (TODO)
-            # compress (TODO)
+            # attempt to sanitize download errors (partially TODO)
+            # glue
+            # compress
         print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
         divisions = self._divide(image_service, download_res)
         try:
@@ -144,7 +152,8 @@ class Tile(object):
                 failures = []
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        print(f'Downloading image {current:03}/{total:03}...', end='', flush=True)
+                        text = f'Downloading image {current}/{total}...'
+                        print(text, end='', flush=True)
                         exception, done = image_service.download(
                             Path(cache) / f'{self.index}-{line}-{cell}.png',
                             divisions[line][cell],
@@ -156,21 +165,22 @@ class Tile(object):
                             if not done:
                                 failures.append((line, cell))
                         else:
-                            print('\b'*28, end='', flush=True)
+                            print('\b'*len(text), end='', flush=True)
                 print(f'Downloaded tile {self.index}.     ')
 
-                self._glue(
+                filename = self._glue(
                     path=Path(cache),
                     base_name=str(self.index),
                     lines=len(divisions),
                     columns=len(divisions[0]),
-                    size=(int(2**self.resolution*self.proportion), int(2**self.resolution))
+                    size=(int(2**self.resolution*self.proportion), int(2**self.resolution)),
+                    compress=compress
                 )
 
                 #Move
                 if not path.is_dir():
                     path.mkdir(parents=True)
-                shutil.copy(Path(cache) / f'{self.index}.png', path)
+                shutil.copy(filename, path)
                 print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
