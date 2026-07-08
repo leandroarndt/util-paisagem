@@ -1,11 +1,12 @@
 from numbers import Number
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
+from queue import Queue
 from PIL import Image
 import math, tempfile, shutil, os, configparser, ast
-
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
+from utilpaisagem.gui.common import format_log
 
 class Tile(object):
     """
@@ -17,11 +18,21 @@ class Tile(object):
     index:int
     coordinates:Coordinates
     resolution:int
+    upstream_queue:Queue|None
 
-    def __init__(self, index:int=0, lat:Number=float('nan'), lon:Number=float('nan'), resolution:int=DOWNLOAD_RES):
+    def __init__(
+        self,
+        index:int=0,
+        lat:Number=float('nan'),
+        lon:Number=float('nan'), 
+        resolution:int=DOWNLOAD_RES,
+        upstream_queue:Queue|None=None,
+    ):
         """
         New Tile object defined by either index or by coordinates.
         """
+        self.upstream_queue = upstream_queue
+
         if not index and (math.isnan(lat) or math.isnan(lon)):
             raise ValueError('Invalid parameters. Should be given either index or lat and lon.')
         if index:
@@ -68,7 +79,15 @@ class Tile(object):
             horizontal = int(full_width // image_service.max_size)
         else:
             horizontal = vertical
-        print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
+        if self.upstream_queue is None:
+            print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
+        else:
+            self.upstream_queue.put_nowait(format_log(
+                    _('Dividing tile in {vertical} lines and {horizontal} columns.').format(
+                    vertical=vertical,
+                    horizontal=horizontal
+                ), self)
+            )
         height = 0.125 / vertical
         if self.coordinates.lat_top <= 0:
             height = -height
@@ -101,15 +120,27 @@ class Tile(object):
             result.save(path / f'{base_name}.png', optimize = True)
             if compress == 'smart' and os.path.getsize(filename) > result.size[0] * result.size[1] * 3 / 6: # DXT1 has a 6:1 compression ratio
                 compress = 'dds'
-                print('DDS is smaller than optimized PNG.')
+                if self.upstream_queue is None:
+                    print('DDS is smaller than optimized PNG.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('DDS is smaller than optimized PNG.'),
+                        self
+                    ))
             elif compress == 'smart':
-                print('Optimized PNG is smaller than DDS.')
+                if self.upstream_queue is None:
+                    print('Optimized PNG is smaller than DDS.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Optimized PNG is smaller than DDS.'),
+                        self
+                    ))
         if compress == 'dds':
             filename = path / f'{base_name}.dds'
             result.save(filename, pixel_format='DXT1')
         return Path(filename)
 
-    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart'):
+    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart', upstream_queue:Queue=None):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -141,7 +172,17 @@ class Tile(object):
             # attempt to sanitize download errors (partially TODO)
             # glue
             # compress
-        print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
+        if self.upstream_queue is None:
+            print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
+        else:
+            self.upstream_queue.put_nowait(format_log(
+                _('Processing tile {index} ({lat_median}, {lon_median})...').format(
+                    index=self.index,
+                    lat_median=self.coordinates.lat_median,
+                    lon_median=self.coordinates.lon_median,
+                ),
+                self
+            ))
 
         # Verify if exists, resolution is equal or higher and there were no failures
         logpath = Path(path / f'{self.index}.log')
@@ -150,26 +191,65 @@ class Tile(object):
             log.read(logpath)
             try:
                 if int(log['INFO']['resolution']) < self.resolution:
-                    print('Previously downloaded file has smaller resolution. Downloading again.')
+                    if self.upstream_queue is None:
+                        print('Previously downloaded file has smaller resolution. Downloading again.')
+                    else:
+                        self.upstream_queue.put_nowait(format_log(
+                            _('Previously downloaded file has smaller resolution. Downloading again.'),
+                            self
+                        ))
                     raise AssertionError
                 if log['INFO']['success'] != 'True' or ast.literal_eval(log['INFO']['failures']) != []:
-                    print('Failure on previous download. Downloading again.')
+                    if self.upstream_queue is None:
+                        print('Failure on previous download. Downloading again.')
+                    else:
+                        self.upstream_queue.put_nowait(format_log(
+                            _('Failure on previous download. Downloading again.'),
+                            self
+                        ))
                     raise AssertionError
                 if compress != 'smart':
                     if log['INFO']['format'] != compress:
-                        print(f'Tile {self.index} has not been saved as a {compress.upper()} file. Downloading again.')
+                        if self.upstream_queue is None:
+                            print(f'Tile {self.index} has not been saved as a {compress.upper()} file. Downloading again.')
+                        else:
+                            self.upstream_queue.put_nowait(format_log(
+                                _('Tile {index} has not been saved as a {format} file. Downloading again.').format(
+                                    index=self.index,
+                                    format=compress.upper(),
+                                ),
+                                self
+                            ))
                         Path(path / f'{self.index}.{log["INFO"]["format"]}').unlink()
                         raise AssertionError
                 if not Path(path / f"{self.index}.{log['INFO']['format']}").exists():
-                    print(Path(path / f"{self.index}.{log['INFO']['format']}"))
-                    print('Previous download was not found where expected. Downloading again.')
+                    p = (Path(path / f"{self.index}.{log['INFO']['format']}"))
+                    if self.upstream_queue is None:
+                        print('Previous download was not found where expected ("{p}"). Downloading again.')
+                    else:
+                        self.upstream_queue.put_nowait(format_log(
+                            _('Previous download was not found where expected ("{p}"). Downloading again.').format(p=p),
+                            self
+                        ))
                     raise AssertionError
-                print(f'Tile {self.index} has already been downloaded. Skipping.')
+                if self.upstream_queue is None:
+                    print(f'Tile {self.index} has already been downloaded. Skipping.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Tile {index} has already been downloaded. Skipping.').format(index=self.index),
+                        self
+                    ))
                 Path(path / f"{self.index}.{log['INFO']['format']}").touch(exist_ok=True)
                 return # skips processing if everything is fine
             except (AssertionError, ValueError, KeyError, FileNotFoundError) as e:
                 if not isinstance(e, AssertionError):
-                    print(f'Failed to check previous download ("{e}"). Downloading again.')
+                    if self.upstream_queue is None:
+                        print(f'Failed to check previous download ("{e}"). Downloading again.')
+                    else:
+                        self.upstream_queue.put_nowait(format_log(
+                            _('Failed to check previous download ("{e}"). Downloading again.').format(e=e),
+                            self
+                        ))
                 # Remove previously downloaded file
                 if Path(path / f'{self.index}.png').exists():
                     Path(path / f'{self.index}.png').unlink()
@@ -187,8 +267,17 @@ class Tile(object):
                 current = 1
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        text = f'Downloading image {current}/{total}...'
-                        print(text, end='', flush=True)
+                        if self.upstream_queue is None:
+                            text = f'Downloading image {current}/{total}...'
+                            print(text, end='', flush=True)
+                        else:
+                            self.upstream_queue.put_nowait(format_log(
+                                _('Downloading image {current}/{total}...').format(
+                                    current=current,
+                                    total=total
+                                ),
+                                self
+                            ))
                         exception, done = image_service.download(
                             Path(cache) / f'{self.index}-{line}-{cell}.png',
                             divisions[line][cell],
@@ -199,9 +288,15 @@ class Tile(object):
                             errors += 1
                             if not done:
                                 failures.append((line, cell))
-                        else:
+                        elif not self.upstream_queue:
                             print('\b'*len(text), end='', flush=True)
-                print(f'Downloaded tile {self.index}.     ')
+                if self.upstream_queue is None:
+                    print(f'Downloaded tile {self.index}.     ')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Downloaded tile {index}.').format(index=self.index),
+                        self
+                    ))
 
                 filename = self._glue(
                     path=Path(cache),
@@ -216,7 +311,16 @@ class Tile(object):
                 if not path.is_dir():
                     path.mkdir(parents=True)
                 shutil.copy(filename, path)
-                print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                if self.upstream_queue is None:
+                    print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Tile {index}\'s photographic scenery placed at {path}.').format(
+                            index=self.index,
+                            path=path
+                        ),
+                        self
+                    ))
 
                 # Write log
                 log = configparser.ConfigParser()
@@ -233,11 +337,33 @@ class Tile(object):
 
         except (URLError, ContentTooShortError) as e:
             if self.resolution > MIN_RES:
-                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                if self.upstream_queue is None:
+                    print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Error downloading cell {index}[{line}][{cell}]: {e}.').format(
+                            index=self.index,
+                            line=line,
+                            cell=cell,
+                            e=e,
+                        ),
+                        self
+                    ))
                 #self.resolution -= 1
                 #self.retrieve(path, image_service, download_res-1, compress)
             else:
-                print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                if self.upstream_queue is None:
+                    print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
+                else:
+                    self.upstream_queue.put_nowait(format_log(
+                        _('Error downloading cell {index}[{line}][{cell}]: {e}.').format(
+                            index=self.index,
+                            line=line,
+                            cell=cell,
+                            e=e,
+                        ),
+                        self
+                    ))
                 # TODO: download wider area and crop; use neighboring image, if any
 
     @classmethod

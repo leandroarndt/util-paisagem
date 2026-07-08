@@ -5,7 +5,8 @@ Manages download jobs:
 """
 from pathlib import Path
 from numbers import Number
-from collections import OrderedDict
+#from collections import OrderedDict
+from queue import Queue
 from utilpaisagem.scenery.image_service import IMAGE_SERVICES, ImageService
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.common import Coordinates, distance, DOWNLOAD_RES, MIN_RES
@@ -25,14 +26,17 @@ class DownloadManager(object):
     center_lat:Number
     center_lon:Number
     resolutions:dict
+    upstream_queue:Queue|None
 
     def __init__(
         self,
         center_lat,
         center_lon,
         radius=50,
-        resolutions={8: DOWNLOAD_RES+2, 20: DOWNLOAD_RES+1, 40075017: DOWNLOAD_RES}
+        resolutions={8: DOWNLOAD_RES+2, 20: DOWNLOAD_RES+1, 40075017: DOWNLOAD_RES},
+        upstream_queue:Queue|None=None
     ):
+        self.upstream_queue = upstream_queue
         self.queue = []
         self.radius = radius
         self.resolutions = resolutions
@@ -48,8 +52,11 @@ class DownloadManager(object):
             order(int): tile place at the queue
         """
         if tile  in self.queue:
-            self.queue.pop(tile)
+            self.queue.pop(self.queue.index(tile))
         self.queue.insert(order, tile)
+    
+    def clear(self):
+        self.queue.clear()
         
     def recenter(self, lat:Number, lon:Number):
         """
@@ -79,7 +86,7 @@ class DownloadManager(object):
                     for d, r in self.resolutions.items():
                         if dist <= d and r > res:
                             res = r
-                    next_tile = Tile(lat=next_lat, lon=next_lon, resolution=res)
+                    next_tile = Tile(lat=next_lat, lon=next_lon, resolution=res, upstream_queue=self.upstream_queue)
                     if next_tile not in done and next_tile not in todo:
                         todo.append(next_tile)
                     if next_tile not in self.queue:

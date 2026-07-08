@@ -1,0 +1,115 @@
+# Portuguese translations for Útil paisagem.
+# Copyright (C) 2026 Leandro Arndt
+# This file is distributed under the same license as the Útil paisagem
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Útil paisagem VERSION\n"
+"Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
+"POT-Creation-Date: 2026-07-08 19:08-0300\n"
+"PO-Revision-Date: 2026-07-07 12:17-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: utilpaisagem/gui/agents.py:106
+msgid "Sucessfuly connected to Flightgear."
+msgstr "Conectado ao Flightgear com sucesso."
+
+#: utilpaisagem/gui/agents.py:115
+msgid "Could not receive coordinates info from Flightgear"
+msgstr "Não foi possível obter coordenadas do Flightgear"
+
+#: utilpaisagem/gui/agents.py:119
+#, python-brace-format
+msgid "Error while retrieving coordinates from flightgear (\"{e}\")"
+msgstr "Erro tentando obter coordenadas do Flightgear (\"{e}\")"
+
+#: utilpaisagem/gui/agents.py:125
+#, python-brace-format
+msgid "Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}"
+msgstr "A aeronave se encontra na latitude {lat:.02f} e longitude {lon:.02f}"
+
+#: utilpaisagem/gui/main.py:49
+msgid "Follow aircraft"
+msgstr "Seguir aeronave"
+
+#: utilpaisagem/gui/main.py:53
+msgid "Follow aircraft on Flightgear over telnet connection."
+msgstr "Seguir aeronave no Flightgear usando conexão telnet."
+
+#: utilpaisagem/scenery/tile.py:86
+#, python-brace-format
+msgid "Dividing tile in {vertical} lines and {horizontal} columns."
+msgstr "Dividindo o ladrilho em {vertical} linhas e {horizontal} colunas."
+
+#: utilpaisagem/scenery/tile.py:127
+msgid "DDS is smaller than optimized PNG."
+msgstr "O DDS é menor que o PNG otimizado."
+
+#: utilpaisagem/scenery/tile.py:135
+msgid "Optimized PNG is smaller than DDS."
+msgstr "O PNG otimizado é menor que o DDS."
+
+#: utilpaisagem/scenery/tile.py:179
+#, python-brace-format
+msgid "Processing tile {index} ({lat_median}, {lon_median})..."
+msgstr "Processando ladrilho {index} ({lat_median}, {lon_median})..."
+
+#: utilpaisagem/scenery/tile.py:198
+msgid "Previously downloaded file has smaller resolution. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:207
+msgid "Failure on previous download. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:217
+#, python-brace-format
+msgid "Tile {index} has not been saved as a {format} file. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:231
+#, python-brace-format
+msgid ""
+"Previous download was not found where expected (\"{p}\"). Downloading "
+"again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:239
+#, python-brace-format
+msgid "Tile {index} has already been downloaded. Skipping."
+msgstr "Ladrilho {index} já foi baixado. Pulando."
+
+#: utilpaisagem/scenery/tile.py:250
+#, python-brace-format
+msgid "Failed to check previous download (\"{e}\"). Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:275
+#, python-brace-format
+msgid "Downloading image {current}/{total}..."
+msgstr "Baixando imagem {current}/{total}..."
+
+#: utilpaisagem/scenery/tile.py:297
+#, python-brace-format
+msgid "Downloaded tile {index}."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:318
+#, python-brace-format
+msgid "Tile {index}'s photographic scenery placed at {path}."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:344 utilpaisagem/scenery/tile.py:359
+#, python-brace-format
+msgid "Error downloading cell {index}[{line}][{cell}]: {e}."
+msgstr ""
+
