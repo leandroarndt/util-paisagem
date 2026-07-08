@@ -241,6 +241,7 @@ class Tile(object):
                         self
                     ))
                 Path(path / f"{self.index}.{log['INFO']['format']}").touch(exist_ok=True)
+                Path(path / f"{self.index}.log").touch(exist_ok=True)
                 return # skips processing if everything is fine
             except (AssertionError, ValueError, KeyError, FileNotFoundError) as e:
                 if not isinstance(e, AssertionError):
