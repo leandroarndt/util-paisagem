@@ -40,16 +40,18 @@ class Downloader(object):
     idle_interval:int
     download_queue:Queue
     wait_queue:Queue
-    downloading:bool
+    current_downloads:int
+    max_downloads:int
 
-    def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, idle_interval:int=100):
+    def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, idle_interval:int=100, max_downloads:int=4):
         self.root = root
         self.upstream_queue = upstream_queue
         self.download_manager = download_manager
         self.interval = idle_interval
         self.download_queue = Queue()
         self.wait_queue = Queue()
-        self.downloading = False
+        self.current_downloads = 0
+        self.max_downloads = max_downloads
     
     def _download_thread(self):
         tile:Tile = self.download_queue.get()
@@ -61,12 +63,13 @@ class Downloader(object):
             self.root.after(100, self._wait_download)
         else:
             print(self.wait_queue.get_nowait())
-            self.downloading = False
+            self.current_downloads -= 1
             self._download_tiles()
 
     def _download_tiles(self):
-        if (not self.download_queue.empty()) and (not self.downloading):
-            self.dowloading = True
+        if (not self.download_queue.empty()) and self.current_downloads < self.max_downloads:
+            self.current_downloads += 1
+            print('Current downloads:', self.current_downloads)
             thread = Thread(target=self._download_thread)
             thread.start()
             self._wait_download()
