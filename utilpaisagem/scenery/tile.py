@@ -83,7 +83,8 @@ class Tile(object):
             print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
         else:
             self.upstream_queue.put_nowait(format_log(
-                    _('Dividing tile in {vertical} lines and {horizontal} columns.').format(
+                    _('Dividing tile {index} in {vertical} lines and {horizontal} columns.').format(
+                    index=self.index,
                     vertical=vertical,
                     horizontal=horizontal
                 ), self)
@@ -124,7 +125,7 @@ class Tile(object):
                     print('DDS is smaller than optimized PNG.')
                 else:
                     self.upstream_queue.put_nowait(format_log(
-                        _('DDS is smaller than optimized PNG.'),
+                        _('Tile {index}: DDS is smaller than optimized PNG.').format(index=self.index),
                         self
                     ))
             elif compress == 'smart':
@@ -132,7 +133,7 @@ class Tile(object):
                     print('Optimized PNG is smaller than DDS.')
                 else:
                     self.upstream_queue.put_nowait(format_log(
-                        _('Optimized PNG is smaller than DDS.'),
+                        _('Tile {index}: optimized PNG is smaller than DDS.'),
                         self
                     ))
         if compress == 'dds':
@@ -272,9 +273,10 @@ class Tile(object):
                             print(text, end='', flush=True)
                         else:
                             self.upstream_queue.put_nowait(format_log(
-                                _('Downloading image {current}/{total}...').format(
+                                _('Downloading image {current}/{total} of tile {index}...').format(
                                     current=current,
-                                    total=total
+                                    total=total,
+                                    index=self.index
                                 ),
                                 self
                             ))
