@@ -6,7 +6,7 @@ from PIL import Image
 import math, tempfile, shutil, os, configparser, ast
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
-from utilpaisagem.gui.common import format_log
+from utilpaisagem.gui.common import format_status
 
 class Tile(object):
     """
@@ -82,7 +82,7 @@ class Tile(object):
         if self.upstream_queue is None:
             print(f'Dividing tile in {vertical} lines and {horizontal} columns.')
         else:
-            self.upstream_queue.put_nowait(format_log(
+            self.upstream_queue.put_nowait(format_status(
                     _('Dividing tile {index} in {vertical} lines and {horizontal} columns.').format(
                     index=self.index,
                     vertical=vertical,
@@ -124,7 +124,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print('DDS is smaller than optimized PNG.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Tile {index}: DDS is smaller than optimized PNG.').format(index=self.index),
                         self
                     ))
@@ -132,7 +132,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print('Optimized PNG is smaller than DDS.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Tile {index}: optimized PNG is smaller than DDS.'),
                         self
                     ))
@@ -176,7 +176,7 @@ class Tile(object):
         if self.upstream_queue is None:
             print(f'Processing tile {self.index} ({self.coordinates.lat_median}, {self.coordinates.lon_median})...')
         else:
-            self.upstream_queue.put_nowait(format_log(
+            self.upstream_queue.put_nowait(format_status(
                 _('Processing tile {index} ({lat_median}, {lon_median})...').format(
                     index=self.index,
                     lat_median=self.coordinates.lat_median,
@@ -195,7 +195,7 @@ class Tile(object):
                     if self.upstream_queue is None:
                         print('Previously downloaded file has smaller resolution. Downloading again.')
                     else:
-                        self.upstream_queue.put_nowait(format_log(
+                        self.upstream_queue.put_nowait(format_status(
                             _('Previously downloaded file has smaller resolution. Downloading again.'),
                             self
                         ))
@@ -204,7 +204,7 @@ class Tile(object):
                     if self.upstream_queue is None:
                         print('Failure on previous download. Downloading again.')
                     else:
-                        self.upstream_queue.put_nowait(format_log(
+                        self.upstream_queue.put_nowait(format_status(
                             _('Failure on previous download. Downloading again.'),
                             self
                         ))
@@ -214,7 +214,7 @@ class Tile(object):
                         if self.upstream_queue is None:
                             print(f'Tile {self.index} has not been saved as a {compress.upper()} file. Downloading again.')
                         else:
-                            self.upstream_queue.put_nowait(format_log(
+                            self.upstream_queue.put_nowait(format_status(
                                 _('Tile {index} has not been saved as a {format} file. Downloading again.').format(
                                     index=self.index,
                                     format=compress.upper(),
@@ -228,7 +228,7 @@ class Tile(object):
                     if self.upstream_queue is None:
                         print('Previous download was not found where expected ("{p}"). Downloading again.')
                     else:
-                        self.upstream_queue.put_nowait(format_log(
+                        self.upstream_queue.put_nowait(format_status(
                             _('Previous download was not found where expected ("{p}"). Downloading again.').format(p=p),
                             self
                         ))
@@ -236,7 +236,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Tile {index} has already been downloaded. Skipping.').format(index=self.index),
                         self
                     ))
@@ -248,7 +248,7 @@ class Tile(object):
                     if self.upstream_queue is None:
                         print(f'Failed to check previous download ("{e}"). Downloading again.')
                     else:
-                        self.upstream_queue.put_nowait(format_log(
+                        self.upstream_queue.put_nowait(format_status(
                             _('Failed to check previous download ("{e}"). Downloading again.').format(e=e),
                             self
                         ))
@@ -273,7 +273,7 @@ class Tile(object):
                             text = f'Downloading image {current}/{total}...'
                             print(text, end='', flush=True)
                         else:
-                            self.upstream_queue.put_nowait(format_log(
+                            self.upstream_queue.put_nowait(format_status(
                                 _('Downloading image {current}/{total} of tile {index}...').format(
                                     current=current,
                                     total=total,
@@ -296,7 +296,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print(f'Downloaded tile {self.index}.     ')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Downloaded tile {index}.').format(index=self.index),
                         self
                     ))
@@ -317,7 +317,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Tile {index}\'s photographic scenery placed at {path}.').format(
                             index=self.index,
                             path=path
@@ -343,7 +343,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Error downloading cell {index}[{line}][{cell}]: {e}.').format(
                             index=self.index,
                             line=line,
@@ -358,7 +358,7 @@ class Tile(object):
                 if self.upstream_queue is None:
                     print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
                 else:
-                    self.upstream_queue.put_nowait(format_log(
+                    self.upstream_queue.put_nowait(format_status(
                         _('Error downloading cell {index}[{line}][{cell}]: {e}.').format(
                             index=self.index,
                             line=line,

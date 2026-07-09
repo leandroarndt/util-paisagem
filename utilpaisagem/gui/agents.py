@@ -8,7 +8,7 @@ from flightgear_python.fg_util import FGCommunicationError, FGConnectionError
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
-from utilpaisagem.gui.common import format_log
+from utilpaisagem.gui.common import format_status
 
 class UpstreamReader(object):
     log:str
@@ -108,10 +108,10 @@ class Follower(object):
         try:
             self.connection.connect() # Raises FGConnectionError if fails
         except FGConnectionError as e:
-            self.upstream_queue.put_nowait(format_log(_('Could not connect to Flightgear.'), self))
+            self.upstream_queue.put_nowait(format_status(_('Could not connect to Flightgear.'), self))
             raise e
         else:
-            self.upstream_queue.put_nowait(format_log(_('Sucessfuly connected to Flightgear.'), self))
+            self.upstream_queue.put_nowait(format_status(_('Sucessfuly connected to Flightgear.'), self))
     
     def follow(self):
         if not self.downstream_queue.is_shutdown:
@@ -120,17 +120,17 @@ class Follower(object):
                 lon = self.connection.get_prop('/position/longitude-deg')
             except FGCommunicationError: # Could not retrieve info from Flightgear
                 self.upstream_queue.put_nowait(
-                    format_log(_('Could not receive coordinates info from Flightgear'), self)
+                    format_status(_('Could not receive coordinates info from Flightgear'), self)
                 )
             except Exception as e:
                 self.upstream_queue.put_nowait(
-                    format_log(_('Error while retrieving coordinates from flightgear ("{e}")').format(exception=e))
+                    format_status(_('Error while retrieving coordinates from flightgear ("{e}")').format(exception=e))
                 )
                 self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=lat, lon=lon) # Update download manager center
                 self.upstream_queue.put_nowait(
-                    format_log(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
+                    format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
                 self.root.after(self.interval, self.follow)
 

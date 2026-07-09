@@ -7,7 +7,7 @@ from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_log
+from utilpaisagem.gui.common import format_status
 
 class MainWindow(object):
     # Útil paisagem things
