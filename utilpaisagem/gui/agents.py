@@ -11,18 +11,23 @@ from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.gui.common import format_status
 
 class UpstreamReader(object):
-    log:str
+    """
+    Reads the upstream queue and puts its content at the status bar.
+    """
     upstream_queue:Queue
     root:tk.Tk
     interval:int
+    status_var:tk.StringVar
 
-    def __init__(self, root:tk.Tk, upstream_queue:Queue, interval:int=100):
+    def __init__(self, root:tk.Tk, status_var:tk.StringVar, upstream_queue:Queue, interval:int=100):
         self.root = root
         self.upstream_queue = upstream_queue
         self.interval = interval
-        self.log = ''
+        self.status_var = status_var
+        self.status_var.set(_('Welcome to Útil paisagem'))
     
     def read(self):
+        msg = ''
         while not self.upstream_queue.empty():
             try:
                 msg = self.upstream_queue.get_nowait()
@@ -30,10 +35,15 @@ class UpstreamReader(object):
                 break
             self.log = self.log + msg + '\n'
             print(msg)
+        if msg:
+            self.status_var.set(msg)
         self.root.after(self.interval, self.read)
 
 # TODO
 class Downloader(object):
+    """
+    Manages download threads.
+    """
     root:tk.Tk
     upstream_queue:Queue
     download_manager:DownloadManager
