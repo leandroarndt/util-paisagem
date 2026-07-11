@@ -7,7 +7,7 @@ from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status
+from utilpaisagem.gui.common import format_status, Settings
 
 class MainWindow(object):
     """
@@ -17,6 +17,7 @@ class MainWindow(object):
     download_manager:DownloadManager
     connection:TelnetConnection
     downloader:Downloader
+    settings:Settings
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -41,10 +42,6 @@ class MainWindow(object):
         self.upstream_queue = Queue()
         self.tasks = {}
 
-        # Útil paisagem things
-        self.download_manager = DownloadManager(0,0, upstream_queue=self.upstream_queue)
-        self.download_manager.clear()
-
         # Create GUI
         self.resources_path = resources_path
         self.window = tk.Tk()
@@ -68,6 +65,19 @@ class MainWindow(object):
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
         self.status_bar = ttk.Label(self.window, textvariable=self.status_var)
         self.status_bar.grid(column=0, row=1, columnspan=2, sticky=tk.W)
+
+        # Settings
+        self.settings = Settings()
+
+        # Útil paisagem things
+        self.download_manager = DownloadManager(
+            center_lat=0,
+            center_lon=0,
+            radius=self.settings.radius,
+            resolutions=self.settings.distances,
+            upstream_queue=self.upstream_queue,
+            )
+        self.download_manager.clear()
 
         # Init upstream reader
         self.upstream_reader = UpstreamReader(self.window, self.status_var, self.upstream_queue, 100)
