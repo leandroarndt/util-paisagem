@@ -74,7 +74,7 @@ class DownloadManager(object):
         done = []
         todo = [center_tile]
         while todo:
-            current = todo[0]
+            current = todo.pop(0)
             dif_lat = 0.07 # Another tile from the center
             dif_lon = abs(current.coordinates.lon_left - current.coordinates.lon_median) + 0.01
             for m in ((-1,0), (0,1), (1,0), (0, -1)):
@@ -92,8 +92,7 @@ class DownloadManager(object):
                     if next_tile not in self.queue:
                         self.add(next_tile, n)
                         n += 1
-            done.append(todo[0])
-            todo.pop(0)
+            done.append(current)
 
     def download_next(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart'):
         """
