@@ -41,6 +41,7 @@ class MainWindow(object):
     lon_label:ttk.Label
     lon_input:tk.text(self.coordinates_frame)
     download_tile_button:tk.Button
+    download_region_button:tk.Button
     follow_button:ttk.Button
 
     # Status bar
@@ -89,11 +90,17 @@ class MainWindow(object):
             text=_('Download tile'),
             command=self.download_tile,
         )
+        self.download_region_button = ttk.Button(
+            self.coordinates_frame,
+            text=_('Download region'),
+            command=self.download_region,
+        )
         self.lat_label.grid(column=0, row=0)
         self.lat_input.grid(column=1, row=0)
         self.lon_label.grid(column=0, row=1)
         self.lon_input.grid(column=1, row=1)
-        self.download_tile_button.grid(column=0, row=2, rowspan=2, sticky=tk.W+tk.E)
+        self.download_tile_button.grid(column=0, row=2, columnspan=2, sticky=tk.W+tk.E)
+        self.download_region_button.grid(column=0, row=3, columnspan=2, sticky=tk.W+tk.E)
 
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
@@ -149,6 +156,9 @@ class MainWindow(object):
     def download_tile(self):
         index = Tile.coordinates_to_index(lat=self.lat_var.get(), lon=self.lon_var.get())
         self.downloader.add_tile(index)
+    
+    def download_region(self):
+        self.download_manager.recenter(lat=self.lat_var.get(), lon=self.lon_var.get())
 
     # Aircraft following
     def follow(self):
