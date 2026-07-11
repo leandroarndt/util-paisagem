@@ -8,7 +8,9 @@ from flightgear_python.fg_util import FGCommunicationError, FGConnectionError
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
-from utilpaisagem.gui.common import format_status
+from utilpaisagem.gui.common import format_status, Settings
+
+settings = Settings()
 
 class UpstreamReader(object):
     """
@@ -33,7 +35,7 @@ class UpstreamReader(object):
                 msg = self.upstream_queue.get_nowait()
             except Empty:
                 break
-            self.log = self.log + msg + '\n'
+            # self.log = self.log + msg + '\n'
             print(msg)
         if msg:
             self.status_var.set(msg)
@@ -65,7 +67,7 @@ class Downloader(object):
     
     def _download_thread(self):
         tile:Tile = self.download_queue.get()
-        tile.retrieve(path=Path('target'), image_service=IMAGE_SERVICES['ArcGIS'], upstream_queue=self.upstream_queue)
+        tile.retrieve(path=Path(settings.orthophotos_folder), image_service=IMAGE_SERVICES['ArcGIS'], upstream_queue=self.upstream_queue)
         self.wait_queue.put_nowait(tile.index)
 
     def _wait_download(self):
@@ -134,7 +136,7 @@ class Follower(object):
                 )
             except Exception as e:
                 self.upstream_queue.put_nowait(
-                    format_status(_('Error while retrieving coordinates from flightgear ("{e}")').format(exception=e))
+                    format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
                 self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:

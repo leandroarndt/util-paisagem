@@ -25,11 +25,11 @@ class Settings(object):
     *ATTENTION:* changes must be saved in order to be restored in the next session!
 
     Attributes and default values, if any:
-        orthophotos_folder:str
+        orthophotos_folder:str = ''
         tile_threads:int = 4
         image_threads:int = 4
         radius:int = 50
-        download_res = DOWNLOAD_RES (10, from `utilpaisagem.gui.common`)
+        download_res = DOWNLOAD_RES # 10 from `utilpaisagem.gui.common`
         distances = {
             8: DOWNLOAD_RES + 2,
             20: DOWNLOAD_RES + 1,
@@ -38,7 +38,7 @@ class Settings(object):
     """
     _file:Path
     _settings:configparser.ConfigParser
-    orthophotos_folder:str
+    orthophotos_folder:str = ''
     tile_threads:int = 4
     image_threads:int = 4
     radius:int = 50
