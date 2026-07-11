@@ -111,11 +111,14 @@ class Tile(object):
             columns: number of image columns.
             size: image size (integer width x height)
         """
+        cell_size = (int(size[0]/columns), int(size[1]/lines))
         result:Image = Image.new('RGB', size)
         for line in range(lines):
             for column in range(columns):
                 with Image.open(path / f'{base_name}-{line}-{column}.png') as image:
-                    result.paste(image, (int(size[0]/columns*column), int(size[1]/lines*line)))
+                    if image.size != cell_size:
+                        image = image.resize(cell_size)
+                    result.paste(image, (cell_size[0]*column, cell_size[1]*line))
         if compress == 'smart' or compress == 'png':
             filename = path / f'{base_name}.png'
             result.save(path / f'{base_name}.png', optimize = True)
@@ -163,9 +166,9 @@ class Tile(object):
         else:
             lon_dir = 'w'
         path = path / Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left/10)) * 10:03}' + \
-            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom / 10) * 10)}') / \
+            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom / 10) * 10):02}') / \
             Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left)):03}' + \
-            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom))}')
+            f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom)):02}')
         # Ok? Touch it.
         # Else:
             # divide
