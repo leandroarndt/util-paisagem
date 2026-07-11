@@ -6,8 +6,9 @@ from queue import Queue
 from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from utilpaisagem.scenery.download_manager import DownloadManager
+from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status, Settings
+from utilpaisagem.gui.common import format_status, Settings, PADDING
 
 class MainWindow(object):
     """
@@ -32,10 +33,19 @@ class MainWindow(object):
 
     # Toolbar
     toolbar_frame:ttk.Frame
+    coordinates_frame:ttk.Frame
+    lat_var:tk.DoubleVar
+    lat_label:ttk.Label
+    lat_input:tk.text(self.coordinates_frame)
+    lon_var:tk.DoubleVar
+    lon_label:ttk.Label
+    lon_input:tk.text(self.coordinates_frame)
+    download_tile_button:tk.Button
     follow_button:ttk.Button
 
     # Status bar
-    status_frame:ttk.Frame
+    status_var:tk.DoubleVar
+    status_bar:ttk.Label
 
     def __init__(self, resources_path:Path):
         # Prepare queue for processing status communication
@@ -46,11 +56,53 @@ class MainWindow(object):
         self.resources_path = resources_path
         self.window = tk.Tk()
         self.window.title('Útil paisagem')
-        self.window.columnconfigure(0, weight=10)
+        self.window.columnconfigure(0, weight=10, pad=PADDING)
+        self.window.columnconfigure(1, pad=PADDING)
         self.window.rowconfigure(0, weight=10)
+        self.window.rowconfigure(1, pad=PADDING)
+
+        # Toolbar
         self.toolbar_frame = ttk.Frame(self.window)
         self.toolbar_frame.grid(column=1, row=0, sticky=tk.N)
-        self.follow_button = ttk.Button(self.toolbar_frame, text=_('Follow aircraft'), command=self.follow)
+        # Coordinates
+        self.coordinates_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
+        self.coordinates_frame.pack(fill=tk.X)
+        self.coordinates_frame.columnconfigure(0, pad=PADDING)
+        self.coordinates_frame.columnconfigure(1, weight=1, pad=PADDING)
+        self.coordinates_frame.rowconfigure(2, pad=PADDING)
+        self.lat_var = tk.DoubleVar(self.coordinates_frame, value=0)
+        self.lat_label = ttk.Label(self.coordinates_frame, text=_('Latitude:'), justify=tk.RIGHT)
+        self.lat_input = ttk.Entry(
+            self.coordinates_frame,
+            textvariable=self.lat_var,
+            justify=tk.LEFT,
+        )
+        self.lon_var = tk.DoubleVar(self.coordinates_frame, value=0)
+        self.lon_label = ttk.Label(self.coordinates_frame, text=_('Longitude:'), justify=tk.RIGHT)
+        self.lon_input = ttk.Entry(
+            self.coordinates_frame,
+            textvariable=self.lat_var,
+            justify=tk.LEFT,
+        )
+        self.download_tile_button = ttk.Button(
+            self.coordinates_frame,
+            text=_('Download tile'),
+            command=self.download_tile,
+        )
+        self.lat_label.grid(column=0, row=0)
+        self.lat_input.grid(column=1, row=0)
+        self.lon_label.grid(column=0, row=1)
+        self.lon_input.grid(column=1, row=1)
+        self.download_tile_button.grid(column=0, row=2, rowspan=2, sticky=tk.W+tk.E)
+
+        # Following
+        self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
+        self.follow_frame.pack(fill=tk.X)
+        self.follow_button = ttk.Button(
+            self.follow_frame,
+            text=_('Follow aircraft'),
+            command=self.follow,
+        )
         self.follow_button.pack(fill=tk.X)
         self.follow_button_tip = Hovertip(
             self.follow_button,
@@ -63,7 +115,7 @@ class MainWindow(object):
 
         # Status bar
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
-        self.status_bar = ttk.Label(self.window, textvariable=self.status_var)
+        self.status_bar = ttk.Label(self.window, textvariable=self.status_var, justify=tk.LEFT)
         self.status_bar.grid(column=0, row=1, columnspan=2, sticky=tk.W)
 
         # Settings
@@ -87,7 +139,18 @@ class MainWindow(object):
         self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
         self.downloader.download()
 
+    # Validation
+    # def validate_number(self, )
+
+    # Actions
     # TODO: set preferences here and at agents.py
+
+    # Download based on latitude and longitude
+    def download_tile(self):
+        index = Tile.coordinates_to_index(lat=self.lat_var.get(), lon=self.lon_var.get())
+        self.downloader.add_tile(index)
+
+    # Aircraft following
     def follow(self):
         """Starts aircraft following thread."""
         if not hasattr(self, 'following_queue') or self.following_queue.is_shutdown:

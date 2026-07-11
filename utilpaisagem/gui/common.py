@@ -7,8 +7,16 @@ from pathlib import Path
 from enum import Enum
 from utilpaisagem.scenery.common import DOWNLOAD_RES, MAX_RES, MIN_RES
 
+# GUI defaults
+PADDING = 6
+
+# Text formatting
+
 def format_status(text:str, obj) -> str:
     return f'{format_datetime(datetime.now(), format='short')} ({obj.__class__.__name__}): {text}'
+
+
+# Preferences
 
 class _Sections(Enum):
     DEFAULT = 'DEFAULT'
