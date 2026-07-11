@@ -74,14 +74,13 @@ class Downloader(object):
         if self.wait_queue.empty():
             self.root.after(100, self._wait_download)
         else:
-            print(self.wait_queue.get_nowait())
+            self.wait_queue.get_nowait()
             self.current_downloads -= 1
             self._download_tiles()
 
     def _download_tiles(self):
         if (not self.download_queue.empty()) and self.current_downloads < self.max_downloads:
             self.current_downloads += 1
-            print('Current downloads:', self.current_downloads)
             thread = Thread(target=self._download_thread)
             thread.start()
             self._wait_download()
@@ -126,7 +125,7 @@ class Follower(object):
             self.upstream_queue.put_nowait(format_status(_('Sucessfuly connected to Flightgear.'), self))
     
     def follow(self):
-        if not self.downstream_queue.is_shutdown:
+        if not self.downstream_queue.is_shutdown: # If the following has not been canceled
             try:
                 lat = self.connection.get_prop('/position/latitude-deg')
                 lon = self.connection.get_prop('/position/longitude-deg')
@@ -138,13 +137,13 @@ class Follower(object):
                 self.upstream_queue.put_nowait(
                     format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
-                self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
+                # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=lat, lon=lon) # Update download manager center
                 self.upstream_queue.put_nowait(
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
-                self.root.after(self.interval, self.follow)
+            self.root.after(self.interval, self.follow)
 
     def run(self):
         self.thread = Thread(target=self.follow)
