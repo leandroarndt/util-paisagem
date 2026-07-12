@@ -77,7 +77,7 @@ class MainWindow(object):
         self.coordinates_frame.pack(fill=tk.X)
         self.index_var = tk.StringVar(self.coordinates_frame)
         self.index = Tile.coordinates_to_index(lat=0, lon=0)
-        self.index_label = ttk.Label(self.coordinates_frame, text=_('Index:'))
+        self.index_label = ttk.Label(self.coordinates_frame, text=_('Tile index:'))
         self.index_input = ttk.Entry(
             self.coordinates_frame,
             textvariable=self.index_var,
@@ -180,7 +180,7 @@ class MainWindow(object):
         try:
             return float(input)
         except ValueError:
-            return parse_decimal(input)
+            return float(parse_decimal(input))
 
     def validate_int(self, input:str):
         """
@@ -202,6 +202,12 @@ class MainWindow(object):
         }
         try:
             value = self.validate_float(what_var[what].get())
+            if what == 'lat' and not (-90 <= value <= 90):
+                what_var[what].set(str(self.lat))
+                return
+            elif what == 'lon' and not (-180 <= value <= 180):
+                what_var[what].set(str(self.lon))
+                return
             self.__dict__[what] = value
         except NumberFormatError:
             what_var[what].set(str(self.__dict__[what]))
