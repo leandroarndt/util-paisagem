@@ -9,6 +9,7 @@ from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, PADDING
+from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
 
 class MainWindow(object):
     """
@@ -34,10 +35,16 @@ class MainWindow(object):
     # Toolbar
     toolbar_frame:ttk.Frame
     coordinates_frame:ttk.Frame
-    lat_var:tk.DoubleVar
+    index:int
+    index_var:tk.StringVar
+    index_label:ttk.Label
+    index_input:ttk.Entry
+    lat:float
+    lat_var:tk.StringVar
     lat_label:ttk.Label
     lat_input:tk.text(self.coordinates_frame)
-    lon_var:tk.DoubleVar
+    lon:float
+    lon_var:tk.StringVar
     lon_label:ttk.Label
     lon_input:tk.text(self.coordinates_frame)
     download_tile_button:tk.Button
@@ -45,7 +52,7 @@ class MainWindow(object):
     follow_button:ttk.Button
 
     # Status bar
-    status_var:tk.DoubleVar
+    status_var:tk.StringVar
     status_bar:ttk.Label
 
     def __init__(self, resources_path:Path):
@@ -68,21 +75,29 @@ class MainWindow(object):
         # Coordinates
         self.coordinates_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.coordinates_frame.pack(fill=tk.X)
-        self.coordinates_frame.columnconfigure(0, pad=PADDING)
-        self.coordinates_frame.columnconfigure(1, weight=1, pad=PADDING)
-        self.coordinates_frame.rowconfigure(2, pad=PADDING)
-        self.lat_var = tk.DoubleVar(self.coordinates_frame, value=0)
-        self.lat_label = ttk.Label(self.coordinates_frame, text=_('Latitude:'), justify=tk.RIGHT)
+        self.index_var = tk.StringVar(self.coordinates_frame)
+        self.index = Tile.coordinates_to_index(lat=0, lon=0)
+        self.index_label = ttk.Label(self.coordinates_frame, text=_('Index:'))
+        self.index_input = ttk.Entry(
+            self.coordinates_frame,
+            textvariable=self.index_var,
+            justify=tk.LEFT,
+        )
+        self.lat_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0))
+        self.lat = 0.0
+        self.lat_label = ttk.Label(self.coordinates_frame, text=_('Latitude:'))
         self.lat_input = ttk.Entry(
             self.coordinates_frame,
             textvariable=self.lat_var,
             justify=tk.LEFT,
+            name='lat'
         )
-        self.lon_var = tk.DoubleVar(self.coordinates_frame, value=0)
-        self.lon_label = ttk.Label(self.coordinates_frame, text=_('Longitude:'), justify=tk.RIGHT)
+        self.lon_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0))
+        self.lon = 0.0
+        self.lon_label = ttk.Label(self.coordinates_frame, text=_('Longitude:'))
         self.lon_input = ttk.Entry(
             self.coordinates_frame,
-            textvariable=self.lat_var,
+            textvariable=self.lon_var,
             justify=tk.LEFT,
         )
         self.download_tile_button = ttk.Button(
@@ -95,12 +110,19 @@ class MainWindow(object):
             text=_('Download region'),
             command=self.download_region,
         )
-        self.lat_label.grid(column=0, row=0)
-        self.lat_input.grid(column=1, row=0)
-        self.lon_label.grid(column=0, row=1)
-        self.lon_input.grid(column=1, row=1)
-        self.download_tile_button.grid(column=0, row=2, columnspan=2, sticky=tk.W+tk.E)
-        self.download_region_button.grid(column=0, row=3, columnspan=2, sticky=tk.W+tk.E)
+        self.coordinates_frame.columnconfigure(1, weight=1)
+        self.index_label.grid(column=0, row=0, sticky=tk.E)
+        self.index_input.grid(column=1, row=0)
+        self.lat_label.grid(column=0, row=1, sticky=tk.E)
+        self.lat_input.grid(column=1, row=1)
+        self.lon_label.grid(column=0, row=2, sticky=tk.E)
+        self.lon_input.grid(column=1, row=2)
+        self.download_tile_button.grid(column=0, row=3, columnspan=2, sticky=tk.W+tk.E)
+        self.download_region_button.grid(column=0, row=4, columnspan=2, sticky=tk.W+tk.E)
+        self.index_var.set(Tile.coordinates_to_index(lat=0, lon=0))
+        self.index_input.bind('<FocusOut>', lambda *args, **kwargs: self.int_input_focus_out('index', *args, **kwargs))
+        self.lat_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lat', *args, **kwargs))
+        self.lon_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lon', *args, **kwargs))
 
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
@@ -147,18 +169,72 @@ class MainWindow(object):
         self.downloader.download()
 
     # Validation
-    # def validate_number(self, )
+    def validate_float(self, input:str):
+        """
+        Validates a floating point number and returns it as a float.
+        Raises error if not possible both using float() and using babel.numbers.parse_decimal().
+
+        Arguments:
+            input(str): text to validate and convert
+        """
+        try:
+            return float(input)
+        except ValueError:
+            return parse_decimal(input)
+
+    def validate_int(self, input:str):
+        """
+        Validates an integer number and returns it as an integer.
+        Raises error if not possible both using int() and using babel.numbers.parse_number().
+
+        Arguments:
+            input(str): text to validate and convert
+        """
+        try:
+            return int(input)
+        except ValueError:
+            return parse_number(input)
+
+    def float_input_focus_out(self, what:str, event:tk.Event):
+        what_var = {
+            'lat': self.lat_var,
+            'lon': self.lon_var,
+        }
+        try:
+            value = self.validate_float(what_var[what].get())
+            self.__dict__[what] = value
+        except NumberFormatError:
+            what_var[what].set(str(self.__dict__[what]))
+            return
+        if what in ['lat', 'lon']:
+            self.index_var.set(str(Tile.coordinates_to_index(lat=self.lat, lon=self.lon)))
+        
+    def int_input_focus_out(self, what:str, event:tk.Event):
+        what_var = {
+            'index': self.index_var,
+        }
+        try:
+            value = self.validate_int(what_var[what].get())
+            self.__dict__[what] = value
+        except NumberFormatError:
+            what_var[what].set(str(self.__dict__[what]))
+            return
+        if what == 'index':
+            coordinates = Tile.index_to_coordinates(self.index)
+            self.lat = coordinates.lat_median
+            self.lon = coordinates.lon_median
+            self.lat_var.set(str(self.lat))
+            self.lon_var.set(str(self.lon))
 
     # Actions
     # TODO: set preferences here and at agents.py
 
     # Download based on latitude and longitude
     def download_tile(self):
-        index = Tile.coordinates_to_index(lat=self.lat_var.get(), lon=self.lon_var.get())
-        self.downloader.add_tile(index)
+        self.downloader.add_tile(self.index)
     
     def download_region(self):
-        self.download_manager.recenter(lat=self.lat_var.get(), lon=self.lon_var.get())
+        self.download_manager.recenter(lat=self.lat, lon=self.lon)
 
     # Aircraft following
     def follow(self):

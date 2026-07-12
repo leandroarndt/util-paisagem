@@ -92,6 +92,8 @@ class Downloader(object):
             self
         ))
 
+    # def add_region(self, )
+
     def download(self):
         while self.download_manager.queue:
             self.download_queue.put_nowait(self.download_manager.queue.pop(0))
