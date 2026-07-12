@@ -153,7 +153,3 @@ class Follower(object):
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
             self.root.after(self.interval, self.follow)
-
-    def run(self):
-        self.thread = Thread(target=self.follow)
-        self.thread.start()
