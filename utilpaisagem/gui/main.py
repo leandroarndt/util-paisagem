@@ -10,6 +10,10 @@ from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, PADDING
 from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
+from tkintermapview import TkinterMapView
+from tkintermapview.canvas_polygon import CanvasPolygon
+from tkintermapview.canvas_path  import CanvasPath
+from tkintermapview.canvas_position_marker import CanvasPositionMarker
 
 class MainWindow(object):
     """
@@ -31,6 +35,11 @@ class MainWindow(object):
     resources_path:Path
     window:tk.Tk
     status_var:tk.StringVar
+
+    # Map
+    map_frame:ttk.Frame
+    map_widget:kinterMapView
+    tile_polygon:CanvasPolygon
 
     # Toolbar
     toolbar_frame:ttk.Frame
@@ -68,7 +77,15 @@ class MainWindow(object):
         self.window.columnconfigure(1, pad=PADDING)
         self.window.rowconfigure(0, weight=10)
         self.window.rowconfigure(1, pad=PADDING)
-
+        # Map
+        self.map_frame = ttk.Frame(self.window)
+        self.map_frame.grid(column=0,row=0, sticky=tk.N+tk.E+tk.S+tk.W)
+        self.map_frame.columnconfigure(0, weight=10)
+        # TODO resize map properly, store window size and map coordinates
+        self.map_widget = TkinterMapView(self.map_frame, width=800, height=600)
+        self.map_widget.set_position(0, 0)
+        self.map_widget.set_zoom(0)
+        self.map_widget.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
         # Toolbar
         self.toolbar_frame = ttk.Frame(self.window)
         self.toolbar_frame.grid(column=1, row=0, sticky=tk.N)
@@ -137,10 +154,6 @@ class MainWindow(object):
             self.follow_button,
             text=_('Follow aircraft on Flightgear over telnet connection.')
         )
-
-        # Map
-        self.map_label = ttk.Label(text='Reserved for map')
-        self.map_label.grid(column=0, row=0)
 
         # Status bar
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
@@ -213,7 +226,9 @@ class MainWindow(object):
             what_var[what].set(str(self.__dict__[what]))
             return
         if what in ['lat', 'lon']:
-            self.index_var.set(str(Tile.coordinates_to_index(lat=self.lat, lon=self.lon)))
+            self.index = Tile.coordinates_to_index(lat=self.lat, lon=self.lon)
+            self.index_var.set(str(self.index))
+            self.create_tile_polygon(self.index)
         
     def int_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
@@ -231,6 +246,30 @@ class MainWindow(object):
             self.lon = coordinates.lon_median
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
+            self.create_tile_polygon(self.index)
+
+    def create_tile_polygon(self, index:int):
+        """
+        Creates a tile polygon from index and stores it at MainWindow.tile_polygon.
+
+        Arguments:
+            index(int): a tile index
+        """
+        if hasattr(self, 'tile_polygon'):
+            self.tile_polygon.delete()
+        coordinates = Tile.index_to_coordinates(self.index)
+        self.tile_polygon = self.map_widget.set_polygon(
+            [
+                (coordinates.lat_top, coordinates.lon_left),
+                (coordinates.lat_top, coordinates.lon_right),
+                (coordinates.lat_bottom, coordinates.lon_right),
+                (coordinates.lat_bottom, coordinates.lon_left)
+            ]
+        )
+        self.map_widget.fit_bounding_box(
+            (coordinates.lat_top, coordinates.lon_left),
+            (coordinates.lat_bottom, coordinates.lon_right),
+        )
 
     # Actions
     # TODO: set preferences here and at agents.py
