@@ -45,7 +45,8 @@ class MainWindow(object):
     map_frame:ttk.Frame
     map_widget:kinterMapView
     tile_polygon:CanvasPolygon
-    markers:list[CanvasPositionMarker]
+    waypoints:list[CanvasPositionMarker]
+    marker:CanvasPositionMarker
     route:CanvasPath
 
     # Toolbar
@@ -85,7 +86,8 @@ class MainWindow(object):
         self.window.rowconfigure(0, weight=10)
         self.window.rowconfigure(1, pad=PADDING)
         # Map
-        self.markers = []
+        self.marker = None
+        self.waypoints = []
         self.route = None
         self.map_frame = ttk.Frame(self.window)
         self.map_frame.grid(column=0,row=0, sticky=tk.N+tk.E+tk.S+tk.W)
@@ -252,6 +254,7 @@ class MainWindow(object):
             self.index = Tile.coordinates_to_index(lat=self.lat, lon=self.lon)
             self.index_var.set(str(self.index))
             self.create_tile_polygon(self.index)
+            self.place_marker(lat=self.lat, lon=self.lon)
         
     def int_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
@@ -298,19 +301,36 @@ class MainWindow(object):
     def create_route(self):
         if hasattr(self.route, 'delete'):
             self.route.delete()
-        if len(self.markers) > 1:
+        if len(self.waypoints) > 1:
             self.route = self.map_widget.set_path(
-                [wp.position for wp in self.markers]
+                [wp.position for wp in self.waypoints]
             )
+
+    def place_marker(self, marker:CanvasPositionMarker=None, lat:float=None, lon:float=None, text:str=''):
+        if hasattr(self.marker, 'delete'):
+            if self.marker not in self.waypoints:
+                self.marker.delete()
+        if marker:
+            self.marker = marker
+            return
+        if not text:
+            text = f'{lat:.02f}, {lon:.02f}'
+        self.marker = self.map_widget.set_marker(lat, lon, text=text)
+
+    def add_waypoint(self, marker:CanvasPositionMarker):
+        self.waypoints.append(marker)
+        self.create_route()
 
     def search(self):
         error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
         if error is None:
-            self.markers.append(
-                self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get())
+            self.place_marker(self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get()))
+            self.waypoints.append(
+                # self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get())
+                self.marker
             )
-            self.lat = self.markers[-1].position[0]
-            self.lon = self.markers[-1].position[1]
+            self.lat = self.marker.position[0]
+            self.lon = self.marker.position[1]
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
             self.index = Tile.coordinates_to_index(self.lat, self.lon)
