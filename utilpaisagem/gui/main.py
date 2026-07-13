@@ -37,9 +37,15 @@ class MainWindow(object):
     status_var:tk.StringVar
 
     # Map
+    search_frame:ttk.Frame
+    search_var:tk.StringVar
+    search_label:ttk.Label
+    search_input:ttk.Entry
+    search_button:ttk.Button
     map_frame:ttk.Frame
     map_widget:kinterMapView
     tile_polygon:CanvasPolygon
+    markers:list[CanvasPositionMarker]
 
     # Toolbar
     toolbar_frame:ttk.Frame
@@ -78,14 +84,29 @@ class MainWindow(object):
         self.window.rowconfigure(0, weight=10)
         self.window.rowconfigure(1, pad=PADDING)
         # Map
+        self.markers = []
         self.map_frame = ttk.Frame(self.window)
         self.map_frame.grid(column=0,row=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.map_frame.columnconfigure(0, weight=10)
+        self.map_frame.rowconfigure(1, weight=10)
+        self.search_frame = ttk.Frame(self.map_frame, padding=PADDING)
+        self.search_frame.columnconfigure(0, pad=PADDING)
+        self.search_frame.columnconfigure(1, weight=10)
+        self.search_frame.columnconfigure(2, pad=PADDING)
+        self.search_var = tk.StringVar(self.search_frame)
+        self.search_label = ttk.Label(self.search_frame, text=_('Address or ICAO code:'))
+        # TODO search on enter
+        self.search_input = ttk.Entry(self.search_frame, textvariable=self.search_var)
+        self.search_button = ttk.Button(self.search_frame, text=_('Search'), command=self.search)
+        self.search_label.grid(column=0, row=0)
+        self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
+        self.search_button.grid(column=2, row=0)
         # TODO resize map properly, store window size and map coordinates
         self.map_widget = TkinterMapView(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
-        self.map_widget.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
+        self.search_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.map_widget.grid(column=0, row=1, sticky=tk.N+tk.E+tk.S+tk.W)
         # Toolbar
         self.toolbar_frame = ttk.Frame(self.window)
         self.toolbar_frame.grid(column=1, row=0, sticky=tk.N)
@@ -264,12 +285,40 @@ class MainWindow(object):
                 (coordinates.lat_top, coordinates.lon_right),
                 (coordinates.lat_bottom, coordinates.lon_right),
                 (coordinates.lat_bottom, coordinates.lon_left)
-            ]
+            ],
+            fill_color=None,
         )
         self.map_widget.fit_bounding_box(
             (coordinates.lat_top, coordinates.lon_left),
             (coordinates.lat_bottom, coordinates.lon_right),
         )
+
+    def search(self):
+        error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
+        if error is None:
+            self.markers.append(
+                self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get())
+            )
+            self.lat = self.markers[-1].position[0]
+            self.lon = self.markers[-1].position[1]
+            self.lat_var.set(str(self.lat))
+            self.lon_var.set(str(self.lon))
+            self.index = Tile.coordinates_to_index(self.lat, self.lon)
+            self.index_var.set(str(self.index))
+            self.create_tile_polygon(self.index)
+            self.upstream_queue.put_nowait(format_status(
+                _('"{address}" found at {lat},{lon}.').format(
+                    address=self.search_var.get(),
+                    lat=self.lat,
+                    lon=self.lon
+                ),
+                self
+            ))
+        else:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not find address {address}.').format(address=self.search_var.get()),
+                self
+            ))
 
     # Actions
     # TODO: set preferences here and at agents.py
