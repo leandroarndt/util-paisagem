@@ -66,6 +66,7 @@ class MainWindow(object):
     lon_input:tk.text(self.coordinates_frame)
     download_tile_button:tk.Button
     download_region_button:tk.Button
+    add_waypoint_button:tk.Button
     follow_button:ttk.Button
 
     # Status bar
@@ -152,6 +153,11 @@ class MainWindow(object):
             text=_('Download region'),
             command=self.download_region,
         )
+        self.add_waypoint_button=ttk.Button(
+            self.coordinates_frame,
+            text=_('Add waypoint'),
+            command=self.waypoint_button_press
+        )
         self.coordinates_frame.columnconfigure(1, weight=1)
         self.index_label.grid(column=0, row=0, sticky=tk.E)
         self.index_input.grid(column=1, row=0)
@@ -161,11 +167,11 @@ class MainWindow(object):
         self.lon_input.grid(column=1, row=2)
         self.download_tile_button.grid(column=0, row=3, columnspan=2, sticky=tk.W+tk.E)
         self.download_region_button.grid(column=0, row=4, columnspan=2, sticky=tk.W+tk.E)
+        self.add_waypoint_button.grid(column=0, row=5, columnspan=2, sticky=tk.W+tk.E)
         self.index_var.set(Tile.coordinates_to_index(lat=0, lon=0))
         self.index_input.bind('<FocusOut>', lambda *args, **kwargs: self.int_input_focus_out('index', *args, **kwargs))
         self.lat_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lat', *args, **kwargs))
         self.lon_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lon', *args, **kwargs))
-
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.follow_frame.pack(fill=tk.X)
@@ -316,6 +322,11 @@ class MainWindow(object):
         if not text:
             text = f'{lat:.02f}, {lon:.02f}'
         self.marker = self.map_widget.set_marker(lat, lon, text=text)
+
+    def waypoint_button_press(self):
+        if not isinstance(self.marker, CanvasPositionMarker):
+            self.place_marker(lat=self.lat, lon=self.lon)
+        self.add_waypoint(self.marker)
 
     def add_waypoint(self, marker:CanvasPositionMarker):
         self.waypoints.append(marker)
