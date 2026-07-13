@@ -46,6 +46,7 @@ class MainWindow(object):
     map_widget:kinterMapView
     tile_polygon:CanvasPolygon
     markers:list[CanvasPositionMarker]
+    route:CanvasPath
 
     # Toolbar
     toolbar_frame:ttk.Frame
@@ -85,6 +86,7 @@ class MainWindow(object):
         self.window.rowconfigure(1, pad=PADDING)
         # Map
         self.markers = []
+        self.route = None
         self.map_frame = ttk.Frame(self.window)
         self.map_frame.grid(column=0,row=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.map_frame.columnconfigure(0, weight=10)
@@ -293,6 +295,14 @@ class MainWindow(object):
             (coordinates.lat_bottom, coordinates.lon_right),
         )
 
+    def create_route(self):
+        if hasattr(self.route, 'delete'):
+            self.route.delete()
+        if len(self.markers) > 1:
+            self.route = self.map_widget.set_path(
+                [wp.position for wp in self.markers]
+            )
+
     def search(self):
         error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
         if error is None:
@@ -314,6 +324,7 @@ class MainWindow(object):
                 ),
                 self
             ))
+            self.create_route()
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Could not find address {address}.').format(address=self.search_var.get()),
