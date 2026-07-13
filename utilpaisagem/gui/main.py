@@ -336,10 +336,6 @@ class MainWindow(object):
         error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
         if error is None:
             self.place_marker(self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get()))
-            self.waypoints.append(
-                # self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get())
-                self.marker
-            )
             self.lat = self.marker.position[0]
             self.lon = self.marker.position[1]
             self.lat_var.set(str(self.lat))
@@ -355,7 +351,6 @@ class MainWindow(object):
                 ),
                 self
             ))
-            self.create_route()
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Could not find address {address}.').format(address=self.search_var.get()),
