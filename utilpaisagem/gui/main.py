@@ -400,7 +400,8 @@ class MainWindow(object):
     def remove_waypoint(self):
         selected = self.waypoints_list.selection_get().split('\n')
         for waypoint in selected:
-            self.waypoints.pop(self.waypoints_var.get().index(waypoint))
+            marker = self.waypoints.pop(self.waypoints_var.get().index(waypoint))
+            marker.delete()
         self.waypoints_to_var()
         self.create_route()
 
