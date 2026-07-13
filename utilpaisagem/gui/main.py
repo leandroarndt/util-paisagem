@@ -67,6 +67,13 @@ class MainWindow(object):
     download_tile_button:tk.Button
     download_region_button:tk.Button
     add_waypoint_button:tk.Button
+    waypoints_var:tk.Variable
+    waypoints_frame:ttk.Frame
+    waypoints_label:ttk.Label
+    waypoints_list:tk.Listbox
+    waypoints_remove_button:tk.Button
+    waypoints_up_button:tk.Button
+    waypoints_down_button:tk.Button
     follow_button:ttk.Button
 
     # Status bar
@@ -172,6 +179,39 @@ class MainWindow(object):
         self.index_input.bind('<FocusOut>', lambda *args, **kwargs: self.int_input_focus_out('index', *args, **kwargs))
         self.lat_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lat', *args, **kwargs))
         self.lon_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lon', *args, **kwargs))
+        # Waypoints list
+        self.waypoints_var = tk.Variable(value=self.waypoints)
+        self.waypoints_frame = ttk.Frame(self.toolbar_frame)
+        self.waypoints_label = ttk.Label(self.waypoints_frame, text=_('Waypoints:'))
+        self.waypoints_list = tk.Listbox(
+            self.waypoints_frame,
+            listvariable=self.waypoints_var,
+            # TODO (moves wrongly) selectmode=tk.MULTIPLE,
+        )
+        self.waypoints_remove_button = tk.Button(
+            self.waypoints_frame,
+            text=_('Remove Waypoint'),
+            command=self.remove_waypoint,
+        )
+        self.waypoints_up_button = tk.Button(
+            self.waypoints_frame,
+            text=_('Up'),
+            command=lambda: self.move_waypoint(-1),
+        )
+        self.waypoints_down_button = tk.Button(
+            self.waypoints_frame,
+            text=_('Down'),
+            command=lambda: self.move_waypoint(1),
+        )
+        self.waypoints_frame.columnconfigure(0, weight=1)
+        self.waypoints_frame.columnconfigure(1, weight=1)
+        self.waypoints_frame.columnconfigure(2, weight=1)
+        self.waypoints_label.grid(column=0, row=0, columnspan=3)
+        self.waypoints_list.grid(column=0, row=1, columnspan=3, sticky=tk.W+tk.E)
+        self.waypoints_remove_button.grid(column=0, row=2, sticky=tk.W + tk.E)
+        self.waypoints_up_button.grid(column=1, row=2)
+        self.waypoints_down_button.grid(column=2, row=2)
+        self.waypoints_frame.pack(fill=tk.X)
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.follow_frame.pack(fill=tk.X)
@@ -328,8 +368,40 @@ class MainWindow(object):
             self.place_marker(lat=self.lat, lon=self.lon)
         self.add_waypoint(self.marker)
 
+    def waypoints_to_var(self):
+        self.waypoints_var.set([f'{n}: {self.waypoints[n].text}' for n in range(len(self.waypoints))])
+
     def add_waypoint(self, marker:CanvasPositionMarker):
         self.waypoints.append(marker)
+        self.waypoints_to_var()
+        self.create_route()
+
+    def move_waypoint(self, amount:int):
+        selected = self.waypoints_list.selection_get().split('\n')
+        indexes = []
+        for i in selected:
+            indexes.append(self.waypoints_var.get().index(i))
+        for i in indexes:
+            waypoint = self.waypoints.pop(i)
+            if i + amount < 0:
+                insertion = len(self.waypoints) + amount + 1
+            else:
+                insertion = i + amount
+            self.waypoints.insert(insertion, waypoint)
+        self.waypoints_to_var()
+        self.create_route()
+        self.waypoints_list.selection_clear(0, len(self.waypoints)-1)
+        for i in indexes:
+            if i - amount < 0:
+                self.waypoints_list.selection_set(i + amount + len(self.waypoints))
+            else:
+                self.waypoints_list.selection_set(i + amount)
+
+    def remove_waypoint(self):
+        selected = self.waypoints_list.selection_get().split('\n')
+        for waypoint in selected:
+            self.waypoints.pop(self.waypoints_var.get().index(waypoint))
+        self.waypoints_to_var()
         self.create_route()
 
     def search(self):
