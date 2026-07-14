@@ -3,17 +3,18 @@ from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from pathlib import Path
 from queue import Queue
+from LatLon23 import LatLon
 from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
-from utilpaisagem.scenery.download_manager import DownloadManager
-from utilpaisagem.scenery.tile import Tile
-from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status, Settings, PADDING
 from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
 from tkintermapview import TkinterMapView
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
+from utilpaisagem.scenery.download_manager import DownloadManager
+from utilpaisagem.scenery.tile import Tile
+from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
+from utilpaisagem.gui.common import format_status, Settings, PADDING
 
 class MainWindow(object):
     """
@@ -74,6 +75,7 @@ class MainWindow(object):
     waypoints_remove_button:tk.Button
     waypoints_up_button:tk.Button
     waypoints_down_button:tk.Button
+    download_route_button:tk.Button
     follow_button:ttk.Button
 
     # Status bar
@@ -203,6 +205,11 @@ class MainWindow(object):
             text=_('Down'),
             command=lambda: self.move_waypoint(1),
         )
+        self.download_route_button = tk.Button(
+            self.waypoints_frame,
+            text=_('Download route'),
+            command=self.download_route,
+        )
         self.waypoints_frame.columnconfigure(0, weight=1)
         self.waypoints_frame.columnconfigure(1, weight=1)
         self.waypoints_frame.columnconfigure(2, weight=1)
@@ -211,6 +218,7 @@ class MainWindow(object):
         self.waypoints_remove_button.grid(column=0, row=2, sticky=tk.W + tk.E)
         self.waypoints_up_button.grid(column=1, row=2)
         self.waypoints_down_button.grid(column=2, row=2)
+        self.download_route_button.grid(column=0, row=3, columnspan=3, sticky=tk.W+tk.E)
         self.waypoints_frame.pack(fill=tk.X)
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
@@ -439,6 +447,28 @@ class MainWindow(object):
     
     def download_region(self):
         self.download_manager.recenter(lat=self.lat, lon=self.lon)
+
+    def download_route(self):
+        distances = list(self.settings.distances.keys())
+        distances.sort()
+        step = distances[0]
+        route = self.waypoints.copy()
+        route.reverse() # DownloadManager puts last center first
+        for i, wp in enumerate(route[:-1]):
+            coord1 = LatLon(*wp.position)
+            coord2 = LatLon(*route[i+1].position)
+            stops = int(coord1.distance(coord2) // step)
+            heading = coord1.heading_initial(coord2)
+            for s in range(stops):
+                mid_coord = coord1.offset(heading, s*step)
+                self.download_manager.recenter(
+                    float(mid_coord.lat),
+                    float(mid_coord.lon),
+                )
+            self.download_manager.recenter(
+                float(coord2.lat),
+                float(coord2.lon),
+            )
 
     # Aircraft following
     def follow(self):
