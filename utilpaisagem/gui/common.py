@@ -46,7 +46,8 @@ class Settings(object):
     """
     _file:Path
     _settings:configparser.ConfigParser
-    orthophotos_folder:str = ''
+    fgdata_folder:str = Path.home() / '.fgdata'
+    orthophotos_folder:str = '%(fgdata_folder)s/utilpaisagem/Orthophotos'
     tile_threads:int = 4
     image_threads:int = 4
     radius:int = 50
@@ -58,6 +59,7 @@ class Settings(object):
     }
         
     _key_section = {
+        'fgdata_folder': _Sections.PATH.value,
         'orthophotos_folder': _Sections.PATH.value,
         'tile_threads': _Sections.DOWNLOAD.value,
         'image_threads': _Sections.DOWNLOAD.value,
