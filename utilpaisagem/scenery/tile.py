@@ -136,7 +136,7 @@ class Tile(object):
                     print('Optimized PNG is smaller than DDS.')
                 else:
                     self.upstream_queue.put_nowait(format_status(
-                        _('Tile {index}: optimized PNG is smaller than DDS.'),
+                        _('Tile {index}: optimized PNG is smaller than DDS.').format(index=self.index),
                         self
                     ))
         if compress == 'dds':
