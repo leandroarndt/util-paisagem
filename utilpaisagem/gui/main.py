@@ -252,13 +252,18 @@ class MainWindow(object):
             )
         self.download_manager.clear()
 
-        # Init upstream reader
-        self.upstream_reader = UpstreamReader(self.window, self.status_var, self.upstream_queue, 100)
-        self.upstream_reader.read()
-
         # Init downloader
         self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
         self.downloader.download()
+
+        # Init upstream reader
+        self.upstream_reader = UpstreamReader(
+            self.window,
+            self.status_var,
+            self.upstream_queue,
+            self.downloader,
+            interval=100)
+        self.upstream_reader.read()
 
     # Validation
     def validate_float(self, input:str):
@@ -475,16 +480,23 @@ class MainWindow(object):
         """Starts aircraft following thread."""
         if not hasattr(self, 'following_queue') or self.following_queue.is_shutdown:
             self.following_queue = Queue()
-        try:
-            self.follower = Follower(
-                root=self.window,
-                upstream_queue=self.upstream_queue,
-                downstream_queue=self.following_queue,
-                download_manager=self.download_manager,
-                # host=host,
-                # port=port,
-                # interval=interval,
-            )
-        except FGConnectionError:
-            return
-        self.follower.follow()
+            try:
+                self.follower = Follower(
+                    root=self.window,
+                    upstream_queue=self.upstream_queue,
+                    downstream_queue=self.following_queue,
+                    download_manager=self.download_manager,
+                    # host=host,
+                    # port=port,
+                    # interval=interval,
+                )
+            except FGConnectionError:
+                self.following_queue.shutdown(immediate=True)
+                return
+            self.follow_button['text'] = _('Stop following')
+            self.follow_button_tip.text = _('Stop following aircraft on FlightGear')
+            self.follower.follow()
+        else: # Stop following
+            self.following_queue.shutdown(immediate=True)
+            self.follow_button['text'] = _('Follow aircraft')
+            self.follow_button_tip.text = _('Follow aircraft on Flightgear over telnet connection.')

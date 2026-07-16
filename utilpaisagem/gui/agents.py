@@ -12,36 +12,6 @@ from utilpaisagem.gui.common import format_status, Settings
 
 settings = Settings()
 
-class UpstreamReader(object):
-    """
-    Reads the upstream queue and puts its content at the status bar.
-    """
-    upstream_queue:Queue
-    root:tk.Tk
-    interval:int
-    status_var:tk.StringVar
-
-    def __init__(self, root:tk.Tk, status_var:tk.StringVar, upstream_queue:Queue, interval:int=100):
-        self.root = root
-        self.upstream_queue = upstream_queue
-        self.interval = interval
-        self.status_var = status_var
-        self.status_var.set(_('Welcome to Útil paisagem'))
-    
-    def read(self):
-        msg = ''
-        while not self.upstream_queue.empty():
-            try:
-                msg = self.upstream_queue.get_nowait()
-            except Empty:
-                break
-            # self.log = self.log + msg + '\n'
-            print(msg)
-        if msg:
-            self.status_var.set(msg)
-        self.root.after(self.interval, self.read)
-
-# TODO
 class Downloader(object):
     """
     Manages download threads.
@@ -159,3 +129,57 @@ class Follower(object):
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
             self.root.after(self.interval, self.follow)
+
+class UpstreamReader(object):
+    """
+    Reads the upstream queue and puts its content at the status bar.
+    """
+    upstream_queue:Queue
+    downloader:Downloader
+    root:tk.Tk
+    interval:int
+    status_var:tk.StringVar
+    show_tiles:bool
+
+    def __init__(
+        self,
+        root:tk.Tk,
+        status_var:tk.StringVar,
+        upstream_queue:Queue,
+        downloader:Downloader,
+        interval:int=100,
+    ):
+        self.root = root
+        self.upstream_queue = upstream_queue
+        self.interval = interval
+        self.downloader = downloader
+        self.status_var = status_var
+        self.status_var.set(_('Welcome to Útil paisagem'))
+        self.show_tiles = False
+    
+    def read(self):
+        if not self.show_tiles:
+            if self.downloader.download_queue.qsize():
+                self.show_tiles = True
+        msg = ''
+        while not self.upstream_queue.empty():
+            try:
+                msg = self.upstream_queue.get_nowait()
+            except Empty:
+                break
+            # self.log = self.log + msg + '\n'
+            print(msg)
+        if msg and self.show_tiles:
+            self.status_var.set(' '.join([
+                msg,
+                _('(Remaining tiles: {n})').format(
+                    n=self.downloader.download_queue.qsize() + self.downloader.current_downloads
+                )
+            ]))
+        elif self.show_tiles and self.downloader.current_downloads == 0:
+            self.status_var.set(_('All tiles have been downloaded.'))
+            self.show_tiles = False
+        elif msg:
+            self.status_var.set(msg)
+        self.root.after(self.interval, self.read)
+
