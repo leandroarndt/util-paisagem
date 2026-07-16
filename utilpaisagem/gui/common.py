@@ -69,14 +69,14 @@ class Settings(object):
     }
 
     def __getattribute__(self, name):
-        try:
-            if name in __class__._key_section:
+        if name in __class__._key_section:
+            try:
                 value = __class__._settings[__class__._key_section[name]][name]
                 if not isinstance(__class__.__dict__[name], str):
                     return ast.literal_eval(value)
                 return value
-        except KeyError:
-            pass
+            except KeyError:
+                pass
         return super().__getattribute__(name)
 
 
@@ -97,19 +97,21 @@ class Settings(object):
         if not hasattr(self.__class__, '_settings'):
             create = not self.__class__._file.exists()
             self.__class__._settings = configparser.ConfigParser()
-            if create: # set default values
-                for section in _Sections:
-                    self.__class__._settings[section.value] = {}
-                for k, v in self.__class__.__dict__.items():
-                    try:
-                        self.__class__._settings[self.__class__._key_section[k]][k] = str(v)
-                    except KeyError:
-                        pass
+            # if create: # set default values
+            for section in _Sections:
+                if section.value != 'DEFAULT':
+                    self.__class__._settings.add_section(section.value)
+            for k, v in self.__class__.__dict__.items():
+                try:
+                    self.__class__._settings[self.__class__._key_section[k]][k] = str(v)
+                except KeyError:
+                    pass
+            if create:
                 if not self.__class__._file.parent.exists():
                     self.__class__._file.parent.mkdir(parents=True)
                 with open(self.__class__._file, 'w') as file:
                     self.__class__._settings.write(file)
-            else: # read exiting file
+            else: # read exiting file (possibly with new values)
                 self.__class__._settings.read(self.__class__._file)
     
     @classmethod
