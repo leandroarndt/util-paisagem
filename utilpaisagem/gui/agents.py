@@ -49,17 +49,19 @@ class Downloader(object):
     root:tk.Tk
     upstream_queue:Queue
     download_manager:DownloadManager
+    interval:int
     idle_interval:int
     download_queue:Queue
     wait_queue:Queue
     current_downloads:int
     max_downloads:int
 
-    def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, idle_interval:int=100, max_downloads:int=4):
+    def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, interval:int=100, idle_interval:int=1000, max_downloads:int=4):
         self.root = root
         self.upstream_queue = upstream_queue
         self.download_manager = download_manager
-        self.interval = idle_interval
+        self.interval = interval
+        self.idle_interval = idle_interval
         self.download_queue = Queue()
         self.wait_queue = Queue()
         self.current_downloads = 0
@@ -71,18 +73,20 @@ class Downloader(object):
         self.wait_queue.put_nowait(tile.index)
 
     def _wait_download(self):
-        if self.wait_queue.empty():
-            self.root.after(100, self._wait_download)
-        else:
+        # if self.wait_queue.empty():
+        #     self.root.after(self.interval, self._wait_download)
+        # else:
+        if not self.wait_queue.empty():
             self.wait_queue.get_nowait()
             self.current_downloads -= 1
             self._download_tiles()
 
     def _download_tiles(self):
-        if (not self.download_queue.empty()) and self.current_downloads < self.max_downloads:
-            self.current_downloads += 1
-            thread = Thread(target=self._download_thread)
-            thread.start()
+        if (not self.download_queue.empty()):
+            if self.current_downloads < self.max_downloads:
+                self.current_downloads += 1
+                thread = Thread(target=self._download_thread)
+                thread.start()
             self._wait_download()
 
     def add_tile(self, index):
@@ -99,7 +103,9 @@ class Downloader(object):
             self.download_queue.put_nowait(self.download_manager.queue.pop(0))
         if not self.download_queue.empty():
             self._download_tiles()
-        self.root.after(self.interval, self.download)
+            self.root.after(self.interval, self.download)
+        else:
+            self.root.after(self.idle_interval, self.download)
 
 class Follower(object):
     """Class used to follow a Flightgear aircraft in a separate thread."""
