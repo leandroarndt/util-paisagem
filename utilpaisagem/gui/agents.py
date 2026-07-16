@@ -25,6 +25,7 @@ class Downloader(object):
     wait_queue:Queue
     current_downloads:int
     max_downloads:int
+    total:int
 
     def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, interval:int=100, idle_interval:int=1000, max_downloads:int=4):
         self.root = root
@@ -36,6 +37,7 @@ class Downloader(object):
         self.wait_queue = Queue()
         self.current_downloads = 0
         self.max_downloads = max_downloads
+        self.total = 0
     
     def _download_thread(self):
         tile:Tile = self.download_queue.get()
@@ -55,6 +57,7 @@ class Downloader(object):
         if (not self.download_queue.empty()):
             if self.current_downloads < self.max_downloads:
                 self.current_downloads += 1
+                self.total += 1
                 thread = Thread(target=self._download_thread)
                 thread.start()
             self._wait_download()
@@ -73,6 +76,9 @@ class Downloader(object):
             self.download_queue.put_nowait(self.download_manager.queue.pop(0))
         if not self.download_queue.empty():
             self._download_tiles()
+            self.root.after(self.interval, self.download)
+        elif self.current_downloads: # No queue, but still downloading
+            self._wait_download()
             self.root.after(self.interval, self.download)
         else:
             self.root.after(self.idle_interval, self.download)
@@ -172,12 +178,15 @@ class UpstreamReader(object):
         if msg and self.show_tiles:
             self.status_var.set(' '.join([
                 msg,
-                _('(Remaining tiles: {n})').format(
-                    n=self.downloader.download_queue.qsize() + self.downloader.current_downloads
+                _('(Remaining tiles: {n}/{total})').format(
+                    n=self.downloader.download_queue.qsize() + self.downloader.current_downloads,
+                    total=self.downloader.total
                 )
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
-            self.status_var.set(_('All tiles have been downloaded.'))
+            self.status_var.set(format_status(
+                _('All {total} tiles have been downloaded.').format(total=self.downloader.total)
+                , self))
             self.show_tiles = False
         elif msg:
             self.status_var.set(msg)
