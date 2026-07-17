@@ -35,9 +35,9 @@ class Downloader(object):
         self.idle_interval = idle_interval
         self.download_queue = Queue()
         self.wait_queue = Queue()
-        self.current_downloads = 0
         self.max_downloads = max_downloads
-        self.total = 0
+        self.current_downloads = 0
+        self.finished_downloads = 0
     
     def _download_thread(self):
         tile:Tile = self.download_queue.get()
@@ -51,13 +51,13 @@ class Downloader(object):
         if not self.wait_queue.empty():
             self.wait_queue.get_nowait()
             self.current_downloads -= 1
+            self.finished_downloads += 1
             self._download_tiles()
 
     def _download_tiles(self):
         if (not self.download_queue.empty()):
             if self.current_downloads < self.max_downloads:
                 self.current_downloads += 1
-                self.total += 1
                 thread = Thread(target=self._download_thread)
                 thread.start()
             self._wait_download()
@@ -180,13 +180,20 @@ class UpstreamReader(object):
                 msg,
                 _('(Remaining tiles: {n}/{total})').format(
                     n=self.downloader.download_queue.qsize() + self.downloader.current_downloads,
-                    total=self.downloader.total
+                    total=self.downloader.download_queue.qsize() + \
+                        self.downloader.finished_downloads + \
+                        self.downloader.current_downloads
                 )
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
             self.status_var.set(format_status(
-                _('All {total} tiles have been downloaded.').format(total=self.downloader.total)
-                , self))
+                _('All {total} tiles have been downloaded.').format(
+                    total=self.downloader.download_queue.qsize() + \
+                        self.downloader.finished_downloads + \
+                        self.downloader.current_downloads
+                ),
+                self
+            ))
             self.show_tiles = False
         elif msg:
             self.status_var.set(msg)
