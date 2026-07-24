@@ -1,6 +1,7 @@
 """Settings window and ini file reader."""
 import math
 from decimal import Decimal
+from pathlib import Path
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -106,13 +107,7 @@ class SettingsWindow(object):
         self.settings = Settings()
         self.sizes = []
         for r in RESOLUTIONS.keys():
-            # self.sizes[_('{size} lines').format(size=self.format_size(r))] = r
             self.sizes.append(self.format_size(r))
-        # self.resolutions = {}
-        # for k, v in RESOLUTIONS.items():
-        #     self.resolutions[_('{res} m/px').format(
-        #         res=format_decimal(Decimal(v).quantize(Decimal('1.00')))
-        #     )] = k
 
         # GUI
         self.window = tk.Toplevel(master, *args, **kwargs)
@@ -137,7 +132,11 @@ class SettingsWindow(object):
             font=tk.font.Font(slant='italic'),
         )
         # TODO
-        # self.fg_path_button = ttk.Button
+        self.fg_path_button = ttk.Button(
+            self.path_frame,
+            text=_('Choose folder'),
+            command=self.choose_fgdata_dir,
+        )
         self.orthophotos_var = tk.StringVar(self.path_frame, value=self.settings.orthophotos_folder)
         self.orthophotos_name = ttk.Label(
             self.path_frame,
@@ -150,12 +149,17 @@ class SettingsWindow(object):
             justify=tk.LEFT,
             font=tk.font.Font(slant='italic'),
         )
+        self.orthophotos_button = ttk.Button(
+            master=self.path_frame,
+            text=_('Choose folder'),
+            command=self.choose_orthophotos_dir,
+        )
         self.fg_path_name.grid(column=0, row=0, sticky=tk.E)
         self.fg_path_label.grid(column=1, row=0, sticky=tk.W)
+        self.fg_path_button.grid(column=2, row=0, sticky=tk.E)
         self.orthophotos_name.grid(column=0, row=1, sticky=tk.E)
         self.orthophotos_label.grid(column=1, row=1, sticky=tk.W)
-        # TODO
-        # self.orthophotos_button = ttk.Button
+        self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
         # Threading and download range
         self.download_frame = ttk.LabelFrame(self.window, text=_('Download'), padding=PADDING)
         self.radius_var = tk.IntVar(self.download_frame, value=self.settings.radius)
@@ -251,6 +255,35 @@ class SettingsWindow(object):
     def unformat_size(self, formatted:str) -> int:
         """Returns the exponent of a download size readable string."""
         return int(math.log2(int(formatted.split()[0])))
+
+    def choose_fgdata_dir(self):
+        path = tk.filedialog.askdirectory(
+            parent=self.window,
+            title=_('Choose FlightGear data directory'),
+            initialdir=self.settings.fgdata_folder,
+        )
+        if path and Path(path).is_dir():
+            self.fg_path_var.set(path)
+
+    def choose_orthophotos_dir(self):
+        path = tk.filedialog.askdirectory(
+            parent=self.window,
+            title=_('Choose "Orthophotos" directory'),
+            initialdir=self.orthophotos_var.get(),
+        )
+        if not path:
+            return
+        path = Path(path)
+        path = path.expanduser()
+        if Path(path).is_dir():
+            if path.name.lower() != 'orthophotos': # Invalid path
+                tk.messagebox.showerror(
+                    title=_('Invalid folder'),
+                    message=_('Please choose a folder named "Orthophotos".')
+                )
+            if path.name != 'Orthophotos': # Normalize
+                path = path.rename(path.parent / 'Orthophotos')
+            self.orthophotos_var.set(path)
 
     def cancel(self):
         self.settings.reload()
