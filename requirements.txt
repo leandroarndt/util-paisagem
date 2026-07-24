@@ -1,5 +1,6 @@
 pillow>=11.2.1
 flightgear_python
 Babel
-appdir
+appdirs
 tkintermapview
+LatLon23
