@@ -66,6 +66,7 @@ class SettingsWindow(object):
     settings:Settings
     sizes:list
     distances:list
+    main_window:object # MainWindow object. Import cannot be done due to recurrence.
 
     # GUI
     window:tk.Toplevel
@@ -96,8 +97,9 @@ class SettingsWindow(object):
     apply_button:ttk.Button
     cancel_button:ttk.Button
 
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, main_window, *args, **kwargs):
         # Útil paisagem things
+        self.main_window = main_window
         self.settings = Settings()
         self.sizes = []
         for r in RESOLUTIONS.keys():
@@ -248,6 +250,7 @@ class SettingsWindow(object):
             if d.status.get() and d.distance.get() > 0:
                 distances[int(d.distance.get())] = d.resolution
         self.settings.distances = distances
+        self.main_window.download_manager.resolutions = distances
     
     def apply_and_close(self):
         self.apply()

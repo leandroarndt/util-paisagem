@@ -244,7 +244,7 @@ class MainWindow(object):
             self.others_frame,
             text=_('Settings'),
             # command=self.open_settings,
-            command=lambda: SettingsWindow(self.window),
+            command=lambda: SettingsWindow(self.window, main_window=self),
         )
         self.settings_button.grid(column=0, row=0, sticky=tk.W+tk.E)
 
@@ -340,7 +340,10 @@ class MainWindow(object):
             what_var[what].set(str(self.__dict__[what]))
             return
         if what == 'index':
-            coordinates = Tile.index_to_coordinates(self.index)
+            coordinates = Tile.index_to_coordinates(
+                self.index,
+                resolution=sorted(self.settings.distances.values())[-1],
+            )
             self.lat = coordinates.lat_median
             self.lon = coordinates.lon_median
             self.lat_var.set(str(self.lat))
@@ -466,7 +469,10 @@ class MainWindow(object):
 
     # Download based on latitude and longitude
     def download_tile(self):
-        self.downloader.add_tile(self.index)
+        self.downloader.add_tile(
+            self.index,
+            resolution=sorted(self.settings.distances.values())[-1],
+        )
     
     def download_region(self):
         self.download_manager.recenter(lat=self.lat, lon=self.lon)

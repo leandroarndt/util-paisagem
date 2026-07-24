@@ -8,6 +8,7 @@ from flightgear_python.fg_util import FGCommunicationError, FGConnectionError
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
+from utilpaisagem.scenery.common import DOWNLOAD_RES
 from utilpaisagem.gui.common import format_status, Settings
 
 settings = Settings()
@@ -62,8 +63,12 @@ class Downloader(object):
                 thread.start()
             self._wait_download()
 
-    def add_tile(self, index):
-        self.download_queue.put_nowait(Tile(index, upstream_queue=self.upstream_queue))
+    def add_tile(self, index, resolution=DOWNLOAD_RES):
+        self.download_queue.put_nowait(Tile(
+            index,
+            resolution=resolution,
+            upstream_queue=self.upstream_queue,
+        ))
         self.upstream_queue.put_nowait(format_status(
             _('Tile {index} added to download queue.').format(index=index),
             self
