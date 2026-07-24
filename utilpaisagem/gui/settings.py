@@ -254,6 +254,7 @@ class SettingsWindow(object):
 
     def cancel(self):
         self.settings.reload()
+        self.make_changes()
         self.window.destroy()
 
     def apply(self):
@@ -274,8 +275,12 @@ class SettingsWindow(object):
             res = distances.pop(sorted(distances.keys())[-1])
             distances[self.settings.radius] = res
         self.settings.distances = distances
+        self.make_changes()
+    
+    def make_changes(self):
         self.main_window.download_manager.radius = self.settings.radius
-        self.main_window.download_manager.resolutions = distances
+        self.main_window.download_manager.resolutions = self.settings.distances
+        self.main_window.download_manager.max_downloads = self.settings.tile_threads
     
     def apply_and_close(self):
         self.apply()
