@@ -1,4 +1,5 @@
 """Settings window and ini file reader."""
+import math
 from decimal import Decimal
 import tkinter as tk
 from tkinter import ttk
@@ -10,7 +11,7 @@ from utilpaisagem.scenery.common import RESOLUTIONS
 class SettingsWindow(object):
     # Útil paisagem things
     settings:Settings
-    resolutions:dict
+    sizes:dict
 
     # GUI
     window:tk.Toplevel
@@ -35,7 +36,7 @@ class SettingsWindow(object):
     image_frame:ttk.LabelFrame
     resolution_var:tk.IntVar
     resolution_label:ttk.Label
-    resolution_option:ttk.OptionMenu
+    resolution_option:ttk.Combobox
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -44,11 +45,15 @@ class SettingsWindow(object):
     def __init__(self, master, *args, **kwargs):
         # Útil paisagem things
         self.settings = Settings()
-        self.resolutions = {}
-        for k, v in RESOLUTIONS.items():
-            self.resolutions[_('{res} m/px').format(
-                res=format_decimal(Decimal(v).quantize(Decimal('1.00')))
-            )] = k
+        self.sizes = []
+        for r in RESOLUTIONS.keys():
+            # self.sizes[_('{size} lines').format(size=self.format_size(r))] = r
+            self.sizes.append(self.format_size(r))
+        # self.resolutions = {}
+        # for k, v in RESOLUTIONS.items():
+        #     self.resolutions[_('{res} m/px').format(
+        #         res=format_decimal(Decimal(v).quantize(Decimal('1.00')))
+        #     )] = k
 
         # GUI
         self.window = tk.Toplevel(master, *args, **kwargs)
@@ -114,10 +119,19 @@ class SettingsWindow(object):
         self.tiles_label.grid(column=0, row=0, sticky=tk.E)
         self.tiles_input.grid(column=1, row=0, sticky=tk.W)
         # Image resolutions
-        self.image_frame = ttk.LabelFrame(self.window, padding=PADDING)
-        self.resolution_var = tk.IntVar(self.image_frame, self.settings.download_res)
-        self.resolution_label = ttk.Label
-        resolution_option:ttk.OptionMenu
+        self.image_frame = ttk.LabelFrame(self.window, text=_('Image settings'), padding=PADDING)
+        self.resolution_var = tk.StringVar(
+            self.image_frame,
+            self.format_size(self.settings.download_res),
+        )
+        self.resolution_label = ttk.Label(self.image_frame, text=_('Download size:'))
+        self.resolution_option = ttk.Combobox(
+            self.image_frame,
+            values=self.sizes,
+            textvariable=self.resolution_var,
+        )
+        self.resolution_label.grid(column=0, row=0)
+        self.resolution_option.grid(column=1, row=0)
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
@@ -138,10 +152,19 @@ class SettingsWindow(object):
         self.cancel_button.grid(column=0, row=0)
         self.apply_button.grid(column=1, row=0)
         self.ok_button.grid(column=2, row=0)
-
+        # Place frames
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.threading_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
-        self.buttons_frame.grid(column=0, row=2, sticky=tk.E)
+        self.image_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
+        self.buttons_frame.grid(column=0, row=3, sticky=tk.E)
+
+    def format_size(self, res:int) -> str:
+        """Formats image size to a readable format."""
+        return _('{size} lines').format(size=2**res)
+    
+    def unformat_size(self, formatted:str) -> int:
+        """Returns the exponent of a download size readable string."""
+        return int(math.log2(int(formatted.split()[0])))
 
     def cancel(self):
         self.settings.reload()
@@ -151,6 +174,7 @@ class SettingsWindow(object):
         self.settings.fgdata_folder = self.fg_path_var.get()
         self.settings.orthophotos_folder = self.orthophotos_var.get()
         self.settings.tile_threads = int(self.tiles_var .get())
+        self.settings.download_res = self.unformat_size(self.resolution_var.get())
     
     def apply_and_close(self):
         self.apply()
