@@ -1,3 +1,4 @@
+import webbrowser
 import tkinter as tk
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
@@ -37,6 +38,8 @@ class MainWindow(object):
     resources_path:Path
     window:tk.Tk
     status_var:tk.StringVar
+    menu:tk.Menu
+    help_menu:tk.Menu
 
     # Map
     search_frame:ttk.Frame
@@ -94,6 +97,32 @@ class MainWindow(object):
         self.resources_path = resources_path
         self.window = tk.Tk()
         self.window.title('Útil paisagem')
+        self.window.withdraw()
+        # Menu
+        self.menu = tk.Menu(self.window)
+        self.help_menu = tk.Menu(self.menu)
+        self.window.configure(menu=self.menu)
+        self.help_menu.add_command(
+            label=_('Online manual'),
+            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/wiki')
+        )
+        self.help_menu.add_command(
+            label=_('Latest releases'),
+            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/releases'),
+        )
+        self.help_menu.add_command(
+            label=_('Contribute'),
+            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem'),
+        )
+        self.help_menu.add_command(
+            label=_('Donate'),
+            command=lambda: webbrowser.open('https://buymeacoffee.com/leandro.a')
+        )
+        self.menu.add_cascade(
+            label=_('Help'),
+            menu=self.help_menu,
+        )
+        # Grid
         self.window.columnconfigure(0, weight=10, pad=PADDING)
         self.window.columnconfigure(1, pad=PADDING)
         self.window.rowconfigure(0, weight=10)
@@ -186,7 +215,7 @@ class MainWindow(object):
         self.lon_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lon', *args, **kwargs))
         # Waypoints list
         self.waypoints_var = tk.Variable(value=self.waypoints)
-        self.waypoints_frame = ttk.Frame(self.toolbar_frame)
+        self.waypoints_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.waypoints_label = ttk.Label(self.waypoints_frame, text=_('Waypoints:'))
         self.waypoints_list = tk.Listbox(
             self.waypoints_frame,
@@ -243,7 +272,6 @@ class MainWindow(object):
         self.settings_button = ttk.Button(
             self.others_frame,
             text=_('Settings'),
-            # command=self.open_settings,
             command=lambda: SettingsWindow(self.window, main_window=self),
         )
         self.settings_button.grid(column=0, row=0, sticky=tk.W+tk.E)
@@ -278,6 +306,8 @@ class MainWindow(object):
             self.downloader,
             interval=100)
         self.upstream_reader.read()
+
+        self.window.deiconify()
 
     # Validation
     def validate_float(self, input:str):
