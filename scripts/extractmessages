@@ -1,0 +1,2 @@
+#!/bin/bash
+pybabel extract -o resources/locale/utilpaisagem.pot --project="Útil paisagem" --copyright-holder="Leandro Arndt" --msgid-bugs-address="utilpaisagem.locale@visaocatolica.com.br" utilpaisagem

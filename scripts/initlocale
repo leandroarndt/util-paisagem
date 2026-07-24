@@ -1,0 +1,2 @@
+#!/bin/bash
+pybabel init -D utilpaisagem -i resources/locale/utilpaisagem.pot -d resources/locale -l $1

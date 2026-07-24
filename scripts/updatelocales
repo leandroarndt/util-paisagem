@@ -1,0 +1,2 @@
+#!/bin/bash
+pybabel update -D utilpaisagem -d resources/locale -i resources/locale/utilpaisagem.pot
