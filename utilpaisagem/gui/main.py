@@ -15,6 +15,7 @@ from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, PADDING
+from utilpaisagem.gui.settings import SettingsWindow
 
 class MainWindow(object):
     """
@@ -77,6 +78,8 @@ class MainWindow(object):
     waypoints_down_button:tk.Button
     download_route_button:tk.Button
     follow_button:ttk.Button
+    others_frame:ttk.Frame
+    settings_button:ttk.Button
 
     # Status bar
     status_var:tk.StringVar
@@ -233,6 +236,17 @@ class MainWindow(object):
             self.follow_button,
             text=_('Follow aircraft on Flightgear over telnet connection.')
         )
+        # Settings, about etc.
+        self.others_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
+        self.others_frame.columnconfigure(0, weight=1)
+        self.others_frame.pack(fill=tk.X)
+        self.settings_button = ttk.Button(
+            self.others_frame,
+            text=_('Settings'),
+            # command=self.open_settings,
+            command=lambda: SettingsWindow(self.window),
+        )
+        self.settings_button.grid(column=0, row=0, sticky=tk.W+tk.E)
 
         # Status bar
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
@@ -442,6 +456,10 @@ class MainWindow(object):
                 _('Could not find address {address}.').format(address=self.search_var.get()),
                 self
             ))
+
+    # def open_settings(self):
+    #     settings_window = SettingsWindow(self.window)
+    #     self.window.wait_window(settings_window.window.master)
 
     # Actions
     # TODO: set preferences here and at agents.py

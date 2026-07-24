@@ -5,6 +5,7 @@ from babel.dates import LOCALTZ, format_datetime
 import configparser, ast, appdirs
 from pathlib import Path
 from enum import Enum
+from tkinter import font
 from utilpaisagem.scenery.common import DOWNLOAD_RES, MAX_RES, MIN_RES
 
 # GUI defaults
@@ -46,7 +47,7 @@ class Settings(object):
     """
     _file:Path
     _settings:configparser.ConfigParser
-    fgdata_folder:str = Path.home() / '.fgdata'
+    fgdata_folder:str = str(Path.home() / '.fgdata')
     orthophotos_folder:str = '%(fgdata_folder)s/utilpaisagem/Orthophotos'
     tile_threads:int = 4
     image_threads:int = 4
@@ -113,7 +114,11 @@ class Settings(object):
                     self.__class__._settings.write(file)
             else: # read exiting file (possibly with new values)
                 self.__class__._settings.read(self.__class__._file)
-    
+
+    @classmethod
+    def reload(cls):
+        cls._settings.read(cls._file)
+
     @classmethod
     def save(cls):
         with open(cls._file, 'w') as file:
