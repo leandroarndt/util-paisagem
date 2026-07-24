@@ -79,7 +79,10 @@ class SettingsWindow(object):
     orthophotos_var:tk.StringVar
     orthophotos_label:ttk.Label
     orthophotos_button:ttk.Button
-    threading_frame:ttk.LabelFrame
+    download_frame:ttk.LabelFrame
+    radius_var:tk.IntVar
+    radius_label:ttk.Label
+    radius_input:ttk.Spinbox
     tiles_var:tk.IntVar
     tiles_label:ttk.Label
     tiles_var:tk.IntVar
@@ -153,16 +156,27 @@ class SettingsWindow(object):
         self.orthophotos_label.grid(column=1, row=1, sticky=tk.W)
         # TODO
         # self.orthophotos_button = ttk.Button
-        # Threading
-        self.threading_frame =ttk.LabelFrame(self.window, text=_('Threading'), padding=PADDING)
-        self.tiles_var = tk.IntVar(self.threading_frame, value=self.settings.tile_threads)
+        # Threading and download range
+        self.download_frame = ttk.LabelFrame(self.window, text=_('Download'), padding=PADDING)
+        self.radius_var = tk.IntVar(self.download_frame, value=self.settings.radius)
+        self.radius_label = ttk.Label(
+            self.download_frame,
+            text=_('Download radius:')
+        )
+        self.radius_input = ttk.Spinbox(
+            self.download_frame,
+            textvariable=self.radius_var,
+            from_=0,
+            to=44100,
+        )
+        self.tiles_var = tk.IntVar(self.download_frame, value=self.settings.tile_threads)
         self.tiles_label = ttk.Label(
-            self.threading_frame,
+            self.download_frame,
             text=_('Maximum simultaneous tiles to download:'),
             justify=tk.RIGHT
         )
         self.tiles_input = ttk.Spinbox(
-            self.threading_frame,
+            self.download_frame,
             textvariable=self.tiles_var,
             from_=1,
             to=36,
@@ -172,10 +186,12 @@ class SettingsWindow(object):
         # threads_var:tk.IntVar
         # threads_label:tk.Label
         # threads_input:ttk.Spinbox
-        self.tiles_label.grid(column=0, row=0, sticky=tk.E)
-        self.tiles_input.grid(column=1, row=0, sticky=tk.W)
+        self.radius_label.grid(column=0, row=0, sticky=tk.E)
+        self.radius_input.grid(column=1, row=0, sticky=tk.W)
+        self.tiles_label.grid(column=0, row=1, sticky=tk.E)
+        self.tiles_input.grid(column=1, row=1, sticky=tk.W)
         # Image resolutions
-        self.image_frame = ttk.LabelFrame(self.window, text=_('Image settings'), padding=PADDING)
+        self.image_frame = ttk.LabelFrame(self.window, text=_('Image'), padding=PADDING)
         self.resolution_var = tk.StringVar(
             self.image_frame,
             self.format_size(self.settings.download_res),
@@ -224,7 +240,7 @@ class SettingsWindow(object):
         self.ok_button.grid(column=2, row=0)
         # Place frames
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
-        self.threading_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
+        self.download_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         self.image_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
         self.buttons_frame.grid(column=0, row=3, sticky=tk.E)
 
@@ -243,13 +259,22 @@ class SettingsWindow(object):
     def apply(self):
         self.settings.fgdata_folder = self.fg_path_var.get()
         self.settings.orthophotos_folder = self.orthophotos_var.get()
+        self.settings.radius = int(self.radius_var.get())
         self.settings.tile_threads = int(self.tiles_var .get())
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
         distances = {}
+        max_distance = 0
         for d in self.distances:
             if d.status.get() and d.distance.get() > 0:
-                distances[int(d.distance.get())] = d.resolution
+                dist = int(d.distance.get())
+                distances[dist] = d.resolution
+                if dist > max_distance:
+                    max_distance = dist
+        if max_distance < self.settings.radius:
+            res = distances.pop(sorted(distances.keys())[-1])
+            distances[self.settings.radius] = res
         self.settings.distances = distances
+        self.main_window.download_manager.radius = self.settings.radius
         self.main_window.download_manager.resolutions = distances
     
     def apply_and_close(self):
