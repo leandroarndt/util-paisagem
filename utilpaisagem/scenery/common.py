@@ -10,18 +10,18 @@ import math
 from numbers import Number
 
 METER_RESOLUTION = 14 # One tile height has circa 13892 meters, thus 2**14 (16384 pixels)
-METER = 1/13892.375 # One meter converted to tile units
+METER_SIZE = 13892.375 # Tile size in meters
 
 # meters/pixel, from 0.84 (16384 px) to 108 (128 px)
 RESOLUTIONS = {
-    14: METER/2**14,
-    13: METER/2**13,
-    12: METER/2**12,
-    11: METER/2**11,
-    10: METER/2**10,
-    9:  METER/2**9,
-    8:  METER/2**8,
-    7:  METER/2**7
+    14: METER_SIZE/2**14,
+    13: METER_SIZE/2**13,
+    12: METER_SIZE/2**12,
+    11: METER_SIZE/2**11,
+    10: METER_SIZE/2**10,
+    9:  METER_SIZE/2**9,
+    8:  METER_SIZE/2**8,
+    7:  METER_SIZE/2**7
 }
 MAX_RES = 14
 DOWNLOAD_RES = 10 # Preferred download resolution to compose high-res tiles
