@@ -56,7 +56,7 @@ class Settings(object):
     distances = {
         8: DOWNLOAD_RES + 2,
         20: DOWNLOAD_RES + 1,
-        40100000: DOWNLOAD_RES,
+        40100: DOWNLOAD_RES,
     }
         
     _key_section = {

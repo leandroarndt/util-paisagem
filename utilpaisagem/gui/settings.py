@@ -8,10 +8,64 @@ from babel.numbers import format_decimal
 from utilpaisagem.gui.common import Settings, PADDING
 from utilpaisagem.scenery.common import RESOLUTIONS
 
+class Distance(ttk.Frame):
+    resolution:int
+    distance:tk.IntVar
+    status:tk.BooleanVar
+    toggle:ttk.Checkbutton
+    distance_entry:ttk.Spinbox
+    km_label:ttk.Label
+
+    def __init__(self, master, resolution:int, distance:int, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        self.resolution = resolution
+        self.distance = tk.IntVar(self, value=distance)
+        self.status = tk.BooleanVar(self)
+        self.columnconfigure(0, pad=PADDING)
+        self.columnconfigure(1, pad=PADDING)
+        self.columnconfigure(2, pad=PADDING)
+        self.toggle = ttk.Checkbutton(
+            master,
+            text=_('{res} m/px range:').format(
+                res=format_decimal(Decimal(RESOLUTIONS[resolution]).quantize(Decimal('1.00')))
+            ),
+            variable=self.status,
+        )
+        self.distance_entry = ttk.Spinbox(
+            master,
+            textvariable=self.distance,
+            from_=-1,
+            to=44100,
+        )
+        self.km_label = ttk.Label(master, text=_('Km'))
+        if distance > 0:
+            self.status.set(True)
+        else:
+            self.status.set(False)
+            self.distance_entry.configure(state=tk.DISABLED)
+        self.status.trace_add('write', self.status_change)
+    
+    def get(self) -> dict[int:int]|None:
+        if self.status.get():
+            return {self.resolution: int(self.distance.get())}
+        return None
+
+    def grid_items(self, column, row):
+        self.toggle.grid(column=column, row=row, sticky=tk.W)
+        self.distance_entry.grid(column=column+1, row=row, sticky=tk.E)
+        self.km_label.grid(column=column+2, row=row, sticky=tk.W)
+    
+    def status_change(self, *args, **kwargs):
+        if self.status.get():
+            self.distance_entry.config(state='enable')
+        else:
+            self.distance_entry.config(state='disable')
+
 class SettingsWindow(object):
     # Útil paisagem things
     settings:Settings
-    sizes:dict
+    sizes:list
+    distances:list
 
     # GUI
     window:tk.Toplevel
@@ -130,8 +184,22 @@ class SettingsWindow(object):
             values=self.sizes,
             textvariable=self.resolution_var,
         )
-        self.resolution_label.grid(column=0, row=0)
-        self.resolution_option.grid(column=1, row=0)
+        self.resolution_label.grid(column=0, row=0, sticky=tk.E)
+        self.resolution_option.grid(column=1, row=0, sticky=tk.W)
+        self.distances = []
+        row = 1
+        resolution_distance = {}
+        for d, r in self.settings.distances.items():
+            resolution_distance[r] = d
+        for r in RESOLUTIONS.keys():
+            try:
+                d = resolution_distance[r]
+            except KeyError:
+                d = -1
+            distance_frame = Distance(self.image_frame, resolution=r, distance=d)
+            self.distances.append(distance_frame)
+            distance_frame.grid_items(column=0, row=row)
+            row += 1
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
@@ -175,6 +243,11 @@ class SettingsWindow(object):
         self.settings.orthophotos_folder = self.orthophotos_var.get()
         self.settings.tile_threads = int(self.tiles_var .get())
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
+        distances = {}
+        for d in self.distances:
+            if d.status.get() and d.distance.get() > 0:
+                distances[int(d.distance.get())] = d.resolution
+        self.settings.distances = distances
     
     def apply_and_close(self):
         self.apply()
