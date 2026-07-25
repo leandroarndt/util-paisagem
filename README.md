@@ -22,9 +22,10 @@ can now be run with the `utilpaisagem.sh` script.
 While Mac and Windows scripts are not made, do the following inside a terminal window
 (`Logo+R` and then `command` on Windows):
 
-1. If you have already installed Python 3.13 or greater, open a terminal window, get into this directory and run python with the arguments "-m venv .env" (e.g.: `python3.exe -m venv .env`)
-2. Still inside the terminal, run the proper activation script inside ".env/scripts" folder.
-3. Run `python -m pip install -r requirements.txt`
+1. If you have already installed Python 3.13 or greater, open a terminal window, get into this directory and run Python with the arguments "-m venv .env" (e.g.: `python3.exe -m venv .env`)
+2. Still inside the terminal, run the proper activation script inside ".env/bin" folder.
+3. Run Python with `-m pip install -r requirements.txt` as arguments (
+`python3.exe -m pip install -r requirements.txt` on Windows).
 
 If everything went fine, you can now run Útil paisagem by activating the virtual environment
 (step 2 of the installation) and passing the "run.py" file to the Python executable
