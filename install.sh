@@ -77,6 +77,9 @@ source scripts/compilemessages
 echo "Changing file permissions..."
 chmod a+x utilpaisagem.sh
 
+echo "Creating shortcut..."
+python shortcut.py
+
 echo ""
 echo "Installation succesfull."
-echo "Run Útil paisagem with \"source $(get_script_dir)/utilpaisagem.sh\""
+echo "Run Útil paisagem using the application shortcut or typing \"source $(get_script_dir)/utilpaisagem.sh\" on the terminal"

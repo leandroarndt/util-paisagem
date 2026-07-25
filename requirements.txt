@@ -4,3 +4,4 @@ Babel
 appdirs
 tkintermapview
 LatLon23
+pyshortcuts
