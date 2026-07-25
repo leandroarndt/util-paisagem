@@ -74,6 +74,9 @@ python -m pip install -r requirements.txt
 echo "Compiling translations..."
 source scripts/compilemessages
 
+echo "Changing file permissions..."
+chmod a+x utilpaisagem.sh
+
 echo ""
 echo "Installation succesfull."
 echo "Run Útil paisagem with \"source $(get_script_dir)/utilpaisagem.sh\""
