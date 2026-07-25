@@ -111,6 +111,7 @@ class SettingsWindow(object):
 
         # GUI
         self.window = tk.Toplevel(master, *args, **kwargs)
+        self.window.protocol('WM_DELETE_WINDOW', lambda: self.cancel())
         self.window.columnconfigure(0, weight=10, pad=PADDING)
         self.window.rowconfigure(0, pad=PADDING)
         self.window.rowconfigure(1, pad=PADDING)
@@ -319,4 +320,3 @@ class SettingsWindow(object):
         self.apply()
         self.settings.save()
         self.window.destroy()
-
