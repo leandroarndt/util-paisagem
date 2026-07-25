@@ -9,3 +9,23 @@ _It's Nothing._
 (Tom Jobim and Aloysio de Oliveira, [Useless landscape](https://www.youtube.com/watch?v=dzjH5P2J10E))
 
 And "you", in a flight simulator, is a photo scenery. This project is dedicated to put the player inside a FlightGear airplane with an as useful landscape as possible.
+
+## Installation
+
+First make sure you have [Python 3.13](https://www.python.org/downloads/) or greater installed.
+On Linux, run the `install.sh` script in this directory. You may need to provide the Python
+binary path to the installation script (e.g.: `source install.sh -p python3.13`). Útil paisagem
+can now be run with the `utilpaisagem.sh` script.
+
+### Other operational systems
+
+While Mac and Windows scripts are not made, do the following inside a terminal window
+(`Logo+R` and then `command` on Windows):
+
+1. If you have already installed Python 3.13 or greater, open a terminal window, get into this directory and run python with the arguments "-m venv .env" (e.g.: `python3.exe -m venv .env`)
+2. Still inside the terminal, run the proper activation script inside ".env/scripts" folder.
+3. Run `python -m pip install -r requirements.txt`
+
+If everything went fine, you can now run Útil paisagem by activating the virtual environment
+(step 2 of the installation) and passing the "run.py" file to the Python executable
+(`python3.exe run.py`, for example).
