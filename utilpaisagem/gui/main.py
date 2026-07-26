@@ -100,7 +100,6 @@ class MainWindow(object):
         self.window.title(
             f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" if not RELEASE else ""}'
         )
-        self.window.withdraw()
         # Menu
         self.menu = tk.Menu(self.window)
         self.help_menu = tk.Menu(self.menu)
@@ -307,8 +306,6 @@ class MainWindow(object):
             self.downloader,
             interval=100)
         self.upstream_reader.read()
-
-        self.window.deiconify()
 
     # Validation
     def validate_float(self, input:str):
