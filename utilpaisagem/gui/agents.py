@@ -11,13 +11,12 @@ from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.scenery.common import DOWNLOAD_RES
 from utilpaisagem.gui.common import format_status, Settings
 
-settings = Settings()
-
 class Downloader(object):
     """
     Manages download threads.
     """
     root:tk.Tk
+    settings:Settings
     upstream_queue:Queue
     download_manager:DownloadManager
     interval:int
@@ -32,17 +31,23 @@ class Downloader(object):
         self.root = root
         self.upstream_queue = upstream_queue
         self.download_manager = download_manager
+        self.settings = Settings()
         self.interval = interval
         self.idle_interval = idle_interval
         self.download_queue = Queue()
         self.wait_queue = Queue()
-        self.max_downloads = max_downloads
+        # self.max_downloads = max_downloads
         self.current_downloads = 0
         self.finished_downloads = 0
     
     def _download_thread(self):
         tile:Tile = self.download_queue.get()
-        tile.retrieve(path=Path(settings.orthophotos_folder), image_service=IMAGE_SERVICES['ArcGIS'], upstream_queue=self.upstream_queue)
+        tile.retrieve(
+            path=Path(self.settings.orthophotos_folder),
+            image_service=IMAGE_SERVICES['ArcGIS'],
+            upstream_queue=self.upstream_queue,
+            download_res=self.settings.download_res,
+        )
         self.wait_queue.put_nowait(tile.index)
 
     def _wait_download(self):
@@ -57,7 +62,7 @@ class Downloader(object):
 
     def _download_tiles(self):
         if (not self.download_queue.empty()):
-            if self.current_downloads < self.max_downloads:
+            if self.current_downloads < self.settings.tile_threads:
                 self.current_downloads += 1
                 thread = Thread(target=self._download_thread)
                 thread.start()

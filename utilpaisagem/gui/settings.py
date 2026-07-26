@@ -84,6 +84,7 @@ class SettingsWindow(object):
     radius_var:tk.IntVar
     radius_label:ttk.Label
     radius_input:ttk.Spinbox
+    radius_km_label:ttk.Label
     tiles_var:tk.IntVar
     tiles_label:ttk.Label
     tiles_var:tk.IntVar
@@ -174,6 +175,7 @@ class SettingsWindow(object):
             from_=0,
             to=44100,
         )
+        self.radius_km_label = ttk.Label(self.download_frame, text=_('Km'))
         self.tiles_var = tk.IntVar(self.download_frame, value=self.settings.tile_threads)
         self.tiles_label = ttk.Label(
             self.download_frame,
@@ -193,6 +195,7 @@ class SettingsWindow(object):
         # threads_input:ttk.Spinbox
         self.radius_label.grid(column=0, row=0, sticky=tk.E)
         self.radius_input.grid(column=1, row=0, sticky=tk.W)
+        self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
         self.tiles_label.grid(column=0, row=1, sticky=tk.E)
         self.tiles_input.grid(column=1, row=1, sticky=tk.W)
         # Image resolutions
@@ -288,7 +291,6 @@ class SettingsWindow(object):
 
     def cancel(self):
         self.settings.reload()
-        self.make_changes()
         self.window.destroy()
 
     def apply(self):
@@ -309,12 +311,6 @@ class SettingsWindow(object):
             res = distances.pop(sorted(distances.keys())[-1])
             distances[self.settings.radius] = res
         self.settings.distances = distances
-        self.make_changes()
-    
-    def make_changes(self):
-        self.main_window.download_manager.radius = self.settings.radius
-        self.main_window.download_manager.resolutions = self.settings.distances
-        self.main_window.download_manager.max_downloads = self.settings.tile_threads
     
     def apply_and_close(self):
         self.apply()

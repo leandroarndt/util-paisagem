@@ -288,8 +288,6 @@ class MainWindow(object):
         self.download_manager = DownloadManager(
             center_lat=0,
             center_lon=0,
-            radius=self.settings.radius,
-            resolutions=self.settings.distances,
             upstream_queue=self.upstream_queue,
             )
         self.download_manager.clear()

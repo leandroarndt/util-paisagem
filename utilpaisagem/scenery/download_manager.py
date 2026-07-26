@@ -10,6 +10,7 @@ from queue import Queue
 from utilpaisagem.scenery.image_service import IMAGE_SERVICES, ImageService
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.common import Coordinates, distance, DOWNLOAD_RES, MIN_RES
+from utilpaisagem.gui.common import Settings
 
 class DownloadManager(object):
     """
@@ -27,19 +28,17 @@ class DownloadManager(object):
     center_lon:Number
     resolutions:dict
     upstream_queue:Queue|None
+    setings:Settings
 
     def __init__(
         self,
         center_lat,
         center_lon,
-        radius=50,
-        resolutions={8: DOWNLOAD_RES+2, 20: DOWNLOAD_RES+1, 40075017: DOWNLOAD_RES},
         upstream_queue:Queue|None=None
     ):
+        self.settings = Settings()
         self.upstream_queue = upstream_queue
         self.queue = []
-        self.radius = radius
-        self.resolutions = resolutions
         self.recenter(center_lat, center_lon)
 
     def add(self, tile:Tile, order:int):
@@ -81,9 +80,9 @@ class DownloadManager(object):
                 next_lat = current.coordinates.lat_median + m[0] * dif_lat
                 next_lon = current.coordinates.lon_median + m[1] * dif_lon
                 dist = distance(lat, lon, next_lat, next_lon)
-                if dist <= self.radius:
+                if dist <= self.settings.radius:
                     res = MIN_RES
-                    for d, r in self.resolutions.items():
+                    for d, r in self.settings.distances.items():
                         if dist <= d and r > res:
                             res = r
                     next_tile = Tile(lat=next_lat, lon=next_lon, resolution=res, upstream_queue=self.upstream_queue)
