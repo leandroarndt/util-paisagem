@@ -13,19 +13,8 @@ And "you", in a flight simulator, is a photo scenery. This project is dedicated 
 ## Installation
 
 First make sure you have [Python 3.13](https://www.python.org/downloads/) or greater installed.
-On Linux, run the `install.sh` script in this directory. You may need to provide the Python
-binary path to the installation script (e.g.: `source install.sh -p python3.13`). Útil paisagem
+After downloading the [latest release](https://github.com/leandroarndt/util-paisagem/releases),
+run the `install.sh` or `win_install.bat` script in this directory according to your operating
+system. You may need to provide the Python binary path to the installation script
+(e.g.: `./install.sh -p python3.13` or `win_install -p python313.exe`). Útil paisagem
 can now be run by clicking the newly created application shortcut.
-
-### Other operational systems
-
-While Mac and Windows scripts are not made, do the following inside a terminal window
-(`Logo+R` and then `command` on Windows):
-
-1. If you have already installed Python 3.13 or greater, open a terminal window, get into this directory and run Python with the arguments "-m venv .env" (e.g.: `py -m venv .env`)
-2. Still inside the terminal, run the proper activation script inside ".env/bin" folder.
-3. Run Python with `-m pip install -r requirements.txt` as arguments
-(`py -m pip install -r requirements.txt` on Windows).
-4. Lastly run shortcut.py (e.g.: `py shortcut.py`).
-
-If everything went fine, you can now run Útil paisagem by clicking on the newly created application shortcut.
