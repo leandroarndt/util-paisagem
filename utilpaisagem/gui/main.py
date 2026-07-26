@@ -12,6 +12,7 @@ from tkintermapview import TkinterMapView
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
+from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RELEASE
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
@@ -96,7 +97,9 @@ class MainWindow(object):
         # Create GUI
         self.resources_path = resources_path
         self.window = tk.Tk()
-        self.window.title('Útil paisagem')
+        self.window.title(
+            f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" if not RELEASE else ""}'
+        )
         self.window.withdraw()
         # Menu
         self.menu = tk.Menu(self.window)
