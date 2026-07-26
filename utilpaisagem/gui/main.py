@@ -48,7 +48,7 @@ class MainWindow(object):
     search_input:ttk.Entry
     search_button:ttk.Button
     map_frame:ttk.Frame
-    map_widget:kinterMapView
+    map_widget:TkinterMapView
     tile_polygon:CanvasPolygon
     waypoints:list[CanvasPositionMarker]
     marker:CanvasPositionMarker
@@ -64,11 +64,11 @@ class MainWindow(object):
     lat:float
     lat_var:tk.StringVar
     lat_label:ttk.Label
-    lat_input:tk.text(self.coordinates_frame)
+    lat_input:tk.Text
     lon:float
     lon_var:tk.StringVar
     lon_label:ttk.Label
-    lon_input:tk.text(self.coordinates_frame)
+    lon_input:tk.Text
     download_tile_button:tk.Button
     download_region_button:tk.Button
     add_waypoint_button:tk.Button
