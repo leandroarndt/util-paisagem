@@ -15,7 +15,7 @@ from tkintermapview.canvas_position_marker import CanvasPositionMarker
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status, Settings, PADDING
+from utilpaisagem.gui.common import format_status, Settings, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
 
 class MainWindow(object):
@@ -167,7 +167,7 @@ class MainWindow(object):
             textvariable=self.index_var,
             justify=tk.LEFT,
         )
-        self.lat_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0))
+        self.lat_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0, locale=LOCALE))
         self.lat = 0.0
         self.lat_label = ttk.Label(self.coordinates_frame, text=_('Latitude:'))
         self.lat_input = ttk.Entry(
@@ -176,7 +176,7 @@ class MainWindow(object):
             justify=tk.LEFT,
             name='lat'
         )
-        self.lon_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0))
+        self.lon_var = tk.StringVar(self.coordinates_frame, value=format_decimal(0.0, locale=LOCALE))
         self.lon = 0.0
         self.lon_label = ttk.Label(self.coordinates_frame, text=_('Longitude:'))
         self.lon_input = ttk.Entry(
@@ -321,7 +321,7 @@ class MainWindow(object):
         try:
             return float(input)
         except ValueError:
-            return float(parse_decimal(input))
+            return float(parse_decimal(input, locale=LOCALE))
 
     def validate_int(self, input:str):
         """
@@ -334,7 +334,7 @@ class MainWindow(object):
         try:
             return int(input)
         except ValueError:
-            return parse_number(input)
+            return parse_number(input, locale=LOCALE)
 
     def float_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
@@ -370,10 +370,7 @@ class MainWindow(object):
             what_var[what].set(str(self.__dict__[what]))
             return
         if what == 'index':
-            coordinates = Tile.index_to_coordinates(
-                self.index,
-                resolution=sorted(self.settings.distances.values())[-1],
-            )
+            coordinates = Tile.index_to_coordinates(self.index)
             self.lat = coordinates.lat_median
             self.lon = coordinates.lon_median
             self.lat_var.set(str(self.lat))

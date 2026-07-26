@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from babel.numbers import format_decimal
-from utilpaisagem.gui.common import Settings, PADDING
+from utilpaisagem.gui.common import Settings, PADDING, LOCALE
 from utilpaisagem.scenery.common import RESOLUTIONS
 
 class Distance(ttk.Frame):
@@ -28,7 +28,7 @@ class Distance(ttk.Frame):
         self.toggle = ttk.Checkbutton(
             master,
             text=_('{res} m/px range:').format(
-                res=format_decimal(Decimal(RESOLUTIONS[resolution]).quantize(Decimal('1.00')))
+                res=format_decimal(Decimal(RESOLUTIONS[resolution]).quantize(Decimal('1.00')), locale=LOCALE)
             ),
             variable=self.status,
         )

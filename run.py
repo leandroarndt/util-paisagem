@@ -1,5 +1,7 @@
+import locale
+locale.setlocale(locale.LC_ALL, '')
 from pathlib import Path
-import gettext
+import gettext, os
 from utilpaisagem.gui import main
 
 base_path = Path(__file__).parent

@@ -1,3 +1,5 @@
+import locale
+#locale.setlocale(locale.LC_ALL, '')
 # format_status
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
@@ -12,9 +14,10 @@ from utilpaisagem.scenery.common import DOWNLOAD_RES, MAX_RES, MIN_RES
 PADDING = 6
 
 # Text formatting
+LOCALE = locale.getlocale()[0] or 'en_US'
 
 def format_status(text:str, obj) -> str:
-    return f'{format_datetime(datetime.now(), format='short')} ({obj.__class__.__name__}): {text}'
+    return f'{format_datetime(datetime.now(), format='short', locale=LOCALE)} ({obj.__class__.__name__}): {text}'
 
 
 # Preferences
