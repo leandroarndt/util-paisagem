@@ -89,6 +89,10 @@ class SettingsWindow(object):
     port_var:tk.IntVar
     port_label:ttk.Label
     port_input:ttk.Entry
+    interval_var:tkIntVar
+    interval_label:ttk.Label
+    interval_input:ttk.Entry
+    interval_seconds_label:ttk.Label
     download_frame:ttk.LabelFrame
     radius_var:tk.IntVar
     radius_label:ttk.Label
@@ -189,10 +193,23 @@ class SettingsWindow(object):
         self.port_var = tk.IntVar(self.connection_frame, value=self.settings.port)
         self.port_label = ttk.Label(self.connection_frame, text=_('Port:'))
         self.port_input = ttk.Entry(self.connection_frame, textvariable=self.port_var)
+        self.interval_var = tk.IntVar(
+            self.connection_frame,
+            value=int(self.settings.following_interval/1000),
+        )
+        self.interval_label = ttk.Label(
+            self.connection_frame,
+            text=_('Interval retrieving aircraft location:'),
+        )
+        self.interval_input = ttk.Entry(self.connection_frame, textvariable=self.interval_var)
+        self.interval_seconds_label = ttk.Label(self.connection_frame, text=_('seconds'))
         self.host_label.grid(column=0, row=0, sticky=tk.E)
         self.host_input.grid(column=1, row=0, sticky=tk.W)
         self.port_label.grid(column=0, row=1, sticky=tk.E)
         self.port_input.grid(column=1, row=1, sticky=tk.W)
+        self.interval_label.grid(column=0, row=2, sticky=tk.E)
+        self.interval_input.grid(column=1, row=2, sticky=tk.W)
+        self.interval_seconds_label.grid(column=2, row=2, sticky=tk.W)
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.connection_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Download tab
@@ -343,6 +360,14 @@ class SettingsWindow(object):
             tk.messagebox.showerror(
                     title=_('Invalid value'),
                     message=_('Invalid value in port configuration. Please inform an integer value.'),
+            )
+            return
+        try:
+            self.settings.following_interval = int(self.interval_var.get())*1000
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in following interval configuration. Please inform an integer value.'),
             )
             return
         try:

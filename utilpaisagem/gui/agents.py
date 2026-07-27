@@ -120,7 +120,6 @@ class Follower(object):
         self.upstream_queue = upstream_queue
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
-        self.interval = interval
         self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=0.5)
         try:
             self.connection.connect() # Raises FGConnectionError if fails
