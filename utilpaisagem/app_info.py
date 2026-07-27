@@ -1,4 +1,4 @@
 VERSION = 0
-SUBVERSION = 1
+SUBVERSION = 2
 REVISION = 0
-RELEASE = 1 # rc = 0; final release = 1
+RC = 1
