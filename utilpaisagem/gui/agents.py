@@ -96,6 +96,7 @@ class Downloader(object):
 class Follower(object):
     """Class used to follow a Flightgear aircraft in a separate thread."""
     root:tk.Tk
+    settings:Settings
     connection:TelnetConnection
     upstream_queue:Queue
     downstream_queue:Queue
@@ -107,16 +108,20 @@ class Follower(object):
         upstream_queue:Queue,
         downstream_queue:Queue,
         download_manager,
-        host:str='localhost',
-        port:int=5000,
-        interval:int=10000
+        *args,
+        **kwargs
     ):
+    #     host:str='localhost',
+    #     port:int=5000,
+    #     interval:int=10000
+    # ):
         self.root = root
+        self.settings = Settings()
         self.upstream_queue = upstream_queue
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
         self.interval = interval
-        self.connection = TelnetConnection(host, port, rx_timeout_s=0.5)
+        self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=0.5)
         try:
             self.connection.connect() # Raises FGConnectionError if fails
         except FGConnectionError as e:
@@ -134,19 +139,19 @@ class Follower(object):
                 self.upstream_queue.put_nowait(
                     format_status(_('Could not receive coordinates info from Flightgear'), self)
                 )
-                self.root.after(self.interval*10, self.follow)
+                self.root.after(self.settings.following_interval*10, self.follow)
             except Exception as e:
                 self.upstream_queue.put_nowait(
                     format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
-                self.root.after(self.interval*10, self.follow)
+                self.root.after(self.settings.following_interval*10, self.follow)
                 # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=lat, lon=lon) # Update download manager center
                 self.upstream_queue.put_nowait(
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
-                self.root.after(self.interval, self.follow)
+                self.root.after(self.settings.following_interval, self.follow)
 
 class UpstreamReader(object):
     """
