@@ -227,9 +227,9 @@ class Tile(object):
                         Path(path / f'{self.index}.{log["INFO"]["format"]}').unlink()
                         raise AssertionError
                 if not Path(path / f"{self.index}.{log['INFO']['format']}").exists():
-                    p = (Path(path / f"{self.index}.{log['INFO']['format']}"))
+                    p = Path(path / f"{self.index}.{log['INFO']['format']}")
                     if self.upstream_queue is None:
-                        print('Previous download was not found where expected ("{p}"). Downloading again.')
+                        print('Previous download was not found where expected ("{p}"). Downloading again.').format(p=p)
                     else:
                         self.upstream_queue.put_nowait(format_status(
                             _('Previous download was not found where expected ("{p}"). Downloading again.').format(p=p),
