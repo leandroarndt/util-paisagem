@@ -73,6 +73,8 @@ class Settings(object):
         'download_res': _Sections.DOWNLOAD.value,
         'radius': _Sections.RANGE.value,
         'distances': _Sections.RANGE.value,
+        'host': _Sections.CONNECTION.value,
+        'port': _Sections.CONNECTION.value,
     }
 
     def __getattribute__(self, name):
