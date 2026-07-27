@@ -116,7 +116,7 @@ class Follower(object):
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
         self.interval = interval
-        self.connection = TelnetConnection(host, port)
+        self.connection = TelnetConnection(host, port, rx_timeout_s=0.5)
         try:
             self.connection.connect() # Raises FGConnectionError if fails
         except FGConnectionError as e:
@@ -134,17 +134,19 @@ class Follower(object):
                 self.upstream_queue.put_nowait(
                     format_status(_('Could not receive coordinates info from Flightgear'), self)
                 )
+                self.root.after(self.interval*10, self.follow)
             except Exception as e:
                 self.upstream_queue.put_nowait(
                     format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
+                self.root.after(self.interval*10, self.follow)
                 # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=lat, lon=lon) # Update download manager center
                 self.upstream_queue.put_nowait(
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
                 )
-            self.root.after(self.interval, self.follow)
+                self.root.after(self.interval, self.follow)
 
 class UpstreamReader(object):
     """
