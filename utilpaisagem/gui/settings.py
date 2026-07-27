@@ -337,22 +337,53 @@ class SettingsWindow(object):
         self.settings.fgdata_folder = self.fg_path_var.get()
         self.settings.orthophotos_folder = self.orthophotos_var.get()
         self.settings.host = self.host_var.get()
-        self.settings.port = int(self.port_var.get())
-        self.settings.radius = int(self.radius_var.get())
-        self.settings.tile_threads = int(self.tiles_var .get())
+        try:
+            self.settings.port = int(self.port_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in port configuration. Please inform an integer value.'),
+            )
+            return
+        try:
+            self.settings.radius = int(self.radius_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in download radius configuration. Please inform an integer value.'),
+            )
+            return
+        try:
+            self.settings.tile_threads = int(self.tiles_var .get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in maximum simultaneous tiles configuration. Please inform an integer value.'),
+            )
+            return
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
         distances = {}
         max_distance = 0
-        for d in self.distances:
-            if d.status.get() and d.distance.get() > 0:
-                dist = int(d.distance.get())
-                distances[dist] = d.resolution
-                if dist > max_distance:
-                    max_distance = dist
-        if max_distance < self.settings.radius:
-            res = distances.pop(sorted(distances.keys())[-1])
-            distances[self.settings.radius] = res
-        self.settings.distances = distances
+        try:
+            for d in self.distances:
+                if d.status.get() and d.distance.get() > 0:
+                    dist = int(d.distance.get())
+                    distances[dist] = d.resolution
+                    if dist > max_distance:
+                        max_distance = dist
+            if max_distance < self.settings.radius:
+                res = distances.pop(sorted(distances.keys())[-1])
+                distances[self.settings.radius] = res
+            self.settings.distances = distances
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid distance value in image resolution configuration ({r}). Please inform an integer value.')\
+                        .format(r=_('{res} m/px').format(
+                            res=format_decimal(Decimal(RESOLUTIONS[d.resolution]).quantize(Decimal('1.00')), locale=LOCALE)),
+                        )
+            )
+            return
     
     def apply_and_close(self):
         self.apply()
