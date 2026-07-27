@@ -64,6 +64,7 @@ class Settings(object):
     }
     host:str = 'localhost'
     port:int = 5000
+    following_interval:int = 10000
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -75,6 +76,7 @@ class Settings(object):
         'distances': _Sections.RANGE.value,
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
+        'following_interval': _Sections.CONNECTION.value,
     }
 
     def __getattribute__(self, name):
