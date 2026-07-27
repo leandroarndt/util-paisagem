@@ -71,6 +71,8 @@ class SettingsWindow(object):
 
     # GUI
     window:tk.Toplevel
+    notebook:ttk.Notebook
+    flightgear_tab:ttk.Frame
     path_frame:ttk.LabelFrame
     fg_path_name:ttk.Label
     fg_path_var:tk.StringVar
@@ -80,6 +82,13 @@ class SettingsWindow(object):
     orthophotos_var:tk.StringVar
     orthophotos_label:ttk.Label
     orthophotos_button:ttk.Button
+    connection_frame:ttk.LabelFrame
+    host_var:tk.StringVar
+    host_label:ttk.Label
+    host_input:ttk.Entry
+    port_var:tk.IntVar
+    port_label:ttk.Label
+    port_input:ttk.Entry
     download_frame:ttk.LabelFrame
     radius_var:tk.IntVar
     radius_label:ttk.Label
@@ -114,12 +123,18 @@ class SettingsWindow(object):
         self.window = tk.Toplevel(master, *args, **kwargs)
         self.window.protocol('WM_DELETE_WINDOW', lambda: self.cancel())
         self.window.columnconfigure(0, weight=10, pad=PADDING)
-        self.window.rowconfigure(0, pad=PADDING)
+        self.window.rowconfigure(0, weight=10, pad=PADDING)
         self.window.rowconfigure(1, pad=PADDING)
         self.window.rowconfigure(2, pad=PADDING)
         self.window.rowconfigure(3, pad=PADDING)
+        self.notebook = ttk.Notebook(self.window)
+        self.notebook.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
+        # FlightGear tab
+        self.flightgear_tab = ttk.Frame(self.notebook, padding=PADDING)
+        self.flightgear_tab.columnconfigure(0, weight=10)
+        self.notebook.add(self.flightgear_tab, text=_('FlightGear'))
         # Paths
-        self.path_frame = ttk.LabelFrame(self.window, text=_('Paths'), padding=PADDING)
+        self.path_frame = ttk.LabelFrame(self.flightgear_tab, text=_('Paths'), padding=PADDING)
         self.path_frame.columnconfigure(1, weight=10)
         self.fg_path_var = tk.StringVar(self.path_frame, value=self.settings.fgdata_folder)
         self.fg_path_name = ttk.Label(
@@ -162,8 +177,31 @@ class SettingsWindow(object):
         self.orthophotos_name.grid(column=0, row=1, sticky=tk.E)
         self.orthophotos_label.grid(column=1, row=1, sticky=tk.W)
         self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
+        # Connection
+        self.connection_frame = ttk.Labelframe(
+            self.flightgear_tab,
+            text=_('FlightGear connection'),
+            padding=PADDING
+        )
+        self.host_var = tk.StringVar(self.connection_frame, value=self.settings.host)
+        self.host_label = ttk.Label(self.connection_frame, text=_('Host:'))
+        self.host_input = ttk.Entry(self.connection_frame, textvariable=self.host_var)
+        self.port_var = tk.IntVar(self.connection_frame, value=self.settings.port)
+        self.port_label = ttk.Label(self.connection_frame, text=_('Port:'))
+        self.port_input = ttk.Entry(self.connection_frame, textvariable=self.port_var)
+        self.host_label.grid(column=0, row=0, sticky=tk.E)
+        self.host_input.grid(column=1, row=0, sticky=tk.W)
+        self.port_label.grid(column=0, row=1, sticky=tk.E)
+        self.port_input.grid(column=1, row=1, sticky=tk.W)
+        self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.connection_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
+        # Download tab
+        self.download_tab = ttk.Frame(self.notebook, padding=PADDING)
+        self.download_tab.columnconfigure(0, weight=10)
+        self.notebook.add(self.download_tab, text=_('Download'))
         # Threading and download range
-        self.download_frame = ttk.LabelFrame(self.window, text=_('Download'), padding=PADDING)
+        self.download_frame = ttk.LabelFrame(self.download_tab, text=_('Download'), padding=PADDING)
+        self.download_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.radius_var = tk.IntVar(self.download_frame, value=self.settings.radius)
         self.radius_label = ttk.Label(
             self.download_frame,
@@ -198,8 +236,13 @@ class SettingsWindow(object):
         self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
         self.tiles_label.grid(column=0, row=1, sticky=tk.E)
         self.tiles_input.grid(column=1, row=1, sticky=tk.W)
+        # Image tab
+        self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
+        self.image_tab.rowconfigure(0, weight=10)
+        self.notebook.add(self.image_tab, text=_('Image resolution'))
         # Image resolutions
-        self.image_frame = ttk.LabelFrame(self.window, text=_('Image'), padding=PADDING)
+        self.image_frame = ttk.LabelFrame(self.image_tab, text=_('Image'), padding=PADDING)
+        self.image_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.resolution_var = tk.StringVar(
             self.image_frame,
             self.format_size(self.settings.download_res),
@@ -247,9 +290,6 @@ class SettingsWindow(object):
         self.apply_button.grid(column=1, row=0)
         self.ok_button.grid(column=2, row=0)
         # Place frames
-        self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
-        self.download_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
-        self.image_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
         self.buttons_frame.grid(column=0, row=3, sticky=tk.E)
 
     def format_size(self, res:int) -> str:
@@ -296,6 +336,8 @@ class SettingsWindow(object):
     def apply(self):
         self.settings.fgdata_folder = self.fg_path_var.get()
         self.settings.orthophotos_folder = self.orthophotos_var.get()
+        self.settings.host = self.host_var.get()
+        self.settings.port = int(self.port_var.get())
         self.settings.radius = int(self.radius_var.get())
         self.settings.tile_threads = int(self.tiles_var .get())
         self.settings.download_res = self.unformat_size(self.resolution_var.get())

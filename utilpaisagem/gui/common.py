@@ -27,6 +27,7 @@ class _Sections(Enum):
     PATH = 'PATH'
     DOWNLOAD = 'DOWNLOAD'
     RANGE = 'RANGE'
+    CONNECTION = 'CONNECTION'
 
 class Settings(object):
     """
@@ -61,6 +62,8 @@ class Settings(object):
         20: DOWNLOAD_RES + 1,
         40100: DOWNLOAD_RES,
     }
+    host:str = 'localhost'
+    port:int = 5000
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
