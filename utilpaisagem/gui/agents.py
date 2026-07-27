@@ -111,16 +111,12 @@ class Follower(object):
         *args,
         **kwargs
     ):
-    #     host:str='localhost',
-    #     port:int=5000,
-    #     interval:int=10000
-    # ):
         self.root = root
         self.settings = Settings()
         self.upstream_queue = upstream_queue
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
-        self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=0.5)
+        self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=1.0)
         try:
             self.connection.connect() # Raises FGConnectionError if fails
         except FGConnectionError as e:
