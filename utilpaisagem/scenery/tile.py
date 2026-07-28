@@ -376,9 +376,10 @@ class Tile(object):
     def tile_width(cls, lat):
         """
         Tile width in degrees according to the latitude
-        (FlightGear uses a variable tile width according to the latitude).
+        (FlightGear uses a variable tile width according to the latitude.
+        See https://wiki.flightgear.org/Tile_Index_Scheme).
         """
-        width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[88,8],[89,360],[90,360]]
+        width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[89,12],[90.1,12]]
         for i in range(len(width_table)):
             if abs(lat)>=width_table[i][0] and abs(lat)<width_table[i+1][0]:
                 return width_table[i][1]
