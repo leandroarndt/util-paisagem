@@ -157,6 +157,16 @@ class MainWindow(object):
         self.map_widget = TkinterMapView(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
+        self.map_widget.add_right_click_menu_command(
+            label=_('Select tile'),
+            command=self.right_click_select_tile,
+            pass_coords=True,
+        )
+        self.map_widget.add_right_click_menu_command(
+            label=_('Add waypoint'),
+            command=self.right_click_add_waypoint,
+            pass_coords=True,
+        )
         self.search_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.map_widget.grid(column=0, row=1, sticky=tk.N+tk.E+tk.S+tk.W)
         # Toolbar
@@ -337,7 +347,7 @@ class MainWindow(object):
             return int(input)
         except ValueError:
             return parse_number(input, locale=LOCALE)
-
+        
     def float_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
             'lat': self.lat_var,
@@ -356,11 +366,8 @@ class MainWindow(object):
             what_var[what].set(str(self.__dict__[what]))
             return
         if what in ['lat', 'lon']:
-            self.index = Tile.coordinates_to_index(lat=self.lat, lon=self.lon)
-            self.index_var.set(str(self.index))
-            self.create_tile_polygon(self.index)
-            self.place_marker(lat=self.lat, lon=self.lon)
-        
+            self.select_tile(mark=True, set_index=True)
+    
     def int_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
             'index': self.index_var,
@@ -372,12 +379,9 @@ class MainWindow(object):
             what_var[what].set(str(self.__dict__[what]))
             return
         if what == 'index':
-            coordinates = Tile.index_to_coordinates(self.index)
-            self.lat = coordinates.lat_median
-            self.lon = coordinates.lon_median
-            self.lat_var.set(str(self.lat))
-            self.lon_var.set(str(self.lon))
-            self.create_tile_polygon(self.index)
+            self.select_tile(mark=False, set_index=False)
+
+    # Map and route operations
 
     def create_tile_polygon(self, index:int):
         """
@@ -403,16 +407,30 @@ class MainWindow(object):
             (coordinates.lat_bottom, coordinates.lon_right),
         )
 
-    def create_route(self):
-        if hasattr(self.route, 'delete'):
-            self.route.delete()
-        if len(self.waypoints) > 1:
-            self.route = self.map_widget.set_path(
-                [wp.position for wp in self.waypoints]
-            )
+    def select_tile(self, mark:bool=False, set_index=False):
+        """Creates a polygon around a scenery tile. If `mark` is true, a map marker is created.
+        If `set_index` is true, `self.index` is set according to `self.lat` and `self.lon`, otherwise
+        `self.lat` and `self.lon` are set according to `self.index`."""
+        if set_index:
+            self.index = Tile.coordinates_to_index(lat=self.lat, lon=self.lon)
+            self.index_var.set(str(self.index))
+        else:
+            coordinates = Tile.index_to_coordinates(self.index)
+            self.lat = coordinates.lat_median
+            self.lon = coordinates.lon_median
+            self.lat_var.set(str(self.lat))
+            self.lon_var.set(str(self.lon))
+        self.create_tile_polygon(self.index)
+        if mark:
+            self.place_marker(lat=self.lat, lon=self.lon)
+        else:
+            if isinstance(self.marker, CanvasPositionMarker) and \
+                self.marker not in self.waypoints and \
+                self.marker.position != (self.lat, self.lon):
+                self.marker.delete()
 
     def place_marker(self, marker:CanvasPositionMarker=None, lat:float=None, lon:float=None, text:str=''):
-        if hasattr(self.marker, 'delete'):
+        if isinstance(self.marker, CanvasPositionMarker):
             if self.marker not in self.waypoints:
                 self.marker.delete()
         if marker:
@@ -421,6 +439,14 @@ class MainWindow(object):
         if not text:
             text = f'{lat:.02f}, {lon:.02f}'
         self.marker = self.map_widget.set_marker(lat, lon, text=text)
+
+    def create_route(self):
+        if hasattr(self.route, 'delete'):
+            self.route.delete()
+        if len(self.waypoints) > 1:
+            self.route = self.map_widget.set_path(
+                [wp.position for wp in self.waypoints]
+            )
 
     def waypoint_button_press(self):
         if not isinstance(self.marker, CanvasPositionMarker):
@@ -472,9 +498,10 @@ class MainWindow(object):
             self.lon = self.marker.position[1]
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
-            self.index = Tile.coordinates_to_index(self.lat, self.lon)
-            self.index_var.set(str(self.index))
-            self.create_tile_polygon(self.index)
+            self.select_tile(mark=False, set_index=True)
+            # self.index = Tile.coordinates_to_index(self.lat, self.lon)
+            # self.index_var.set(str(self.index))
+            # self.create_tile_polygon(self.index)
             self.upstream_queue.put_nowait(format_status(
                 _('"{address}" found at {lat},{lon}.').format(
                     address=self.search_var.get(),
@@ -489,12 +516,20 @@ class MainWindow(object):
                 self
             ))
 
-    # def open_settings(self):
-    #     settings_window = SettingsWindow(self.window)
-    #     self.window.wait_window(settings_window.window.master)
-
-    # Actions
-    # TODO: set preferences here and at agents.py
+    def right_click_select_tile(self, coords:tuple[float]):
+        self.lat = coords[0]
+        self.lon = coords[1]
+        self.lat_var.set(str(coords[0]))
+        self.lon_var.set(str(coords[1]))
+        self.select_tile(mark=False, set_index=True)
+    
+    def right_click_add_waypoint(self, coords:tuple[float]):
+        self.lat = coords[0]
+        self.lon = coords[1]
+        self.lat_var.set(str(coords[0]))
+        self.lon_var.set(str(coords[1]))
+        self.select_tile(mark=True, set_index=True)
+        self.add_waypoint(self.marker)
 
     # Download based on latitude and longitude
     def download_tile(self):
