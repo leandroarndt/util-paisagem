@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem VERSION\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-07-27 19:05-0300\n"
+"POT-Creation-Date: 2026-07-28 09:41-0300\n"
 "PO-Revision-Date: 2026-07-07 12:17-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -47,7 +47,7 @@ msgstr "Erro tentando obter coordenadas do Flightgear (\"{exception}\")"
 msgid "Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}"
 msgstr "A aeronave se encontra na latitude {lat:.02f} e longitude {lon:.02f}"
 
-#: utilpaisagem/gui/agents.py:175 utilpaisagem/gui/main.py:282
+#: utilpaisagem/gui/agents.py:175 utilpaisagem/gui/main.py:286
 msgid "Welcome to Útil paisagem"
 msgstr "Bem-vindo ao Útil Paisagem"
 
@@ -66,100 +66,104 @@ msgid "Online manual"
 msgstr "Manual online"
 
 #: utilpaisagem/gui/main.py:112
-msgid "Latest releases"
-msgstr "Últimas versões"
+msgid "Latest release"
+msgstr "Versão mais recente"
 
 #: utilpaisagem/gui/main.py:116
+msgid "Found a bug?"
+msgstr "Encontrou um erro?"
+
+#: utilpaisagem/gui/main.py:120
 msgid "Contribute"
 msgstr "Contribua"
 
-#: utilpaisagem/gui/main.py:120
+#: utilpaisagem/gui/main.py:124
 msgid "Donate"
 msgstr "Doe"
 
-#: utilpaisagem/gui/main.py:124
+#: utilpaisagem/gui/main.py:128
 msgid "Help"
 msgstr "Ajuda"
 
-#: utilpaisagem/gui/main.py:145
+#: utilpaisagem/gui/main.py:149
 msgid "Address or ICAO code:"
 msgstr "Endereço ou código ICAO:"
 
-#: utilpaisagem/gui/main.py:148
+#: utilpaisagem/gui/main.py:152
 msgid "Search"
 msgstr "Buscar"
 
-#: utilpaisagem/gui/main.py:166
+#: utilpaisagem/gui/main.py:170
 msgid "Tile index:"
 msgstr "Índice do ladrilho:"
 
-#: utilpaisagem/gui/main.py:174
+#: utilpaisagem/gui/main.py:178
 msgid "Latitude:"
 msgstr "Latitude:"
 
-#: utilpaisagem/gui/main.py:183
+#: utilpaisagem/gui/main.py:187
 msgid "Longitude:"
 msgstr "Longitude:"
 
-#: utilpaisagem/gui/main.py:191
+#: utilpaisagem/gui/main.py:195
 msgid "Download tile"
 msgstr "Baixar ladrilho"
 
-#: utilpaisagem/gui/main.py:196
+#: utilpaisagem/gui/main.py:200
 msgid "Download region"
 msgstr "Baixar região"
 
-#: utilpaisagem/gui/main.py:201
+#: utilpaisagem/gui/main.py:205
 msgid "Add waypoint"
 msgstr "Adicionar ponto de referência"
 
-#: utilpaisagem/gui/main.py:221
+#: utilpaisagem/gui/main.py:225
 msgid "Waypoints:"
 msgstr "Pontos de referência:"
 
-#: utilpaisagem/gui/main.py:229
+#: utilpaisagem/gui/main.py:233
 msgid "Remove Waypoint"
 msgstr "Remover ponto de referência"
 
-#: utilpaisagem/gui/main.py:234
+#: utilpaisagem/gui/main.py:238
 msgid "Up"
 msgstr "Acima"
 
-#: utilpaisagem/gui/main.py:239
+#: utilpaisagem/gui/main.py:243
 msgid "Down"
 msgstr "Abaixo"
 
-#: utilpaisagem/gui/main.py:244
+#: utilpaisagem/gui/main.py:248
 msgid "Download route"
 msgstr "Baixar rota"
 
-#: utilpaisagem/gui/main.py:262 utilpaisagem/gui/main.py:550
+#: utilpaisagem/gui/main.py:266 utilpaisagem/gui/main.py:554
 msgid "Follow aircraft"
 msgstr "Seguir aeronave"
 
-#: utilpaisagem/gui/main.py:268 utilpaisagem/gui/main.py:551
+#: utilpaisagem/gui/main.py:272 utilpaisagem/gui/main.py:555
 msgid "Follow aircraft on Flightgear over telnet connection."
 msgstr "Seguir aeronave no Flightgear usando conexão telnet."
 
-#: utilpaisagem/gui/main.py:276
+#: utilpaisagem/gui/main.py:280
 msgid "Settings"
 msgstr "Configurações"
 
-#: utilpaisagem/gui/main.py:475
+#: utilpaisagem/gui/main.py:479
 #, python-brace-format
 msgid "\"{address}\" found at {lat},{lon}."
 msgstr "\"{address}\" encontrado em {lat},{lon}."
 
-#: utilpaisagem/gui/main.py:484
+#: utilpaisagem/gui/main.py:488
 #, python-brace-format
 msgid "Could not find address {address}."
 msgstr "Não foi possível encontrar {address}."
 
-#: utilpaisagem/gui/main.py:545
+#: utilpaisagem/gui/main.py:549
 msgid "Stop following"
 msgstr "Parar de seguir"
 
-#: utilpaisagem/gui/main.py:546
+#: utilpaisagem/gui/main.py:550
 msgid "Stop following aircraft on FlightGear"
 msgstr "Parar de seguir aeronave no Flightgear"
 
@@ -198,7 +202,7 @@ msgstr "Pasta das imagens do cenário:"
 
 #: utilpaisagem/gui/settings.py:188
 msgid "FlightGear connection"
-msgstr ""
+msgstr "Conexão com o FlightGear"
 
 #: utilpaisagem/gui/settings.py:192
 msgid "Host:"
@@ -276,37 +280,38 @@ msgstr "Por favor, escolha uma pasta chamada \"Orthophotos\"."
 #: utilpaisagem/gui/settings.py:362 utilpaisagem/gui/settings.py:370
 #: utilpaisagem/gui/settings.py:378 utilpaisagem/gui/settings.py:386
 #: utilpaisagem/gui/settings.py:406
-#
 msgid "Invalid value"
 msgstr "Valor inválido"
 
 #: utilpaisagem/gui/settings.py:363
 msgid "Invalid value in port configuration. Please inform an integer value."
-msgstr "Valor inválido na configuração da porta. Por favor, informe um valor inteiro."
+msgstr ""
+"Valor inválido na configuração da porta. Por favor, informe um valor "
+"inteiro."
 
 #: utilpaisagem/gui/settings.py:371
 msgid ""
 "Invalid value in following interval configuration. Please inform an "
 "integer value."
 msgstr ""
-"Valor inválido na configuração do intervalo de acompanhamento. Por favor, informe um"
-"valor inteiro."
+"Valor inválido na configuração do intervalo de acompanhamento. Por favor,"
+" informe umvalor inteiro."
 
 #: utilpaisagem/gui/settings.py:379
 msgid ""
 "Invalid value in download radius configuration. Please inform an integer "
 "value."
 msgstr ""
-"Valor inválido na configuração do raio de download. Por favor, informe um"
-"valor inteiro."
+"Valor inválido na configuração do raio de download. Por favor, informe "
+"umvalor inteiro."
 
 #: utilpaisagem/gui/settings.py:387
 msgid ""
 "Invalid value in maximum simultaneous tiles configuration. Please inform "
 "an integer value."
 msgstr ""
-"Valor inválido na configuração do número máximo de ladrilhos simultâneos. Por favor, informe um"
-"valor inteiro."
+"Valor inválido na configuração do número máximo de ladrilhos simultâneos."
+" Por favor, informe umvalor inteiro."
 
 #: utilpaisagem/gui/settings.py:407
 #, python-brace-format
@@ -314,11 +319,11 @@ msgid ""
 "Invalid distance value in image resolution configuration ({r}). Please "
 "inform an integer value."
 msgstr ""
-"Valor inválido na configuração da resolução da imagem ({r}). Por favor,"
-"informe um valor inteiro."
+"Valor inválido na configuração da resolução da imagem ({r}). Por "
+"favor,informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:408
-#,  python-brace-format
+#, python-brace-format
 msgid "{res} m/px"
 msgstr "{res} m/px"
 
@@ -361,8 +366,8 @@ msgid ""
 "Previous download was not found where expected (\"{p}\"). Downloading "
 "again."
 msgstr ""
-"Arquivo anterior não encontrado onde esperado (\"{p}\"). "
-"Baixando novamente."
+"Arquivo anterior não encontrado onde esperado (\"{p}\"). Baixando "
+"novamente."
 
 #: utilpaisagem/scenery/tile.py:243
 #, python-brace-format
