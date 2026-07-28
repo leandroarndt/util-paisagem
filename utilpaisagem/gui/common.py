@@ -52,7 +52,7 @@ class Settings(object):
     _file:Path
     _settings:configparser.ConfigParser
     fgdata_folder:str = str(Path.home() / '.fgdata')
-    orthophotos_folder:str = '%(fgdata_folder)s/utilpaisagem/Orthophotos'
+    orthophotos_folder:str = str(Path('%(fgdata_folder)s') / 'utilpaisagem' / 'Orthophotos')
     tile_threads:int = 4
     image_threads:int = 4
     radius:int = 50

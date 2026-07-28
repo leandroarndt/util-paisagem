@@ -89,7 +89,7 @@ class SettingsWindow(object):
     port_var:tk.IntVar
     port_label:ttk.Label
     port_input:ttk.Entry
-    interval_var:tkIntVar
+    interval_var:tk.IntVar
     interval_label:ttk.Label
     interval_input:ttk.Entry
     interval_seconds_label:ttk.Label
