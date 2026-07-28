@@ -435,10 +435,12 @@ class MainWindow(object):
                 self.marker.delete()
         if marker:
             self.marker = marker
+            self.marker.command = self.left_click_marker
             return
         if not text:
             text = f'{lat:.02f}, {lon:.02f}'
         self.marker = self.map_widget.set_marker(lat, lon, text=text)
+        self.marker.command = self.left_click_marker
 
     def create_route(self):
         if hasattr(self.route, 'delete'):
@@ -494,14 +496,10 @@ class MainWindow(object):
         error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
         if error is None:
             self.place_marker(self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get()))
-            self.lat = self.marker.position[0]
-            self.lon = self.marker.position[1]
+            self.lat, self.lon = self.marker.position
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
             self.select_tile(mark=False, set_index=True)
-            # self.index = Tile.coordinates_to_index(self.lat, self.lon)
-            # self.index_var.set(str(self.index))
-            # self.create_tile_polygon(self.index)
             self.upstream_queue.put_nowait(format_status(
                 _('"{address}" found at {lat},{lon}.').format(
                     address=self.search_var.get(),
@@ -517,19 +515,23 @@ class MainWindow(object):
             ))
 
     def right_click_select_tile(self, coords:tuple[float]):
-        self.lat = coords[0]
-        self.lon = coords[1]
+        self.lat, self.lon = coords
         self.lat_var.set(str(coords[0]))
         self.lon_var.set(str(coords[1]))
         self.select_tile(mark=False, set_index=True)
     
     def right_click_add_waypoint(self, coords:tuple[float]):
-        self.lat = coords[0]
-        self.lon = coords[1]
+        self.lat, self.lon = coords
         self.lat_var.set(str(coords[0]))
         self.lon_var.set(str(coords[1]))
         self.select_tile(mark=True, set_index=True)
         self.add_waypoint(self.marker)
+
+    def left_click_marker(self, marker:CanvasPositionMarker):
+        self.lat, self.lon = marker.position
+        self.lat_var.set(str(marker.position[0]))
+        self.lon_var.set(str(marker.position[1]))
+        self.select_tile(mark=False, set_index=True)
 
     # Download based on latitude and longitude
     def download_tile(self):
