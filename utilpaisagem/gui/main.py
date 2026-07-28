@@ -109,8 +109,8 @@ class MainWindow(object):
             command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/wiki')
         )
         self.help_menu.add_command(
-            label=_('Latest releases'),
-            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/releases'),
+            label=_('Latest release'),
+            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/releases/latest'),
         )
         self.help_menu.add_command(
             label=_('Contribute'),
