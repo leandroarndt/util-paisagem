@@ -113,6 +113,10 @@ class MainWindow(object):
             command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/releases/latest'),
         )
         self.help_menu.add_command(
+            label=_('Found a bug?'),
+            command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/issues'),
+        )
+        self.help_menu.add_command(
             label=_('Contribute'),
             command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem'),
         )
