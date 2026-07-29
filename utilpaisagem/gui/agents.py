@@ -102,21 +102,26 @@ class Follower(object):
     downstream_queue:Queue
     download_manager:DownloadManager
     interval:int
+    lat:float
+    lon:float
 
     def __init__(self,
-        root:tk.Tk,
+        main_window,
         upstream_queue:Queue,
         downstream_queue:Queue,
         download_manager,
         *args,
         **kwargs
     ):
-        self.root = root
+        self.main_window = main_window
         self.settings = Settings()
         self.upstream_queue = upstream_queue
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
         self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=1.0)
+        self.lat = 0.0
+        self.lon = 0.0
+
         try:
             self.connection.connect() # Raises FGConnectionError if fails
         except FGConnectionError as e:
@@ -128,25 +133,28 @@ class Follower(object):
     def follow(self):
         if not self.downstream_queue.is_shutdown: # If the following has not been canceled
             try:
-                lat = self.connection.get_prop('/position/latitude-deg')
-                lon = self.connection.get_prop('/position/longitude-deg')
+                self.lat = self.connection.get_prop('/position/latitude-deg')
+                self.lon = self.connection.get_prop('/position/longitude-deg')
             except FGCommunicationError: # Could not retrieve info from Flightgear
                 self.upstream_queue.put_nowait(
                     format_status(_('Could not receive coordinates info from Flightgear'), self)
                 )
-                self.root.after(self.settings.following_interval*10, self.follow)
+                self.main_window.place_aircraft(self.lat, self.lon, active=False)
+                self.main_window.window.after(self.settings.following_interval*10, self.follow)
             except Exception as e:
                 self.upstream_queue.put_nowait(
                     format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
-                self.root.after(self.settings.following_interval*10, self.follow)
+                self.main_window.place_aircraft(self.lat, self.lon, active=False)
+                self.main_window.window.after(self.settings.following_interval*10, self.follow)
                 # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
-                self.download_manager.recenter(lat=lat, lon=lon) # Update download manager center
+                self.download_manager.recenter(lat=self.lat, lon=self.lon) # Update download manager center
+                self.main_window.place_aircraft(self.lat, self.lon, active=True)
                 self.upstream_queue.put_nowait(
-                    format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=lat, lon=lon), self)
+                    format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=self.lat, lon=self.lon), self)
                 )
-                self.root.after(self.settings.following_interval, self.follow)
+                self.main_window.window.after(self.settings.following_interval, self.follow)
 
 class UpstreamReader(object):
     """

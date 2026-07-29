@@ -8,11 +8,12 @@ from LatLon23 import LatLon
 from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
+from PIL import Image, ImageTk
 from tkintermapview import TkinterMapView
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
-from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC
+from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
@@ -54,6 +55,8 @@ class MainWindow(object):
     waypoints:list[CanvasPositionMarker]
     marker:CanvasPositionMarker
     route:CanvasPath
+    active_aircraft_icon:ImageTk
+    greyed_aircraft_icon:ImageTk
 
     # Toolbar
     toolbar_frame:ttk.Frame
@@ -82,6 +85,9 @@ class MainWindow(object):
     waypoints_down_button:tk.Button
     download_route_button:tk.Button
     follow_button:ttk.Button
+    follow_button_tip:Hovertip
+    center_on_aircraft_button:ttk.Button
+    center_on_aircraft_tip:Hovertip
     others_frame:ttk.Frame
     settings_button:ttk.Button
 
@@ -169,6 +175,9 @@ class MainWindow(object):
         )
         self.search_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.map_widget.grid(column=0, row=1, sticky=tk.N+tk.E+tk.S+tk.W)
+        self.active_aircraft_icon = ImageTk.PhotoImage(Image.open(resources_path / 'images' / 'aircraft.png'))
+        self.greyed_aircraft_icon = ImageTk.PhotoImage(Image.open(resources_path / 'images' / 'greyed aircraft.png'))
+        self.aircraft = None
         # Toolbar
         self.toolbar_frame = ttk.Frame(self.window)
         self.toolbar_frame.grid(column=1, row=0, sticky=tk.N)
@@ -271,16 +280,27 @@ class MainWindow(object):
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.follow_frame.pack(fill=tk.X)
+        self.follow_frame.columnconfigure(0, weight=10)
         self.follow_button = ttk.Button(
             self.follow_frame,
             text=_('Follow aircraft'),
             command=self.follow,
         )
-        self.follow_button.pack(fill=tk.X)
         self.follow_button_tip = Hovertip(
             self.follow_button,
             text=_('Follow aircraft on Flightgear over telnet connection.')
         )
+        self.center_on_aircraft_button = ttk.Button(
+            self.follow_frame,
+            text=_('Center on aircraft'),
+            command=self.center_on_aircraft,
+        )
+        self.center_on_aircraft_tip = Hovertip(
+            self.center_on_aircraft_button,
+            text=_('Center map on aircraft and show the corresponding scenery tile.')
+        )
+        self.follow_button.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.center_on_aircraft_button.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Settings, about etc.
         self.others_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.others_frame.columnconfigure(0, weight=1)
@@ -533,6 +553,17 @@ class MainWindow(object):
         self.lon_var.set(str(marker.position[1]))
         self.select_tile(mark=False, set_index=True)
 
+    def place_aircraft(self, lat, lon, active=True):
+        if isinstance(self.aircraft, CanvasPositionMarker):
+            self.aircraft.delete()
+        self.aircraft = self.map_widget.set_marker(lat, lon, icon=self.active_aircraft_icon if active else self.greyed_aircraft_icon)
+    
+    def center_on_aircraft(self):
+        self.lat, self.lon = self.aircraft.position
+        self.lat_var.set(str(self.lat))
+        self.lon_var.set(str(self.lon))
+        self.select_tile(mark=False, set_index=True)
+
     # Download based on latitude and longitude
     def download_tile(self):
         self.downloader.add_tile(
@@ -572,7 +603,7 @@ class MainWindow(object):
             self.following_queue = Queue()
             try:
                 self.follower = Follower(
-                    root=self.window,
+                    main_window=self,
                     upstream_queue=self.upstream_queue,
                     downstream_queue=self.following_queue,
                     download_manager=self.download_manager,
