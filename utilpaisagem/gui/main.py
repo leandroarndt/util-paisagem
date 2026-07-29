@@ -621,3 +621,5 @@ class MainWindow(object):
             self.following_queue.shutdown(immediate=True)
             self.follow_button['text'] = _('Follow aircraft')
             self.follow_button_tip.text = _('Follow aircraft on Flightgear over telnet connection.')
+            if isinstance(self.aircraft, CanvasPositionMarker):
+                self.aircraft.change_icon(self.greyed_aircraft_icon)
