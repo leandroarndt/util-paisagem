@@ -144,19 +144,12 @@ class Tile(object):
             result.save(filename, pixel_format='DXT1')
         return Path(filename)
 
-    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart', upstream_queue:Queue=None):
-        """
-        Tests if the image exists and is not needed to regenerate it. If Ok, touch the
-        file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
-        resolution or there was an error in the previous processing.
-        
+    def get_path(self, base_path:Path):
+        """Returns the path to the tile file.
+
         Args:
-            path (Path): path to the orthophotos folder, including it.
-            image_service (ImagerService): image downloader
-            download_res(int): exponent of two representing vertical image size
-            compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
+            base_path(Path): path to the "Orthophotos" folder, including it.
         """
-        # Path directions
         if self.coordinates.lat_median > 0:
             lat_dir = 'n'
         else:
@@ -165,10 +158,24 @@ class Tile(object):
             lon_dir = 'e'
         else:
             lon_dir = 'w'
-        path = path / Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left/10)) * 10:03}' + \
+        return base_path / Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left/10)) * 10:03}' + \
             f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom / 10) * 10):02}') / \
             Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left)):03}' + \
             f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom)):02}')
+
+    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart', upstream_queue:Queue=None):
+        """
+        Tests if the image exists and is not needed to regenerate it. If Ok, touch the
+        file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
+        resolution or there was an error in the previous processing.
+        
+        Args:
+            path(Path): path to the orthophotos folder, including it.
+            image_service(ImagerService): image downloader
+            download_res(int): exponent of two representing vertical image size
+            compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
+        """
+        path = self.get_path(path)
         # Ok? Touch it.
         # Else:
             # divide

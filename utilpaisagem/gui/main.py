@@ -1,5 +1,6 @@
 import webbrowser
 import tkinter as tk
+import pyperclip
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from pathlib import Path
@@ -13,6 +14,7 @@ from tkintermapview import TkinterMapView
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
+from showinfm import show_in_file_manager
 from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
@@ -39,8 +41,11 @@ class MainWindow(object):
     # GUI things
     resources_path:Path
     window:tk.Tk
+    contents:ttk.Frame
     status_var:tk.StringVar
     menu:tk.Menu
+    file_menu:tk.Menu
+    edit_menu:tk.Menu
     help_menu:tk.Menu
 
     # Map
@@ -108,8 +113,30 @@ class MainWindow(object):
         )
         # Menu
         self.menu = tk.Menu(self.window)
+        self.file_menu = tk.Menu(self.menu)
+        self.file_menu.add_command(
+            label=_('Show orthophotos folder'),
+            command=lambda: show_in_file_manager(str(self.settings.orthophotos_folder)),
+        )
+        self.file_menu.add_command(
+            label=_('Show tile image'),
+            command=self.show_tile_image,
+        )
+        self.edit_menu = tk.Menu(self.menu)
+        self.edit_menu.add_command(
+            label=_('Copy coordinates'),
+            command=lambda: pyperclip.copy(f'{self.lat}, {self.lon}'),
+        )
+        self.edit_menu.add_command(
+            label=_('Copy tile index'),
+            command=lambda: pyperclip.copy(str(self.index)),
+        )
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(
+            label=_('Settings'),
+            command=lambda: SettingsWindow(self.window, main_window=self),
+        )
         self.help_menu = tk.Menu(self.menu)
-        self.window.configure(menu=self.menu)
         self.help_menu.add_command(
             label=_('Online manual'),
             command=lambda: webbrowser.open('https://github.com/leandroarndt/util-paisagem/wiki')
@@ -131,14 +158,23 @@ class MainWindow(object):
             command=lambda: webbrowser.open('https://buymeacoffee.com/leandro.a')
         )
         self.menu.add_cascade(
+            label=_('File'),
+            menu=self.file_menu,
+        )
+        self.menu.add_cascade(
+            label=_('Edit'),
+            menu=self.edit_menu,
+        )
+        self.menu.add_cascade(
             label=_('Help'),
             menu=self.help_menu,
         )
+        self.window.configure(menu=self.menu)
         # Grid
         self.window.columnconfigure(0, weight=10, pad=PADDING)
-        self.window.columnconfigure(1, pad=PADDING)
+        self.window.columnconfigure(1, weight=0, pad=PADDING)
         self.window.rowconfigure(0, weight=10)
-        self.window.rowconfigure(1, pad=PADDING)
+        self.window.rowconfigure(1, weight=0, pad=PADDING)
         # Map
         self.marker = None
         self.waypoints = []
@@ -340,6 +376,15 @@ class MainWindow(object):
             self.downloader,
             interval=100)
         self.upstream_reader.read()
+
+    def show_tile_image(self):
+        dds = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds'
+        if dds.exists():
+            show_in_file_manager(str(dds))
+        else:
+            show_in_file_manager(str(
+                Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png'
+            ))
 
     # Validation
     def validate_float(self, input:str):

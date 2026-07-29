@@ -5,3 +5,5 @@ appdirs
 tkintermapview
 LatLon23
 pyshortcuts
+pyperclip
+show-in-file-manager
