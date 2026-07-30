@@ -115,6 +115,7 @@ class MainWindow(object):
         self.window.title(
             f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" + str(RC) if RC else ""}'
         )
+
         # Menu
         self.menu = tk.Menu(self.window)
         self.file_menu = tk.Menu(self.menu)
@@ -405,6 +406,8 @@ class MainWindow(object):
             interval=100)
         self.upstream_reader.read()
 
+    # Menu commands
+
     def show_tile_image(self):
         dds = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds'
         png = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png'
@@ -424,9 +427,7 @@ class MainWindow(object):
             message=_('Are you sure you want to delete tile {index}?').format(index=self.index)
         )
         if answer:
-            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds').unlink(missing_ok=True)
-            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png').unlink(missing_ok=True)
-            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.log').unlink(missing_ok=True)
+            Tile(self.index).delete_files()
 
     # Validation
     def validate_float(self, input:str):

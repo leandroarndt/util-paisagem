@@ -6,7 +6,7 @@ from PIL import Image
 import math, tempfile, shutil, os, configparser, ast
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
-from utilpaisagem.gui.common import format_status
+from utilpaisagem.gui.common import format_status, Settings
 
 class Tile(object):
     """
@@ -19,6 +19,7 @@ class Tile(object):
     coordinates:Coordinates
     resolution:int
     upstream_queue:Queue|None
+    settings:Settings
 
     def __init__(
         self,
@@ -45,6 +46,8 @@ class Tile(object):
             self.resolution = resolution
         else:
             raise ValueError(f'Invalid resolution. Should be at least {MIN_RES} and at most {MAX_RES}.')
+        
+        self.settings = Settings()
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(lat={self.coordinates.lat_median}, lon={self.coordinates.lon_median})>'
@@ -378,6 +381,31 @@ class Tile(object):
                         self
                     ))
                 # TODO: download wider area and crop; use neighboring image, if any
+
+    def files_exist(self) -> bool:
+        """Returns true if any of .DDS, .PNG or .LOG files exist"""
+        dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
+        for file in dds:
+            return True
+        png = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.png', case_sensitive=False)
+        for file in png:
+            return True
+        log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
+        for file in log:
+            return True
+        return False
+
+
+    def delete_files(self):
+        dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
+        for file in dds:
+            file.unlink()
+        png = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.png', case_sensitive=False)
+        for file in png:
+            file.unlink()
+        log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
+        for file in log:
+            file.unlink()
 
     @classmethod
     def tile_width(cls, lat):
