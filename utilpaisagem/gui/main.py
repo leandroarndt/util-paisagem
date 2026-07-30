@@ -627,6 +627,8 @@ class MainWindow(object):
         self.lat, self.lon = marker.position
         self.lat_var.set(str(marker.position[0]))
         self.lon_var.set(str(marker.position[1]))
+        self.waypoints_list.select_clear(0, 'end')
+        self.waypoints_list.select_set(self.waypoints.index(marker))
         self.select_tile(mark=False, set_index=True)
 
     def place_aircraft(self, lat, lon, active=True):
