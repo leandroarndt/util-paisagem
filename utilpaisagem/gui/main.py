@@ -198,8 +198,9 @@ class MainWindow(object):
         self.search_frame.columnconfigure(2, pad=PADDING)
         self.search_var = tk.StringVar(self.search_frame)
         self.search_label = ttk.Label(self.search_frame, text=_('Address or ICAO code:'))
-        # TODO search on enter
         self.search_input = ttk.Entry(self.search_frame, textvariable=self.search_var)
+        self.search_input.bind('<Return>', self.search)
+        self.search_input.bind('<Control-Return>', self.search_waypoint)
         self.search_button = ttk.Button(self.search_frame, text=_('Search'), command=self.search)
         self.search_label.grid(column=0, row=0)
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
@@ -584,7 +585,7 @@ class MainWindow(object):
         self.waypoints_to_var()
         self.create_route()
 
-    def search(self):
+    def search(self, *args, **kwargs):
         error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
         if error is None:
             self.place_marker(self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get()))
@@ -600,11 +601,17 @@ class MainWindow(object):
                 ),
                 self
             ))
+            return True
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Could not find address {address}.').format(address=self.search_var.get()),
                 self
             ))
+            return False
+
+    def search_waypoint(self, *args, **kwargs):
+        if self.search():
+            self.add_waypoint(self.marker)
 
     def right_click_select_tile(self, coords:tuple[float]):
         self.lat, self.lon = coords
