@@ -81,10 +81,14 @@ class MainWindow(object):
     download_tile_button:tk.Button
     download_region_button:tk.Button
     add_waypoint_button:tk.Button
+    current_waypoint:int # index in self.waypoints
     waypoints_var:tk.Variable
     waypoints_frame:ttk.Frame
     waypoints_label:ttk.Label
     waypoints_list:tk.Listbox
+    waypoint_name_var:tk.StringVar
+    waypoint_name_entry:ttk.Entry
+    waypoint_rename_button:ttk.Button
     waypoints_remove_button:tk.Button
     waypoints_up_button:tk.Button
     waypoints_down_button:tk.Button
@@ -285,6 +289,7 @@ class MainWindow(object):
         self.lat_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lat', *args, **kwargs))
         self.lon_input.bind('<FocusOut>', lambda *args, **kwargs: self.float_input_focus_out('lon', *args, **kwargs))
         # Waypoints list
+        self.current_waypoint = -1
         self.waypoints_var = tk.Variable(value=self.waypoints)
         self.waypoints_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.waypoints_label = ttk.Label(self.waypoints_frame, text=_('Waypoints:'))
@@ -294,6 +299,13 @@ class MainWindow(object):
             # TODO (moves wrongly) selectmode=tk.MULTIPLE,
         )
         self.waypoints_list.bind('<<ListboxSelect>>', self.select_waypoint)
+        self.waypoint_name_var = tk.StringVar(self.waypoints_frame)
+        self.waypoint_name_entry = ttk.Entry(self.waypoints_frame, textvariable=self.waypoint_name_var)
+        self.waypoint_rename_button = ttk.Button(
+            self.waypoints_frame,
+            text=_('Rename'),
+            command=self.rename_waypoint,
+        )
         self.waypoints_remove_button = tk.Button(
             self.waypoints_frame,
             text=_('Remove Waypoint'),
@@ -319,10 +331,12 @@ class MainWindow(object):
         self.waypoints_frame.columnconfigure(2, weight=1)
         self.waypoints_label.grid(column=0, row=0, columnspan=3)
         self.waypoints_list.grid(column=0, row=1, columnspan=3, sticky=tk.W+tk.E)
-        self.waypoints_remove_button.grid(column=0, row=2, sticky=tk.W + tk.E)
-        self.waypoints_up_button.grid(column=1, row=2)
-        self.waypoints_down_button.grid(column=2, row=2)
-        self.download_route_button.grid(column=0, row=3, columnspan=3, sticky=tk.W+tk.E)
+        self.waypoint_name_entry.grid(column=0, row=2, sticky=tk.W+tk.E)
+        self.waypoint_rename_button.grid(column=1, row=2, columnspan=2, sticky=tk.W+tk.E)
+        self.waypoints_remove_button.grid(column=0, row=3, sticky=tk.W + tk.E)
+        self.waypoints_up_button.grid(column=1, row=3)
+        self.waypoints_down_button.grid(column=2, row=3)
+        self.download_route_button.grid(column=0, row=4, columnspan=3, sticky=tk.W+tk.E)
         self.waypoints_frame.pack(fill=tk.X)
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
@@ -556,6 +570,13 @@ class MainWindow(object):
         self.waypoints_to_var()
         self.create_route()
 
+    def rename_waypoint(self, *args, **kwargs):
+        selected = self.waypoints_list.curselection()
+        print(self.waypoint_name_var.get())
+        self.waypoints[selected[0]].set_text(self.waypoint_name_var.get())
+        self.waypoints_to_var()
+        self.waypoints_list.select_set(self.current_waypoint)
+
     def move_waypoint(self, amount:int):
         selected = self.waypoints_list.selection_get().split('\n')
         indexes = []
@@ -570,7 +591,7 @@ class MainWindow(object):
             self.waypoints.insert(insertion, waypoint)
         self.waypoints_to_var()
         self.create_route()
-        self.waypoints_list.selection_clear(0, len(self.waypoints)-1)
+        self.waypoints_list.selection_clear(0, 'end')
         for i in indexes:
             if i - amount < 0:
                 self.waypoints_list.selection_set(i + amount + len(self.waypoints))
@@ -627,15 +648,18 @@ class MainWindow(object):
         self.add_waypoint(self.marker)
 
     def select_waypoint(self, event):
-        selected = self.waypoints_list.curselection()
-        self.select_marker(self.waypoints[selected[0]])
+        self.current_waypoint = self.waypoints_list.curselection()[0]
+        self.waypoint_name_var.set(self.waypoints[self.current_waypoint].text)
+        self.select_marker(self.waypoints[self.current_waypoint])
 
     def select_marker(self, marker:CanvasPositionMarker):
         self.lat, self.lon = marker.position
         self.lat_var.set(str(marker.position[0]))
         self.lon_var.set(str(marker.position[1]))
         self.waypoints_list.select_clear(0, 'end')
-        self.waypoints_list.select_set(self.waypoints.index(marker))
+        self.current_waypoint = self.waypoints.index(marker)
+        self.waypoints_list.select_set(self.current_waypoint)
+        self.waypoint_name_var.set(marker.text)
         self.select_tile(mark=False, set_index=True)
 
     def place_aircraft(self, lat, lon, active=True):
