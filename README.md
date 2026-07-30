@@ -10,6 +10,8 @@ _It's Nothing._
 
 And "you", in a flight simulator, is a photo scenery. This project is dedicated to put the player inside a FlightGear airplane with an as useful landscape as possible.
 
+![Screenshot from FlightGear with Útil paisagem](https://raw.githubusercontent.com/wiki/leandroarndt/util-paisagem/images/Screenshots/BR-277%20-%20SBCT%20cockpit.png)
+
 ## Installation
 
 First make sure you have [Python 3.13](https://www.python.org/downloads/) or greater installed.
