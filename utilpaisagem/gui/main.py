@@ -122,6 +122,15 @@ class MainWindow(object):
             label=_('Show tile image'),
             command=self.show_tile_image,
         )
+        self.file_menu.add_command(
+            label=_('Delete tile'),
+            command=self.delete_tile,
+        )
+        self.file_menu.add_separator()
+        self.file_menu.add_command(
+            label=_('Quit'),
+            command=lambda: self.window.destroy(),
+        )
         self.edit_menu = tk.Menu(self.menu)
         self.edit_menu.add_command(
             label=_('Copy coordinates'),
@@ -283,6 +292,7 @@ class MainWindow(object):
             listvariable=self.waypoints_var,
             # TODO (moves wrongly) selectmode=tk.MULTIPLE,
         )
+        self.waypoints_list.bind('<<ListboxSelect>>', self.select_waypoint)
         self.waypoints_remove_button = tk.Button(
             self.waypoints_frame,
             text=_('Remove Waypoint'),
@@ -353,6 +363,9 @@ class MainWindow(object):
         self.status_bar = ttk.Label(self.window, textvariable=self.status_var, justify=tk.LEFT)
         self.status_bar.grid(column=0, row=1, columnspan=2, sticky=tk.W)
 
+        # Size
+        self.window.update()
+        self.window.minsize(self.window.winfo_width(), self.window.winfo_height()+32) # Account for menu bar
         # Settings
         self.settings = Settings()
 
@@ -379,12 +392,26 @@ class MainWindow(object):
 
     def show_tile_image(self):
         dds = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds'
+        png = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png'
         if dds.exists():
             show_in_file_manager(str(dds))
+        elif png.exists():
+            show_in_file_manager(str(png))
         else:
-            show_in_file_manager(str(
-                Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png'
-            ))
+            tk.messagebox.showerror(
+                title=_('Image not found'),
+                message=_('No image found for tile {index}.').format(index=self.index)
+            )
+
+    def delete_tile(self):
+        answer = tk.messagebox.askyesno(
+            title=_('Delete tile?'),
+            message=_('Are you sure you want to delete tile {index}?').format(index=self.index)
+        )
+        if answer:
+            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds').unlink(missing_ok=True)
+            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png').unlink(missing_ok=True)
+            (Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.log').unlink(missing_ok=True)
 
     # Validation
     def validate_float(self, input:str):
@@ -500,12 +527,12 @@ class MainWindow(object):
                 self.marker.delete()
         if marker:
             self.marker = marker
-            self.marker.command = self.left_click_marker
+            self.marker.command = self.select_marker
             return
         if not text:
             text = f'{lat:.02f}, {lon:.02f}'
         self.marker = self.map_widget.set_marker(lat, lon, text=text)
-        self.marker.command = self.left_click_marker
+        self.marker.command = self.select_marker
 
     def create_route(self):
         if hasattr(self.route, 'delete'):
@@ -592,7 +619,11 @@ class MainWindow(object):
         self.select_tile(mark=True, set_index=True)
         self.add_waypoint(self.marker)
 
-    def left_click_marker(self, marker:CanvasPositionMarker):
+    def select_waypoint(self, event):
+        selected = self.waypoints_list.curselection()
+        self.select_marker(self.waypoints[selected[0]])
+
+    def select_marker(self, marker:CanvasPositionMarker):
         self.lat, self.lon = marker.position
         self.lat_var.set(str(marker.position[0]))
         self.lon_var.set(str(marker.position[1]))
