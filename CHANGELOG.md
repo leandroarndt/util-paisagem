@@ -1,5 +1,22 @@
 # Útil paisagem changelog
 
+## 0.3.0rc1
+
+- Rename waypoints
+- Added context menus on map:
+  - Select tile.
+  - Add waypoint.
+- Left click on markers centers the map and selects their tiles.
+- Added "file" menu:
+  - Show orthophotos folder
+  - Show tile image
+  - Delete tile
+- Added "edit" menu:
+  - Copy coordinates
+  - Copy tile index
+  - Settings
+- Search with "return" at the search bar and add waypoint on search with "ctrl+return"
+
 ## 0.2.0
 
 - Connection settings (FlightGear telnet host, port, following interval).
