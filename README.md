@@ -18,3 +18,9 @@ run the `install.sh` or `win_install.bat` script in this directory according to 
 system. You may need to provide the Python binary path to the installation script
 (e.g.: `./install.sh -p python3.13` or `win_install -p python313.exe`). Útil paisagem
 can now be run by clicking the newly created application shortcut.
+
+**Attention:** if the install script cannot find your Python executable, pass it as an
+argument to the script. E.g.: `./install.sh -p /path/to/python3` (Linux) or
+`win_install.bat -p c:\path\to\python.exe` (Windows).
+
+Read more at the [Útil paisagem wiki](https://github.com/leandroarndt/util-paisagem/wiki/Installation).
