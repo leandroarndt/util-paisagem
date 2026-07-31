@@ -155,6 +155,11 @@ class Follower(object):
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=self.lat, lon=self.lon), self)
                 )
                 self.main_window.window.after(self.settings.following_interval, self.follow)
+        else:
+            self.close_connection()
+    
+    def close_connection(self):
+        self.connection.sock.close()
 
 class UpstreamReader(object):
     """
