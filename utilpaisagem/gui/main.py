@@ -736,7 +736,8 @@ class MainWindow(object):
                 self.aircraft.change_icon(self.greyed_aircraft_icon)
 
     def close(self): # Tries to close nicely
-        if not self.following_queue.is_shutdown:
-            self.following_queue.shutdown()
-            self.follower.close_connection()
+        if hasattr(self, 'following_queue'):
+            if not self.following_queue.is_shutdown:
+                self.following_queue.shutdown()
+                self.follower.close_connection()
         self.window.destroy()
