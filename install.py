@@ -1,15 +1,19 @@
 import os, platform, webbrowser
 from os import popen, _wrap_close
 from venv import EnvBuilder
+from pathlib import Path
+from threading import Thread
+from time import sleep
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 PADDING=6
 REQUIRED_PYTHON_VERSION = (3, 13, 0)
 if 'TEST' in os.environ:
-    ENV_PATH = '.test_env'
+    ENV_DIR = Path(__file__).parent / '.test_env'
 else:
-    ENV_PATH = '.env'
+    ENV_DIR = Path(__file__).parent / '.env'
+REQUIREMENTS = Path(__file__).parent / 'requirements.txt'
 
 class VersionError(Exception):
     pass
@@ -17,6 +21,15 @@ class VersionError(Exception):
 class Installer(EnvBuilder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def create(self, *args, **kwargs):
+        print('started', flush=True)
+        super().create(*args, **kwargs)
+        print('finished', flush=True)
+
+    def post_setup(self, context):
+        os.environ['VIRTUAL_ENV'] = context.env_dir
+        self.context = context
 
 class InstallerWindow(object):
     # Installation
@@ -60,6 +73,9 @@ class InstallerWindow(object):
         self.shortcut_label.grid(column=0, row=3, columnspan=3, sticky=tk.W)
         self.exit_button.grid(column=1, row=4, sticky=tk.W+tk.E)
 
+        self.window.after(1, self.install)
+
+    def install(self):
         # Verify Python version >= 3.13
         python_version = platform.python_version_tuple()
         try:
@@ -86,14 +102,51 @@ You must upgrade to Python {REQUIRED_PYTHON_VERSION[0]}.{REQUIRED_PYTHON_VERSION
             system_site_packages=False,
         )
 
+        self.window.after(1, self.create_environment)
+
+    def wait(self, thread:Thread, variable:tk.StringVar, message:str, next_step:callable):
+        if thread.is_alive():
+            self.window.after(100, self.wait, thread, variable, message, next_step)
+        else:
+            variable.set(message)
+            next_step()
+
+    def create_environment(self):
         self.environment_var.set('Creating virtual environment...')
-        self.environment_var.set('Virtual environment created.')
+        thread = Thread(target=self.installer.create, args=(ENV_DIR,))
+        thread.start()
+        self.wait(
+            thread=thread,
+            variable=self.environment_var,
+            message='Virtual environment created.',
+            next_step=self.install_packages,
+        )
+    
+    def install_packages(self):
         self.pip_var.set('Installing required packages...')
         self.pip_var.set('Required packages installed.')
+        self.window.after(1, self.compile_translations)
+    
+    def compile_translations(self):
         self.locales_var.set('Compiling translations...')
+        self.window.update()
+        self.window.update_idletasks()
         self.locales_var.set('Translations compiled.')
+        self.window.after(1, self.create_shortcuts)
+    
+    def create_shortcuts(self):
         self.shortcut_var.set('Creating shortcuts...')
+        self.window.update()
+        self.window.update_idletasks()
         self.shortcut_var.set('Shortcuts created.')
+        self.window.after(1, self.finish)
+    
+    def finish(self):
+        messagebox.showinfo(
+            title='Success',
+            message='Útil paisagem has been successfully installed.\
+A shortcut for the application has been created.'
+        )
 
 if __name__ == '__main__':
     gui = InstallerWindow()
