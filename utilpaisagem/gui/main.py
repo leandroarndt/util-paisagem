@@ -542,8 +542,8 @@ class MainWindow(object):
             if self.marker not in self.waypoints:
                 self.marker.delete()
         if marker:
+            marker.command = self.select_marker
             self.marker = marker
-            self.marker.command = self.select_marker
             return
         if not text:
             text = f'{lat:.02f}, {lon:.02f}'
@@ -608,12 +608,12 @@ class MainWindow(object):
         self.create_route()
 
     def search(self, *args, **kwargs):
-        error = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get())
-        if error is None:
-            self.place_marker(self.map_widget.set_address(self.search_var.get(), marker=True, text=self.search_var.get()))
-            self.lat, self.lon = self.marker.position
+        marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
+        if isinstance(marker, CanvasPositionMarker):
+            self.lat, self.lon = marker.position
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
+            self.place_marker(marker)
             self.select_tile(mark=False, set_index=True)
             self.upstream_queue.put_nowait(format_status(
                 _('"{address}" found at {lat},{lon}.').format(
