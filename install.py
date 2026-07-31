@@ -23,13 +23,14 @@ class Installer(EnvBuilder):
         super().__init__(*args, **kwargs)
 
     def create(self, *args, **kwargs):
-        print('started', flush=True)
         super().create(*args, **kwargs)
-        print('finished', flush=True)
 
     def post_setup(self, context):
         os.environ['VIRTUAL_ENV'] = context.env_dir
         self.context = context
+    
+    def install_requirements(self):
+        print(self.context.bin_path)
 
 class InstallerWindow(object):
     # Installation
@@ -124,8 +125,13 @@ You must upgrade to Python {REQUIRED_PYTHON_VERSION[0]}.{REQUIRED_PYTHON_VERSION
     
     def install_packages(self):
         self.pip_var.set('Installing required packages...')
-        self.pip_var.set('Required packages installed.')
-        self.window.after(1, self.compile_translations)
+        thread = Thread(target=self.installer.install_requirements)
+        self.wait(
+            thread=thread,
+            variable=self.pip_var,
+            message='Required packages installed.',
+            next_step=self.compile_translations
+        )
     
     def compile_translations(self):
         self.locales_var.set('Compiling translations...')
@@ -147,6 +153,7 @@ You must upgrade to Python {REQUIRED_PYTHON_VERSION[0]}.{REQUIRED_PYTHON_VERSION
             message='Útil paisagem has been successfully installed.\
 A shortcut for the application has been created.'
         )
+        self.window.destroy()
 
 if __name__ == '__main__':
     gui = InstallerWindow()
