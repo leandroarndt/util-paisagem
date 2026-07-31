@@ -115,6 +115,7 @@ class MainWindow(object):
         self.window.title(
             f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" + str(RC) if RC else ""}'
         )
+        self.window.protocol('WM_DELETE_WINDOW', lambda: self.close())
 
         # Menu
         self.menu = tk.Menu(self.window)
@@ -491,7 +492,7 @@ class MainWindow(object):
 
     # Map and route operations
 
-    def create_tile_polygon(self, index:int):
+    def create_tile_polygon(self, index:int, fit_map=True):
         """
         Creates a tile polygon from index and stores it at MainWindow.tile_polygon.
 
@@ -510,12 +511,13 @@ class MainWindow(object):
             ],
             fill_color=None,
         )
-        self.map_widget.fit_bounding_box(
-            (coordinates.lat_top, coordinates.lon_left),
-            (coordinates.lat_bottom, coordinates.lon_right),
-        )
+        if fit_map:
+            self.map_widget.fit_bounding_box(
+                (coordinates.lat_top, coordinates.lon_left),
+                (coordinates.lat_bottom, coordinates.lon_right),
+            )
 
-    def select_tile(self, mark:bool=False, set_index=False):
+    def select_tile(self, mark:bool=False, set_index=False, fit_map=True):
         """Creates a polygon around a scenery tile. If `mark` is true, a map marker is created.
         If `set_index` is true, `self.index` is set according to `self.lat` and `self.lon`, otherwise
         `self.lat` and `self.lon` are set according to `self.index`."""
@@ -528,7 +530,7 @@ class MainWindow(object):
             self.lon = coordinates.lon_median
             self.lat_var.set(str(self.lat))
             self.lon_var.set(str(self.lon))
-        self.create_tile_polygon(self.index)
+        self.create_tile_polygon(self.index, fit_map=fit_map)
         if mark:
             self.place_marker(lat=self.lat, lon=self.lon)
         else:
@@ -672,7 +674,8 @@ class MainWindow(object):
         self.lat, self.lon = self.aircraft.position
         self.lat_var.set(str(self.lat))
         self.lon_var.set(str(self.lon))
-        self.select_tile(mark=False, set_index=True)
+        self.select_tile(mark=False, set_index=True, fit_map=False)
+        self.map_widget.set_position(self.lat, self.lon)
 
     # Download based on latitude and longitude
     def download_tile(self):
@@ -717,9 +720,6 @@ class MainWindow(object):
                     upstream_queue=self.upstream_queue,
                     downstream_queue=self.following_queue,
                     download_manager=self.download_manager,
-                    # host=host,
-                    # port=port,
-                    # interval=interval,
                 )
             except FGConnectionError:
                 self.following_queue.shutdown(immediate=True)
@@ -729,7 +729,14 @@ class MainWindow(object):
             self.follower.follow()
         else: # Stop following
             self.following_queue.shutdown(immediate=True)
+            self.follower.close_connection()
             self.follow_button['text'] = _('Follow aircraft')
             self.follow_button_tip.text = _('Follow aircraft on Flightgear over telnet connection.')
             if isinstance(self.aircraft, CanvasPositionMarker):
                 self.aircraft.change_icon(self.greyed_aircraft_icon)
+
+    def close(self): # Tries to close nicely
+        if not self.following_queue.is_shutdown:
+            self.following_queue.shutdown()
+            self.follower.close_connection()
+        self.window.destroy()
