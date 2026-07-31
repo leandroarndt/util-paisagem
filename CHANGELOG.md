@@ -1,6 +1,6 @@
 # Útil paisagem changelog
 
-## 0.3.0rc1
+## 0.3.0rc2
 
 - Rename waypoints
 - Added context menus on map:
@@ -16,6 +16,8 @@
   - Copy tile index
   - Settings
 - Search with "return" at the search bar and add waypoint on search with "ctrl+return"
+- Created a workaround for the bug [reported by Patamoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440849#p440835)
+which consisted of babel.numbers.format_decimal throwing babel.core.UnknownLocaleError on windows with locale "spanish_CHILE" (issue #3).
 
 ## 0.2.0
 
