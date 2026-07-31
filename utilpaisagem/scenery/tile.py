@@ -93,14 +93,12 @@ class Tile(object):
                 ), self)
             )
         height = 0.125 / vertical
-        if self.coordinates.lat_top <= 0:
-            height = -height
         width = (self.coordinates.lon_right - self.coordinates.lon_left) / horizontal
         return [[Coordinates (
-            lat1=self.coordinates.lat_top + y*height,
+            lat1=self.coordinates.lat_top - y*height,
             lon1=self.coordinates.lon_left + x*width,
-            lat2=self.coordinates.lat_top + y*height + height,
-            lon2=self.coordinates.lon_left + x*width + width
+            lat2=self.coordinates.lat_top - (y+1)*height,
+            lon2=self.coordinates.lon_left + (x+1)*width
             ) for x in range(horizontal)] for y in range(vertical)]
 
     def _glue(self, path:Path, base_name:str, lines:int, columns:int, size:[tuple,list], compress='smart') -> Path:
