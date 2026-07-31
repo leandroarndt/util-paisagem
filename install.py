@@ -1,9 +1,8 @@
-import os, platform, webbrowser
-from os import popen, _wrap_close
+import os, platform, webbrowser, subprocess, sys
 from venv import EnvBuilder
 from pathlib import Path
 from threading import Thread
-from time import sleep
+from queue import Queue
 import tkinter as tk
 from tkinter import ttk, messagebox
 
@@ -22,6 +21,22 @@ class Installer(EnvBuilder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def _reader(self, stream, queue:Queue):
+        if stream:
+            while True:
+                s = stream.readline()
+                if not s:
+                    break
+                queue.put(s)
+
+    def _read_from_pipes(self, process, out:Queue, err:Queue):
+        out_reader = Thread(target=self._reader, args=(process.stdout, out))
+        err_reader = Thread(target=self._reader, args=(process.stderr, err))
+        out_reader.start()
+        err_reader.start()
+        out_reader.join()
+        err_reader.join()
+
     def create(self, *args, **kwargs):
         super().create(*args, **kwargs)
 
@@ -29,13 +44,22 @@ class Installer(EnvBuilder):
         os.environ['VIRTUAL_ENV'] = context.env_dir
         self.context = context
     
-    def install_requirements(self):
-        print(self.context.bin_path)
+    def install_requirements(self, out:Queue, err:Queue):
+        pip = subprocess.Popen((self.context.env_exe, '-m', 'pip', 'install', '--upgrade', 'pip'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self._read_from_pipes(pip, out, err)
+        packages = subprocess.Popen((self.context.env_exe, '-m', 'pip', 'install', '-r', REQUIREMENTS), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self._read_from_pipes(packages, out, err)
+    
+    def compile_translations(self):
+        pybabel_exe = Path(self.context.bin_path) / 'pybabel'
+        if pybabel_exe.exists():
+            p = subprocess.run((pybabel_exe, 'compile', '-D', 'utilpaisagem', '-d', Path(__file__).parent / 'resources' / 'locale'), stdout=sys.stdout, stderr=sys.stderr)
 
 class InstallerWindow(object):
     # Installation
-    current_task:_wrap_close
     installer:Installer
+    err_queue:Queue
+    out_queue:Queue
 
     # GUI
     window:tk.Tk
@@ -51,6 +75,10 @@ class InstallerWindow(object):
     exit_button:ttk.Button
 
     def __init__(self):
+        # Queues
+        self.err_queue = Queue()
+        self.out_queue = Queue()
+
         # Build GUI
         self.window = tk.Tk()
         self.window.title('Installing Útil paisagem')
@@ -75,6 +103,14 @@ class InstallerWindow(object):
         self.exit_button.grid(column=1, row=4, sticky=tk.W+tk.E)
 
         self.window.after(1, self.install)
+
+    def _read_err(self):
+        while not self.err_queue.empty():
+            print(f'Error: {self.err_queue.get().decode()[:-1]}')
+
+    def _read_out(self):
+        while not self.out_queue.empty():
+            print(f'{self.out_queue.get().decode()[:-1]}') # There is always a \n on readline()
 
     def install(self):
         # Verify Python version >= 3.13
@@ -106,6 +142,8 @@ You must upgrade to Python {REQUIRED_PYTHON_VERSION[0]}.{REQUIRED_PYTHON_VERSION
         self.window.after(1, self.create_environment)
 
     def wait(self, thread:Thread, variable:tk.StringVar, message:str, next_step:callable):
+        self._read_out()
+        self._read_err()
         if thread.is_alive():
             self.window.after(100, self.wait, thread, variable, message, next_step)
         else:
@@ -125,7 +163,8 @@ You must upgrade to Python {REQUIRED_PYTHON_VERSION[0]}.{REQUIRED_PYTHON_VERSION
     
     def install_packages(self):
         self.pip_var.set('Installing required packages...')
-        thread = Thread(target=self.installer.install_requirements)
+        thread = Thread(target=self.installer.install_requirements, args=(self.out_queue, self.err_queue))
+        thread.start()
         self.wait(
             thread=thread,
             variable=self.pip_var,
