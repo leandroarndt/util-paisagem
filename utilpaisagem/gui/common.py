@@ -3,6 +3,7 @@ import locale
 # format_status
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
+from babel.core import UnknownLocaleError
 # Settings
 import configparser, ast, appdirs
 from pathlib import Path
@@ -15,6 +16,11 @@ PADDING = 6
 
 # Text formatting
 LOCALE = locale.getlocale()[0] or 'en_US'
+# Test locale
+try:
+    format_datetime(datetime.now(), format='short', locale=LOCALE)
+except UnknownLocaleError:
+    LOCALE = 'en_US'
 
 def format_status(text:str, obj) -> str:
     return f'{format_datetime(datetime.now(), format='short', locale=LOCALE)} ({obj.__class__.__name__}): {text}'
