@@ -219,3 +219,4 @@ __marimo__/
 
 # Custom
 *~
+.test_env/
