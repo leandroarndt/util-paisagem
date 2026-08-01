@@ -608,6 +608,7 @@ class MainWindow(object):
             marker.delete()
         self.waypoints_to_var()
         self.create_route()
+        self.waypoint_name_var.set('')
 
     def search(self, *args, **kwargs):
         marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
