@@ -7,7 +7,7 @@
 Name 'Util paisagem'
 
 # define name of installer
-OutFile "Util_Paisagem_Installer.exe"
+OutFile "dist\Util_Paisagem_Installer.exe"
  
 # define installation directory
 InstallDir "$LOCALAPPDATA\Programs\Util Paisagem"
