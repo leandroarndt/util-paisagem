@@ -102,14 +102,14 @@ class SettingsWindow(object):
     tiles_label:ttk.Label
     tiles_var:tk.IntVar
     tiles_input:ttk.Spinbox
+    resolution_var:tk.IntVar
+    resolution_label:ttk.Label
+    resolution_option:ttk.Combobox
     threads_var:tk.IntVar
     threads_var:tk.IntVar
     threads_label:tk.Label
     threads_input:ttk.Spinbox
     image_frame:ttk.LabelFrame
-    resolution_var:tk.IntVar
-    resolution_label:ttk.Label
-    resolution_option:ttk.Combobox
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -250,10 +250,22 @@ class SettingsWindow(object):
         # threads_label:tk.Label
         # threads_input:ttk.Spinbox
         self.radius_label.grid(column=0, row=0, sticky=tk.E)
-        self.radius_input.grid(column=1, row=0, sticky=tk.W)
+        self.radius_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
-        self.tiles_label.grid(column=0, row=1, sticky=tk.E)
-        self.tiles_input.grid(column=1, row=1, sticky=tk.W)
+        self.resolution_var = tk.StringVar(
+            self.download_frame,
+            self.format_size(self.settings.download_res),
+        )
+        self.resolution_label = ttk.Label(self.download_frame, text=_('Download size:'))
+        self.resolution_option = ttk.Combobox(
+            self.download_frame,
+            values=self.sizes,
+            textvariable=self.resolution_var,
+        )
+        self.resolution_label.grid(column=0, row=1, sticky=tk.E)
+        self.resolution_option.grid(column=1, row=1, sticky=tk.W+tk.E)
+        self.tiles_label.grid(column=0, row=2, sticky=tk.E)
+        self.tiles_input.grid(column=1, row=2, sticky=tk.W+tk.E)
         # Image tab
         self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.image_tab.rowconfigure(0, weight=10)
@@ -261,18 +273,6 @@ class SettingsWindow(object):
         # Image resolutions
         self.image_frame = ttk.LabelFrame(self.image_tab, text=_('Image'), padding=PADDING)
         self.image_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
-        self.resolution_var = tk.StringVar(
-            self.image_frame,
-            self.format_size(self.settings.download_res),
-        )
-        self.resolution_label = ttk.Label(self.image_frame, text=_('Download size:'))
-        self.resolution_option = ttk.Combobox(
-            self.image_frame,
-            values=self.sizes,
-            textvariable=self.resolution_var,
-        )
-        self.resolution_label.grid(column=0, row=0, sticky=tk.E)
-        self.resolution_option.grid(column=1, row=0, sticky=tk.W)
         self.distances = []
         row = 1
         resolution_distance = {}
