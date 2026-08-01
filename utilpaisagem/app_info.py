@@ -1,7 +1,7 @@
 from pathlib import Path
 
 VERSION = 0
-SUBVERSION = 3
+SUBVERSION = 4
 REVISION = 0
 RC = ' NEXT'
 
