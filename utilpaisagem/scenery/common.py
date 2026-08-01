@@ -26,6 +26,11 @@ RESOLUTIONS = {
 MAX_RES = 14
 DOWNLOAD_RES = 10 # Preferred download resolution to compose high-res tiles
 MIN_RES = 7
+COMPRESSION = {
+    _('DDS'): 'dds',
+    _('PNG'): 'png',
+    _('smallest size'): 'smart',
+}
 
 def distance(lat1:Number, lon1:Number, lat2:Number, lon2:Number):
     """

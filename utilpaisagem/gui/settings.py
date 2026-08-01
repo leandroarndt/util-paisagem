@@ -7,7 +7,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from babel.numbers import format_decimal
 from utilpaisagem.gui.common import Settings, PADDING, LOCALE
-from utilpaisagem.scenery.common import RESOLUTIONS
+from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
 
 class Distance(ttk.Frame):
     resolution:int
@@ -104,7 +104,10 @@ class SettingsWindow(object):
     tiles_input:ttk.Spinbox
     resolution_var:tk.IntVar
     resolution_label:ttk.Label
-    resolution_option:ttk.Combobox
+    resolution_entry:ttk.Combobox
+    image_format_var:tk.StringVar
+    image_format_label:tk.Label
+    image_format_entry:ttk.Combobox
     threads_var:tk.IntVar
     threads_var:tk.IntVar
     threads_label:tk.Label
@@ -257,15 +260,27 @@ class SettingsWindow(object):
             self.format_size(self.settings.download_res),
         )
         self.resolution_label = ttk.Label(self.download_frame, text=_('Download size:'))
-        self.resolution_option = ttk.Combobox(
+        self.resolution_entry = ttk.Combobox(
             self.download_frame,
             values=self.sizes,
             textvariable=self.resolution_var,
         )
         self.resolution_label.grid(column=0, row=1, sticky=tk.E)
-        self.resolution_option.grid(column=1, row=1, sticky=tk.W+tk.E)
-        self.tiles_label.grid(column=0, row=2, sticky=tk.E)
-        self.tiles_input.grid(column=1, row=2, sticky=tk.W+tk.E)
+        self.resolution_entry.grid(column=1, row=1, sticky=tk.W+tk.E)
+        self.image_format_var = tk.StringVar(self.download_frame)
+        for k, v in COMPRESSION.items():
+            if v == self.settings.image_format:
+                self.image_format_var.set(k)
+        self.image_format_label = ttk.Label(self.download_frame, text=_('Image file format:'))
+        self.image_format_entry = ttk.Combobox(
+            self.download_frame,
+            values=list(COMPRESSION.keys()),
+            textvariable=self.image_format_var
+        )
+        self.image_format_label.grid(column=0, row=2, sticky=tk.E)
+        self.image_format_entry.grid(column=1, row=2, sticky=tk.W+tk.E)
+        self.tiles_label.grid(column=0, row=3, sticky=tk.E)
+        self.tiles_input.grid(column=1, row=3, sticky=tk.W+tk.E)
         # Image tab
         self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.image_tab.rowconfigure(0, weight=10)
@@ -388,6 +403,7 @@ class SettingsWindow(object):
             )
             return
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
+        self.settings.image_format = COMPRESSION[self.image_format_var.get()]
         distances = {}
         max_distance = 0
         try:

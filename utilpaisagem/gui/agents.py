@@ -47,6 +47,7 @@ class Downloader(object):
             image_service=IMAGE_SERVICES['ArcGIS'],
             upstream_queue=self.upstream_queue,
             download_res=self.settings.download_res,
+            compress=self.settings.image_format,
         )
         self.wait_queue.put_nowait(tile.index)
 

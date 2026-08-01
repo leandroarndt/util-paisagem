@@ -44,16 +44,21 @@ class Settings(object):
     *ATTENTION:* changes must be saved in order to be restored in the next session!
 
     Attributes and default values, if any:
-        orthophotos_folder:str = ''
+        fgdata_folder:str = str(Path.home() / '.fgdata')
+        orthophotos_folder:str = str(Path('%(fgdata_folder)s') / 'utilpaisagem' / 'Orthophotos')
         tile_threads:int = 4
         image_threads:int = 4
         radius:int = 50
-        download_res = DOWNLOAD_RES # 10 from `utilpaisagem.gui.common`
+        download_res:int = DOWNLOAD_RES
+        image_format:str = 'smart'
         distances = {
             8: DOWNLOAD_RES + 2,
             20: DOWNLOAD_RES + 1,
-            40100000: DOWNLOAD_RES,
+            40100: DOWNLOAD_RES,
         }
+        host:str = 'localhost'
+        port:int = 5000
+        following_interval:int = 10000
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -62,7 +67,8 @@ class Settings(object):
     tile_threads:int = 4
     image_threads:int = 4
     radius:int = 50
-    download_res = DOWNLOAD_RES
+    download_res:int = DOWNLOAD_RES
+    image_format:str = 'smart'
     distances = {
         8: DOWNLOAD_RES + 2,
         20: DOWNLOAD_RES + 1,
@@ -78,6 +84,7 @@ class Settings(object):
         'tile_threads': _Sections.DOWNLOAD.value,
         'image_threads': _Sections.DOWNLOAD.value,
         'download_res': _Sections.DOWNLOAD.value,
+        'image_format': _Sections.DOWNLOAD.value,
         'radius': _Sections.RANGE.value,
         'distances': _Sections.RANGE.value,
         'host': _Sections.CONNECTION.value,
