@@ -1,5 +1,12 @@
 # Útil paisagem changelog
 
+## 0.4.0 (next)
+
+- **TODO:** Change download resolution to the "download" tab in settings.
+- **TODO:** Add image file format to the settings.
+- **TODO:** Add threading to tile download and add the corresponding setting
+to the GUI
+
 ## 0.3.0
 
 - Windows installer
