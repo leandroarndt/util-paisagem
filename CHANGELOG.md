@@ -1,7 +1,8 @@
 # Útil paisagem changelog
 
-## 0.3.0rc3
+## 0.3.0
 
+- Windows installer
 - Rename waypoints
 - Added context menus on map:
   - Select tile.
