@@ -3,7 +3,7 @@
 ## 0.4.0 (next)
 
 - Change download resolution to the "download" tab in settings.
-- **TODO:** Add image file format to the settings.
+- Add image file format to the settings.
 - **TODO:** Add threading to tile download and add the corresponding setting
 to the GUI
 - Empty waypoint name on deletion.
