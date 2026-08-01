@@ -6,6 +6,7 @@
 - **TODO:** Add image file format to the settings.
 - **TODO:** Add threading to tile download and add the corresponding setting
 to the GUI
+- **TODO:** Empty waypoint name on deletion.
 
 ## 0.3.0
 
