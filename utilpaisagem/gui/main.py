@@ -574,9 +574,9 @@ class MainWindow(object):
         self.create_route()
 
     def rename_waypoint(self, *args, **kwargs):
-        selected = self.waypoints_list.curselection()
-        print(self.waypoint_name_var.get())
-        self.waypoints[selected[0]].set_text(self.waypoint_name_var.get())
+        # selected = self.waypoints_list.curselection()
+        # print(self.waypoint_name_var.get())
+        self.waypoints[self.current_waypoint].set_text(self.waypoint_name_var.get())
         self.waypoints_to_var()
         self.waypoints_list.select_set(self.current_waypoint)
 
@@ -651,9 +651,12 @@ class MainWindow(object):
         self.add_waypoint(self.marker)
 
     def select_waypoint(self, event):
-        self.current_waypoint = self.waypoints_list.curselection()[0]
-        self.waypoint_name_var.set(self.waypoints[self.current_waypoint].text)
-        self.select_marker(self.waypoints[self.current_waypoint])
+        try:
+            self.current_waypoint = self.waypoints_list.curselection()[0]
+            self.waypoint_name_var.set(self.waypoints[self.current_waypoint].text)
+            self.select_marker(self.waypoints[self.current_waypoint])
+        except IndexError: # Sometimes it gets deselected on focus out
+            pass
 
     def select_marker(self, marker:CanvasPositionMarker):
         self.lat, self.lon = marker.position
@@ -671,11 +674,12 @@ class MainWindow(object):
         self.aircraft = self.map_widget.set_marker(lat, lon, icon=self.active_aircraft_icon if active else self.greyed_aircraft_icon)
     
     def center_on_aircraft(self):
-        self.lat, self.lon = self.aircraft.position
-        self.lat_var.set(str(self.lat))
-        self.lon_var.set(str(self.lon))
-        self.select_tile(mark=False, set_index=True, fit_map=False)
-        self.map_widget.set_position(self.lat, self.lon)
+        if isinstance(self.aircraft, CanvasPositionMarker):
+            self.lat, self.lon = self.aircraft.position
+            self.lat_var.set(str(self.lat))
+            self.lon_var.set(str(self.lon))
+            self.select_tile(mark=False, set_index=True, fit_map=False)
+            self.map_widget.set_position(self.lat, self.lon)
 
     # Download based on latitude and longitude
     def download_tile(self):
