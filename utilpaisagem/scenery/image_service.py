@@ -38,6 +38,16 @@ class ImageService(object):
         
         return int(width), int(height)
 
+    def can_download(self, coordinates:Coordinates) -> bool:
+        """
+        Tells wether `coordinates` can be downloaded by the image service.
+        This method must be overriden by each `ImageService` class.
+
+        Arguments:
+            coordinates(Coordinates): coordinates to be tested for download
+        """
+        return False
+
     def download(self, file:Path, coordinates:Coordinates, height:int):
         """
         Downloads an image from `coordinates` with `height` pixels and writes it
@@ -85,15 +95,6 @@ class _ArcGIS(ImageService):
         if coordinates.lat_top > 89 or coordinates.lat_bottom < -89:
             return False
         return True
-        return _(
-            'Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not covered by {service_name}'
-        ).format(
-            lat_top=coordinates.lat_top,
-            lon_left=coordinates.lon_left,
-            lat_bottom=coordinates.lat_bottom,
-            lon_right=coordinates.lon_right,
-            service_name=self.name,
-        )
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
         return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&imageSR=4326&size={width},{height}&format=png24&f=image'
