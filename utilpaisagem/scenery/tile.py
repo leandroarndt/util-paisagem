@@ -317,32 +317,7 @@ class Tile(object):
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
                         download_queue.put_nowait((current, line, cell))
-                        # threads.append(Thread(target=do_download, args=(current, line, cell)))
                         current += 1
-                        # if self.upstream_queue is None:
-                        #     text = f'Downloading image {current}/{total}...'
-                        #     print(text, end='', flush=True)
-                        # else:
-                        #     self.upstream_queue.put_nowait(format_status(
-                        #         _('Downloading image {current}/{total} of tile {index}...').format(
-                        #             current=current,
-                        #             total=total,
-                        #             index=self.index
-                        #         ),
-                        #         self
-                        #     ))
-                        # exception, done = image_service.download(
-                        #     Path(cache) / f'{self.index}-{line}-{cell}.png',
-                        #     divisions[line][cell],
-                        #     2**download_res
-                        # )
-                        # current += 1
-                        # if exception is not None:
-                        #     errors += 1
-                        #     if not done:
-                        #         failures.append((line, cell))
-                        # elif not self.upstream_queue:
-                        #     print('\b'*len(text), end='', flush=True)
                 threads = []
                 for t in range(self.settings.image_threads):
                     threads.append(Thread(target=downloader))

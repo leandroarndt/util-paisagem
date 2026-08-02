@@ -103,7 +103,6 @@ class Settings(object):
                 pass
         return super().__getattribute__(name)
 
-
     def __setattr__(self, name, value):
         if name in __class__._key_section:
             __class__._settings[__class__._key_section[name]][name] = str(value)
