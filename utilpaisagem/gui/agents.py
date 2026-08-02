@@ -44,7 +44,7 @@ class Downloader(object):
         tile:Tile = self.download_queue.get()
         tile.retrieve(
             path=Path(self.settings.orthophotos_folder),
-            image_service=IMAGE_SERVICES['ArcGIS'],
+            image_service=IMAGE_SERVICES[0],
             upstream_queue=self.upstream_queue,
             download_res=self.settings.download_res,
             compress=self.settings.image_format,
