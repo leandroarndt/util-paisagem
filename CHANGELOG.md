@@ -1,10 +1,10 @@
 # Útil paisagem changelog
 
-## 0.4.0 (next)
+## 0.4.0rc1
 
 - Change download resolution to the "download" tab in settings.
 - Add image file format to the settings.
-- **TODO:** Add threading to tile download and add the corresponding setting
+- Add threading to tile download and add the corresponding setting
 to the GUI
 - Empty waypoint name on deletion.
 
