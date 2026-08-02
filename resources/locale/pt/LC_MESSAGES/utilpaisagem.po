@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem VERSION\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-08-01 23:23-0300\n"
+"POT-Creation-Date: 2026-08-02 18:05-0300\n"
 "PO-Revision-Date: 2026-07-07 12:17-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -181,11 +181,11 @@ msgstr "Abaixo"
 msgid "Download route"
 msgstr "Baixar rota"
 
-#: utilpaisagem/gui/main.py:349 utilpaisagem/gui/main.py:738
+#: utilpaisagem/gui/main.py:349 utilpaisagem/gui/main.py:743
 msgid "Follow aircraft"
 msgstr "Seguir aeronave"
 
-#: utilpaisagem/gui/main.py:354 utilpaisagem/gui/main.py:739
+#: utilpaisagem/gui/main.py:354 utilpaisagem/gui/main.py:744
 msgid "Follow aircraft on Flightgear over telnet connection."
 msgstr "Seguir aeronave no Flightgear usando conexão telnet."
 
@@ -206,30 +206,30 @@ msgstr "Imagem não encontrada"
 msgid "No image found for tile {index}."
 msgstr "Imagem não encontrada para o ladrilho {index}."
 
-#: utilpaisagem/gui/main.py:427
+#: utilpaisagem/gui/main.py:432
 msgid "Delete tile?"
 msgstr "Deletar ladrilho?"
 
-#: utilpaisagem/gui/main.py:428
+#: utilpaisagem/gui/main.py:433
 #, python-brace-format
 msgid "Are you sure you want to delete tile {index}?"
 msgstr "Deseja realmente deletar o ladrilho {index}?"
 
-#: utilpaisagem/gui/main.py:622
+#: utilpaisagem/gui/main.py:627
 #, python-brace-format
 msgid "\"{address}\" found at {lat},{lon}."
 msgstr "\"{address}\" encontrado em {lat},{lon}."
 
-#: utilpaisagem/gui/main.py:632
+#: utilpaisagem/gui/main.py:637
 #, python-brace-format
 msgid "Could not find address {address}."
 msgstr "Não foi possível encontrar {address}."
 
-#: utilpaisagem/gui/main.py:732
+#: utilpaisagem/gui/main.py:737
 msgid "Stop following"
 msgstr "Parar de seguir"
 
-#: utilpaisagem/gui/main.py:733
+#: utilpaisagem/gui/main.py:738
 msgid "Stop following aircraft on FlightGear"
 msgstr "Parar de seguir aeronave no Flightgear"
 
@@ -421,45 +421,63 @@ msgstr "PNG"
 msgid "smallest size"
 msgstr "menor tamanho"
 
-#: utilpaisagem/scenery/tile.py:90
+#: utilpaisagem/scenery/tile.py:92
 #, python-brace-format
 msgid "Dividing tile {index} in {vertical} lines and {horizontal} columns."
 msgstr "Dividindo o ladrilho {index} em {vertical} linhas e {horizontal} colunas."
 
-#: utilpaisagem/scenery/tile.py:133
+#: utilpaisagem/scenery/tile.py:135
 #, python-brace-format
 msgid "Tile {index}: DDS is smaller than optimized PNG."
 msgstr "Ladrilho {index}: O DDS é menor que o PNG otimizado."
 
-#: utilpaisagem/scenery/tile.py:141
+#: utilpaisagem/scenery/tile.py:143
 #, python-brace-format
 msgid "Tile {index}: optimized PNG is smaller than DDS."
 msgstr "Ladrilho {index}: o PNG otimizado é menor que o DDS."
 
-#: utilpaisagem/scenery/tile.py:194
+#: utilpaisagem/scenery/tile.py:185
+#, python-brace-format
+msgid ""
+"Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, "
+"{lon_right:.03f}  is not covered by {service_name}"
+msgstr ""
+"A área de {lat_top:.03f}, {lon_left:.03f} a {lat_bottom:.03f}, "
+"{lon_right:.03f} não é coberta por {service_name}"
+
+#: utilpaisagem/scenery/tile.py:195
+#, python-brace-format
+msgid ""
+"Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not "
+"covered by {service_name}"
+msgstr ""
+"A área de {lat_top}, {lon_left} a {lat_bottom}, {lon_right} não é "
+"coberta por {service_name}"
+
+#: utilpaisagem/scenery/tile.py:218
 #, python-brace-format
 msgid "Downloading image {current}/{total} of tile {index}..."
 msgstr "Baixando imagem {current}/{total} do ladrilho {index}..."
 
-#: utilpaisagem/scenery/tile.py:226
+#: utilpaisagem/scenery/tile.py:250
 #, python-brace-format
 msgid "Processing tile {index} ({lat_median}, {lon_median})..."
 msgstr "Processando ladrilho {index} ({lat_median}, {lon_median})..."
 
-#: utilpaisagem/scenery/tile.py:245
+#: utilpaisagem/scenery/tile.py:269
 msgid "Previously downloaded file has smaller resolution. Downloading again."
 msgstr "A resolução do arquivo baixado antes é menor. Baixando novamente."
 
-#: utilpaisagem/scenery/tile.py:254
+#: utilpaisagem/scenery/tile.py:278
 msgid "Failure on previous download. Downloading again."
 msgstr "Falha ao baixar anteriormente. Baixando novamente."
 
-#: utilpaisagem/scenery/tile.py:264
+#: utilpaisagem/scenery/tile.py:288
 #, python-brace-format
 msgid "Tile {index} has not been saved as a {format} file. Downloading again."
 msgstr "Ladrilho {index} não foi salvo no formato {format}. Baixando novamente."
 
-#: utilpaisagem/scenery/tile.py:278
+#: utilpaisagem/scenery/tile.py:302
 #, python-brace-format
 msgid ""
 "Previous download was not found where expected (\"{p}\"). Downloading "
@@ -468,29 +486,34 @@ msgstr ""
 "Arquivo anterior não encontrado onde esperado (\"{p}\"). Baixando "
 "novamente."
 
-#: utilpaisagem/scenery/tile.py:286
+#: utilpaisagem/scenery/tile.py:310
 #, python-brace-format
 msgid "Tile {index} has already been downloaded. Skipping."
 msgstr "Ladrilho {index} já foi baixado. Pulando."
 
-#: utilpaisagem/scenery/tile.py:298
+#: utilpaisagem/scenery/tile.py:322
 #, python-brace-format
 msgid "Failed to check previous download (\"{e}\"). Downloading again."
 msgstr ""
 "Não foi possível verificar o download anterior (\"{e}\"). Baixando "
 "novamente."
 
-#: utilpaisagem/scenery/tile.py:332
+#: utilpaisagem/scenery/tile.py:356
 #, python-brace-format
 msgid "Downloaded tile {index}."
 msgstr "Baixado o ladrilho {index}."
 
-#: utilpaisagem/scenery/tile.py:353
+#: utilpaisagem/scenery/tile.py:378
 #, python-brace-format
 msgid "Tile {index}'s photographic scenery placed at {path}."
 msgstr "Cenário fotográfico do ladrilho {index} colocado em {path}."
 
-#: utilpaisagem/scenery/tile.py:379 utilpaisagem/scenery/tile.py:394
+#: utilpaisagem/scenery/tile.py:388
+#, python-brace-format
+msgid "Tile {self.index}'s photographic scenery could not be saved."
+msgstr "Cenário fotográfico do ladrilho {self.index} não pôde ser salvo."
+
+#: utilpaisagem/scenery/tile.py:413 utilpaisagem/scenery/tile.py:428
 #, python-brace-format
 msgid "Error downloading cell {index}[{line}][{cell}]: {e}."
 msgstr "Erro baixando célula {index}[{line}][{cell}]: {e}."

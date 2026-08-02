@@ -1,12 +1,14 @@
 # Útil paisagem changelog
 
-## 0.4.0rc1
+## 0.4.0rc2
 
-- Change download resolution to the "download" tab in settings.
-- Add image file format to the settings.
-- Add threading to tile download and add the corresponding setting
+- Moved download resolution to the "download" tab in settings.
+- Added image file format to the settings.
+- Added threading to tile download and the corresponding setting
 to the GUI
-- Empty waypoint name on deletion.
+- Empties waypoint name on deletion.
+- Fixed issue #6 about Windows installations (with embedable Python)
+not showing the tile image (it now opens the parent folder).
 
 ## 0.3.0
 
