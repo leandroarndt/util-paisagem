@@ -413,14 +413,19 @@ class MainWindow(object):
         dds = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.dds'
         png = Tile(self.index).get_path(self.settings.orthophotos_folder) / f'{self.index}.png'
         if dds.exists():
-            show_in_file_manager(str(dds))
+            path = dds
         elif png.exists():
-            show_in_file_manager(str(png))
+            path = png
         else:
             tk.messagebox.showerror(
                 title=_('Image not found'),
                 message=_('No image found for tile {index}.').format(index=self.index)
             )
+            return
+        try:
+            show_in_file_manager(str(path)) # Fails on Windows with embedable Python (issue #6)
+        except NameError:
+            show_in_file_manager(str(path.parent))
 
     def delete_tile(self):
         answer = tk.messagebox.askyesno(
