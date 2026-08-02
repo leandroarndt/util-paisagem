@@ -247,14 +247,18 @@ class SettingsWindow(object):
             from_=1,
             to=36,
         )
-        # TODO
-        # threads_var:tk.IntVar
-        # threads_var:tk.IntVar
-        # threads_label:tk.Label
-        # threads_input:ttk.Spinbox
-        self.radius_label.grid(column=0, row=0, sticky=tk.E)
-        self.radius_input.grid(column=1, row=0, sticky=tk.W+tk.E)
-        self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
+        self.threads_var = tk.IntVar(self.download_frame, value=self.settings.image_threads)
+        self.threads_label=ttk.Label(
+            self.download_frame,
+            text=_('Maximum simultaneous downloads for each tile:'),
+            justify=tk.RIGHT,
+        )
+        self.threads_input = ttk.Spinbox(
+            self.download_frame,
+            textvariable=self.threads_var,
+            from_=1,
+            to=36,
+        )
         self.resolution_var = tk.StringVar(
             self.download_frame,
             self.format_size(self.settings.download_res),
@@ -265,8 +269,6 @@ class SettingsWindow(object):
             values=self.sizes,
             textvariable=self.resolution_var,
         )
-        self.resolution_label.grid(column=0, row=1, sticky=tk.E)
-        self.resolution_entry.grid(column=1, row=1, sticky=tk.W+tk.E)
         self.image_format_var = tk.StringVar(self.download_frame)
         for k, v in COMPRESSION.items():
             if v == self.settings.image_format:
@@ -277,10 +279,17 @@ class SettingsWindow(object):
             values=list(COMPRESSION.keys()),
             textvariable=self.image_format_var
         )
+        self.radius_label.grid(column=0, row=0, sticky=tk.E)
+        self.radius_input.grid(column=1, row=0, sticky=tk.W+tk.E)
+        self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
+        self.resolution_label.grid(column=0, row=1, sticky=tk.E)
+        self.resolution_entry.grid(column=1, row=1, sticky=tk.W+tk.E)
         self.image_format_label.grid(column=0, row=2, sticky=tk.E)
         self.image_format_entry.grid(column=1, row=2, sticky=tk.W+tk.E)
         self.tiles_label.grid(column=0, row=3, sticky=tk.E)
         self.tiles_input.grid(column=1, row=3, sticky=tk.W+tk.E)
+        self.threads_label.grid(column=0, row=4, sticky=tk.E)
+        self.threads_input.grid(column=1, row=4, sticky=tk.W+tk.E)
         # Image tab
         self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.image_tab.rowconfigure(0, weight=10)
@@ -395,11 +404,19 @@ class SettingsWindow(object):
             )
             return
         try:
-            self.settings.tile_threads = int(self.tiles_var .get())
+            self.settings.tile_threads = int(self.tiles_var.get())
         except tk.TclError:
             tk.messagebox.showerror(
                     title=_('Invalid value'),
                     message=_('Invalid value in maximum simultaneous tiles configuration. Please inform an integer value.'),
+            )
+            return
+        try:
+            self.settings.image_threads = int(self.threads_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in maximum simultaneous downloads for each tile configuration. Please inform an integer value.'),
             )
             return
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
