@@ -4,7 +4,9 @@ from urllib.error import URLError, ContentTooShortError
 from queue import Queue
 from PIL import Image
 from threading import Thread
+from decimal import Decimal
 import math, tempfile, shutil, os, configparser, ast
+from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.gui.common import format_status, Settings
@@ -177,6 +179,28 @@ class Tile(object):
             download_res(int): exponent of two representing vertical image size
             compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
         """
+        if not image_service.can_download(self.coordinates):
+            if self.upstream_queue is None:
+                print(_(
+                    'Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, {lon_right:.03f}  is not covered by {service_name}'
+                ).format(
+                    lat_top=self.coordinates.lat_top,
+                    lon_left=self.coordinates.lon_left,
+                    lat_bottom=self.coordinates.lat_bottom,
+                    lon_right=self.coordinates.lon_right,
+                    service_name=image_service.name,
+                ))
+            else:
+                self.upstream_queue.put_nowait(_(
+                    'Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not covered by {service_name}'
+                ).format(
+                    lat_top=format_decimal(Decimal(self.coordinates.lat_top).quantize(Decimal('0.001'))),
+                    lon_left=format_decimal(Decimal(self.coordinates.lon_left).quantize(Decimal('0.001'))),
+                    lat_bottom=format_decimal(Decimal(self.coordinates.lat_bottom).quantize(Decimal('0.001'))),
+                    lon_right=format_decimal(Decimal(self.coordinates.lon_right).quantize(Decimal('0.001'))),
+                    service_name=image_service.name,
+                ))
+            return
         def downloader():
             nonlocal download_queue
             while not download_queue.empty():
