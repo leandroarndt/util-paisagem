@@ -367,19 +367,29 @@ class Tile(object):
                 )
 
                 #Move
-                if not path.is_dir():
-                    path.mkdir(parents=True)
-                shutil.copy(filename, path)
-                if self.upstream_queue is None:
-                    print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                if filename.exists():
+                    if not path.is_dir():
+                        path.mkdir(parents=True)
+                    shutil.copy(filename, path)
+                    if self.upstream_queue is None:
+                        print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                    else:
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Tile {index}\'s photographic scenery placed at {path}.').format(
+                                index=self.index,
+                                path=path
+                            ),
+                            self
+                        ))
+                elif self.upstream_queue is None:
+                    print(f'Tile {self.index}\'s photographic scenery could not be saved.')
                 else:
                     self.upstream_queue.put_nowait(format_status(
-                        _('Tile {index}\'s photographic scenery placed at {path}.').format(
-                            index=self.index,
-                            path=path
-                        ),
-                        self
-                    ))
+                            _('Tile {self.index}\'s photographic scenery could not be saved.').format(
+                                index=self.index,
+                            ),
+                            self
+                        ))
 
                 # Write log
                 log = configparser.ConfigParser()
