@@ -177,6 +177,13 @@ class Tile(object):
             download_res(int): exponent of two representing vertical image size
             compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
         """
+        def downloader():
+            nonlocal download_queue
+            while not download_queue.empty():
+                current, line, cell = download_queue.get_nowait()
+                do_download(current, line, cell)
+                download_queue.task_done()
+
         def do_download(current, line, cell):
             nonlocal self, total, divisions, errors, failures
             if self.upstream_queue is None:
@@ -306,10 +313,11 @@ class Tile(object):
                 # Download
                 total = len(divisions) * len(divisions[0])
                 current = 1
-                threads = []
+                download_queue = Queue()
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        threads.append(Thread(target=do_download, args=(current, line, cell)))
+                        download_queue.put_nowait((current, line, cell))
+                        # threads.append(Thread(target=do_download, args=(current, line, cell)))
                         current += 1
                         # if self.upstream_queue is None:
                         #     text = f'Downloading image {current}/{total}...'
@@ -335,6 +343,9 @@ class Tile(object):
                         #         failures.append((line, cell))
                         # elif not self.upstream_queue:
                         #     print('\b'*len(text), end='', flush=True)
+                threads = []
+                for t in range(self.settings.image_threads):
+                    threads.append(Thread(target=downloader))
                 for t in threads:
                     t.start()
                 while threads:
