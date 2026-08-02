@@ -3,6 +3,7 @@ from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
 from queue import Queue
 from PIL import Image
+from threading import Thread
 import math, tempfile, shutil, os, configparser, ast
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
@@ -176,6 +177,33 @@ class Tile(object):
             download_res(int): exponent of two representing vertical image size
             compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
         """
+        def do_download(current, line, cell):
+            nonlocal self, total, divisions, errors, failures
+            if self.upstream_queue is None:
+                text = f'Downloading image {current}/{total}...'
+                print(text, end='', flush=True)
+            else:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Downloading image {current}/{total} of tile {index}...').format(
+                        current=current,
+                        total=total,
+                        index=self.index
+                    ),
+                    self
+                ))
+            exception, done = image_service.download(
+                Path(cache) / f'{self.index}-{line}-{cell}.png',
+                divisions[line][cell],
+                2**download_res
+            )
+            current += 1
+            if exception is not None:
+                errors += 1
+                if not done:
+                    failures.append((line, cell))
+            elif not self.upstream_queue:
+                print('\b'*len(text), end='', flush=True)
+
         path = self.get_path(path)
         # Ok? Touch it.
         # Else:
@@ -278,32 +306,39 @@ class Tile(object):
                 # Download
                 total = len(divisions) * len(divisions[0])
                 current = 1
+                threads = []
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        if self.upstream_queue is None:
-                            text = f'Downloading image {current}/{total}...'
-                            print(text, end='', flush=True)
-                        else:
-                            self.upstream_queue.put_nowait(format_status(
-                                _('Downloading image {current}/{total} of tile {index}...').format(
-                                    current=current,
-                                    total=total,
-                                    index=self.index
-                                ),
-                                self
-                            ))
-                        exception, done = image_service.download(
-                            Path(cache) / f'{self.index}-{line}-{cell}.png',
-                            divisions[line][cell],
-                            2**download_res
-                        )
+                        threads.append(Thread(target=do_download, args=(current, line, cell)))
                         current += 1
-                        if exception is not None:
-                            errors += 1
-                            if not done:
-                                failures.append((line, cell))
-                        elif not self.upstream_queue:
-                            print('\b'*len(text), end='', flush=True)
+                        # if self.upstream_queue is None:
+                        #     text = f'Downloading image {current}/{total}...'
+                        #     print(text, end='', flush=True)
+                        # else:
+                        #     self.upstream_queue.put_nowait(format_status(
+                        #         _('Downloading image {current}/{total} of tile {index}...').format(
+                        #             current=current,
+                        #             total=total,
+                        #             index=self.index
+                        #         ),
+                        #         self
+                        #     ))
+                        # exception, done = image_service.download(
+                        #     Path(cache) / f'{self.index}-{line}-{cell}.png',
+                        #     divisions[line][cell],
+                        #     2**download_res
+                        # )
+                        # current += 1
+                        # if exception is not None:
+                        #     errors += 1
+                        #     if not done:
+                        #         failures.append((line, cell))
+                        # elif not self.upstream_queue:
+                        #     print('\b'*len(text), end='', flush=True)
+                for t in threads:
+                    t.start()
+                while threads:
+                    threads.pop().join()
                 if self.upstream_queue is None:
                     print(f'Downloaded tile {self.index}.     ')
                 else:
