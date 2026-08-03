@@ -2,13 +2,15 @@
 
 ## 0.4.0rc2
 
-- Moved download resolution to the "download" tab in settings.
 - Added image file format to the settings.
 - Added threading to tile download and the corresponding setting
 to the GUI
 - Empties waypoint name on deletion.
+- Moved download resolution to the "download" tab in settings.
 - Fixed issue #6 about Windows installations (with embedable Python)
 not showing the tile image (it now opens the parent folder).
+- Doesn't try to download latitudes greater than 85 degrees (ArcGIS
+does not provide them — issue #6).
 
 ## 0.3.0
 
