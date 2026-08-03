@@ -1,6 +1,6 @@
 # Útil paisagem changelog
 
-## 0.4.0rc2
+## 0.4.0
 
 - Added image file format to the settings.
 - Added threading to tile download and the corresponding setting
@@ -10,7 +10,7 @@ to the GUI
 - Fixed issue #6 about Windows installations (with embedable Python)
 not showing the tile image (it now opens the parent folder).
 - Doesn't try to download latitudes greater than 85 degrees (ArcGIS
-does not provide them — issue #6).
+does not provide them — issue #5).
 
 ## 0.3.0
 
