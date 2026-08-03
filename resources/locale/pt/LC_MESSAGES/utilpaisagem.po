@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem VERSION\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-08-02 18:05-0300\n"
+"POT-Creation-Date: 2026-08-02 21:26-0300\n"
 "PO-Revision-Date: 2026-07-07 12:17-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -58,8 +58,8 @@ msgstr "(Ladrilhos restantes: {n}/{total})"
 
 #: utilpaisagem/gui/agents.py:216
 #, python-brace-format
-msgid "All {total} tiles have been downloaded."
-msgstr "Todos os {total} ladrilhos foram baixados."
+msgid "All {total} tiles have been processed."
+msgstr "Todos os {total} ladrilhos foram processados."
 
 #: utilpaisagem/gui/main.py:124
 msgid "Show orthophotos folder"
@@ -451,8 +451,8 @@ msgid ""
 "Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not "
 "covered by {service_name}"
 msgstr ""
-"A área de {lat_top}, {lon_left} a {lat_bottom}, {lon_right} não é "
-"coberta por {service_name}"
+"A área de {lat_top}, {lon_left} a {lat_bottom}, {lon_right} não é coberta"
+" por {service_name}"
 
 #: utilpaisagem/scenery/tile.py:218
 #, python-brace-format
