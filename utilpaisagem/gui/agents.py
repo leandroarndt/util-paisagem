@@ -213,7 +213,7 @@ class UpstreamReader(object):
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
             self.status_var.set(format_status(
-                _('All {total} tiles have been downloaded.').format(
+                _('All {total} tiles have been processed.').format(
                     total=self.downloader.download_queue.qsize() + \
                         self.downloader.finished_downloads + \
                         self.downloader.current_downloads
