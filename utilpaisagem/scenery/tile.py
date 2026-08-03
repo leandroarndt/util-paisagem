@@ -3,7 +3,10 @@ from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
 from queue import Queue
 from PIL import Image
+from threading import Thread
+from decimal import Decimal
 import math, tempfile, shutil, os, configparser, ast
+from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.gui.common import format_status, Settings
@@ -176,6 +179,62 @@ class Tile(object):
             download_res(int): exponent of two representing vertical image size
             compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
         """
+        if not image_service.can_download(self.coordinates):
+            if self.upstream_queue is None:
+                print(_(
+                    'Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, {lon_right:.03f}  is not covered by {service_name}'
+                ).format(
+                    lat_top=self.coordinates.lat_top,
+                    lon_left=self.coordinates.lon_left,
+                    lat_bottom=self.coordinates.lat_bottom,
+                    lon_right=self.coordinates.lon_right,
+                    service_name=image_service.name,
+                ))
+            else:
+                self.upstream_queue.put_nowait(_(
+                    'Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not covered by {service_name}'
+                ).format(
+                    lat_top=format_decimal(Decimal(self.coordinates.lat_top).quantize(Decimal('0.001'))),
+                    lon_left=format_decimal(Decimal(self.coordinates.lon_left).quantize(Decimal('0.001'))),
+                    lat_bottom=format_decimal(Decimal(self.coordinates.lat_bottom).quantize(Decimal('0.001'))),
+                    lon_right=format_decimal(Decimal(self.coordinates.lon_right).quantize(Decimal('0.001'))),
+                    service_name=image_service.name,
+                ))
+            return
+        def downloader():
+            nonlocal download_queue
+            while not download_queue.empty():
+                current, line, cell = download_queue.get_nowait()
+                do_download(current, line, cell)
+                download_queue.task_done()
+
+        def do_download(current, line, cell):
+            nonlocal self, total, divisions, errors, failures
+            if self.upstream_queue is None:
+                text = f'Downloading image {current}/{total}...'
+                print(text, end='', flush=True)
+            else:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Downloading image {current}/{total} of tile {index}...').format(
+                        current=current,
+                        total=total,
+                        index=self.index
+                    ),
+                    self
+                ))
+            exception, done = image_service.download(
+                Path(cache) / f'{self.index}-{line}-{cell}.png',
+                divisions[line][cell],
+                2**download_res
+            )
+            current += 1
+            if exception is not None:
+                errors += 1
+                if not done:
+                    failures.append((line, cell))
+            elif not self.upstream_queue:
+                print('\b'*len(text), end='', flush=True)
+
         path = self.get_path(path)
         # Ok? Touch it.
         # Else:
@@ -278,32 +337,18 @@ class Tile(object):
                 # Download
                 total = len(divisions) * len(divisions[0])
                 current = 1
+                download_queue = Queue()
                 for line in range(len(divisions)):
                     for cell in range(len(divisions[line])):
-                        if self.upstream_queue is None:
-                            text = f'Downloading image {current}/{total}...'
-                            print(text, end='', flush=True)
-                        else:
-                            self.upstream_queue.put_nowait(format_status(
-                                _('Downloading image {current}/{total} of tile {index}...').format(
-                                    current=current,
-                                    total=total,
-                                    index=self.index
-                                ),
-                                self
-                            ))
-                        exception, done = image_service.download(
-                            Path(cache) / f'{self.index}-{line}-{cell}.png',
-                            divisions[line][cell],
-                            2**download_res
-                        )
+                        download_queue.put_nowait((current, line, cell))
                         current += 1
-                        if exception is not None:
-                            errors += 1
-                            if not done:
-                                failures.append((line, cell))
-                        elif not self.upstream_queue:
-                            print('\b'*len(text), end='', flush=True)
+                threads = []
+                for t in range(self.settings.image_threads):
+                    threads.append(Thread(target=downloader))
+                for t in threads:
+                    t.start()
+                while threads:
+                    threads.pop().join()
                 if self.upstream_queue is None:
                     print(f'Downloaded tile {self.index}.     ')
                 else:
@@ -322,19 +367,29 @@ class Tile(object):
                 )
 
                 #Move
-                if not path.is_dir():
-                    path.mkdir(parents=True)
-                shutil.copy(filename, path)
-                if self.upstream_queue is None:
-                    print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                if filename.exists():
+                    if not path.is_dir():
+                        path.mkdir(parents=True)
+                    shutil.copy(filename, path)
+                    if self.upstream_queue is None:
+                        print(f'Tile {self.index}\'s photographic scenery placed at {path}.')
+                    else:
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Tile {index}\'s photographic scenery placed at {path}.').format(
+                                index=self.index,
+                                path=path
+                            ),
+                            self
+                        ))
+                elif self.upstream_queue is None:
+                    print(f'Tile {self.index}\'s photographic scenery could not be saved.')
                 else:
                     self.upstream_queue.put_nowait(format_status(
-                        _('Tile {index}\'s photographic scenery placed at {path}.').format(
-                            index=self.index,
-                            path=path
-                        ),
-                        self
-                    ))
+                            _('Tile {self.index}\'s photographic scenery could not be saved.').format(
+                                index=self.index,
+                            ),
+                            self
+                        ))
 
                 # Write log
                 log = configparser.ConfigParser()

@@ -12,6 +12,7 @@ class ImageService(object):
     from `coordinates`, `width` and `height` parameters.
     """
 
+    name:str
     description:str
     license_link:str
     availability_area:str
@@ -37,6 +38,16 @@ class ImageService(object):
             width = self.max_size
         
         return int(width), int(height)
+
+    def can_download(self, coordinates:Coordinates) -> bool:
+        """
+        Tells wether `coordinates` can be downloaded by the image service.
+        This method must be overriden by each `ImageService` class.
+
+        Arguments:
+            coordinates(Coordinates): coordinates to be tested for download
+        """
+        return False
 
     def download(self, file:Path, coordinates:Coordinates, height:int):
         """
@@ -75,17 +86,22 @@ class ImageService(object):
 
 class _ArcGIS(ImageService):
     def __init__(self):
+        self.name = 'ArcGIS'
         self.description = 'Worldwide service under restrictive license'
         self.license_link = 'https://www.esri.com/en-us/legal/terms/full-master-agreement'
         self.availability_area = 'Worldwide'
         self.max_size = 4096
 
+    def can_download(self, coordinates:Coordinates):
+        if coordinates.lat_top > 89 or coordinates.lat_bottom < -89:
+            return False
+        return True
+
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
         return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&imageSR=4326&size={width},{height}&format=png24&f=image'
 
-# There is no need for a singleton. This dictionary is only a centralized place
-# for image service classes stored along with their names. This may facilitate
-# GUI development.
-IMAGE_SERVICES = {
-    'ArcGIS': _ArcGIS(),
-}
+# There is no need for a singleton. This list is only a centralized place
+# for image service classes stored in order to facilitate GUI development.
+IMAGE_SERVICES = [
+    _ArcGIS(),
+]

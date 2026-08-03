@@ -7,7 +7,7 @@ from pathlib import Path
 from numbers import Number
 #from collections import OrderedDict
 from queue import Queue
-from utilpaisagem.scenery.image_service import IMAGE_SERVICES, ImageService
+from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.common import Coordinates, distance, DOWNLOAD_RES, MIN_RES
 from utilpaisagem.gui.common import Settings
