@@ -9,10 +9,9 @@
 - Disk space management
   - Maximum space
   - Time since last use
-- Tile renewal: time since last update
 
 **DONE:**
-- Nothing yet
+- Tile renewal (new image download) after configurable amount of time
 
 ## 0.4.0
 

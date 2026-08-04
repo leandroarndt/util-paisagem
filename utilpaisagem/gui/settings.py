@@ -113,6 +113,11 @@ class SettingsWindow(object):
     threads_label:tk.Label
     threads_input:ttk.Spinbox
     image_frame:ttk.LabelFrame
+    tile_management_tab:ttk.Frame
+    tile_age_frame:ttk.Labelframe
+    renewal_age_var:tk.IntVar
+    renewal_age_label:ttk.Label
+    renewal_age_entry:ttk.Entry
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -311,6 +316,26 @@ class SettingsWindow(object):
             self.distances.append(distance_frame)
             distance_frame.grid_items(column=0, row=row)
             row += 1
+        # Tile management
+        self.tile_management_tab = ttk.Frame(self.notebook, padding=PADDING)
+        self.tile_management_tab.columnconfigure(0, weight=10)
+        self.notebook.add(self.tile_management_tab, text=_('Tile management'))
+        # Tile age
+        self.tile_age_frame = ttk.Labelframe(
+            self.tile_management_tab,
+            text=_('Tile age'),
+            padding=PADDING
+        )
+        self.renewal_age_var = tk.IntVar(self.tile_age_frame, value=self.settings.renewal_age)
+        self.renewal_age_label = ttk.Label(
+            self.tile_age_frame,
+            text=_('Days until downloading new image for tile:'),
+        )
+        self.renewal_age_entry = ttk.Entry(self.tile_age_frame, textvariable=self.renewal_age_var)
+        self.tile_age_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.renewal_age_label.grid(column=0, row=0, sticky=tk.E)
+        self.renewal_age_entry.grid(column=1, row=0, sticky=tk.W)
+
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
@@ -442,6 +467,14 @@ class SettingsWindow(object):
                         .format(r=_('{res} m/px').format(
                             res=format_decimal(Decimal(RESOLUTIONS[d.resolution]).quantize(Decimal('1.00')), locale=LOCALE)),
                         )
+            )
+            return
+        try:
+            self.settings.renewal_age = int(self.renewal_age_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in tile renewal age configuration. Please inform an integer value.'),
             )
             return
     

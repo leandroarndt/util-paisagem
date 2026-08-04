@@ -5,11 +5,15 @@ from queue import Queue
 from PIL import Image
 from threading import Thread
 from decimal import Decimal
+from datetime import datetime, timedelta
 import math, tempfile, shutil, os, configparser, ast
 from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.gui.common import format_status, Settings, QUIT
+
+class NeedsRenewalError(Exception):
+    pass
 
 class Tile(object):
     """
@@ -262,6 +266,7 @@ class Tile(object):
         if logpath.exists():
             log = configparser.ConfigParser()
             log.read(logpath)
+            delete = False
             try:
                 if int(log['INFO']['resolution']) < self.resolution:
                     if self.upstream_queue is None:
@@ -305,6 +310,8 @@ class Tile(object):
                             self    
                         ))
                     raise AssertionError
+                if datetime.now() - datetime.fromtimestamp(os.path.getmtime(logpath)) > timedelta(days=self.settings.renewal_age):
+                    raise NeedsRenewalError
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
                 else:
@@ -324,6 +331,17 @@ class Tile(object):
                             _('Failed to check previous download ("{e}"). Downloading again.').format(e=e),
                             self
                         ))
+                delete = True
+            except NeedsRenewalError:
+                if self.upstream_queue is None:
+                    print(f'Tile {self.index} needs renewal. Downloading again.')
+                else:
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Tile {index} needs renewal. Downloading again.').format(index=self.index),
+                        self,
+                    ))
+                delete = True
+            if delete:
                 # Remove previously downloaded file
                 if Path(path / f'{self.index}.png').exists():
                     Path(path / f'{self.index}.png').unlink()
