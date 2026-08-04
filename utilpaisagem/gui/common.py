@@ -1,5 +1,6 @@
 import locale
 #locale.setlocale(locale.LC_ALL, '')
+from threading import Event
 # format_status
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
@@ -25,6 +26,9 @@ except UnknownLocaleError:
 def format_status(text:str, obj) -> str:
     return f'{format_datetime(datetime.now(), format='short', locale=LOCALE)} ({obj.__class__.__name__}): {text}'
 
+# App-wide events
+
+QUIT = Event()
 
 # Preferences
 

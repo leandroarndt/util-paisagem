@@ -19,7 +19,7 @@ from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_p
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status, Settings, PADDING, LOCALE
+from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
 
 class MainWindow(object):
@@ -748,6 +748,7 @@ class MainWindow(object):
     def close(self): # Tries to close nicely
         if hasattr(self, 'following_queue'):
             if not self.following_queue.is_shutdown:
-                self.following_queue.shutdown()
+                self.following_queue.shutdown(immediate=True)
                 self.follower.close_connection()
+        QUIT.set()        
         self.window.destroy()

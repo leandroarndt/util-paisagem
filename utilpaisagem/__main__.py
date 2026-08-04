@@ -1,3 +1,5 @@
+import locale
+locale.setlocale(locale.LC_ALL, '')
 import gettext
 from pathlib import Path
 from utilpaisagem.app_info import resources_path
