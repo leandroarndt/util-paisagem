@@ -7,4 +7,5 @@ make_shortcut(
     name='Útil paisagem',
     description='Útil paisagem FlightGear photo scenery',
     terminal=False,
+    icon=str(Path(__file__).parent/'resources'/'images'/'utilpaisagem.ico'),
 )
