@@ -1,3 +1,3 @@
 pushd %~dp0
-.\python.exe run.py
+.\pythonw.exe run.py
 popd
