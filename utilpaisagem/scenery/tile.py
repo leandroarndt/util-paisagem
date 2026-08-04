@@ -9,7 +9,7 @@ import math, tempfile, shutil, os, configparser, ast
 from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
-from utilpaisagem.gui.common import format_status, Settings
+from utilpaisagem.gui.common import format_status, Settings, QUIT
 
 class Tile(object):
     """
@@ -202,8 +202,10 @@ class Tile(object):
                 ))
             return
         def downloader():
-            nonlocal download_queue
+            nonlocal download_queue, self
             while not download_queue.empty():
+                if QUIT.is_set():
+                    break
                 current, line, cell = download_queue.get_nowait()
                 do_download(current, line, cell)
                 download_queue.task_done()
@@ -434,6 +436,11 @@ class Tile(object):
                         self
                     ))
                 # TODO: download wider area and crop; use neighboring image, if any
+        except FileNotFoundError as e:
+            if QUIT.is_set:
+                return
+            else:
+                raise e
 
     def files_exist(self) -> bool:
         """Returns true if any of .DDS, .PNG or .LOG files exist"""
