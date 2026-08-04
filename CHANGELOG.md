@@ -1,5 +1,19 @@
 # Útil paisagem changelog
 
+## 0.5.0 (NEXT)
+
+**TODO:**
+- Tile visualization:
+  - Great tiles
+  - Tiles
+- Disk space management
+  - Maximum space
+  - Time since last use
+- Tile renewal: time since last update
+
+**DONE:**
+- Nothing yet
+
 ## 0.4.0
 
 - Added image file format to the settings.
