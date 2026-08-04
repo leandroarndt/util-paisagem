@@ -14,8 +14,8 @@ does not provide them — issue #5).
 
 ### 0.4.1
 
-- Fixed an issue which could make download threads run forever in
-background after closing the app in some situations.
+- Fixed an issue which could make download threads run for a long
+time in background after closing the app in some situations.
 - Application icon
 
 ## 0.3.0
