@@ -38,6 +38,7 @@ class _Sections(Enum):
     DOWNLOAD = 'DOWNLOAD'
     RANGE = 'RANGE'
     CONNECTION = 'CONNECTION'
+    TILE_MANAGEMENT = 'TILE_MANAGEMENT'
 
 class Settings(object):
     """
@@ -63,6 +64,8 @@ class Settings(object):
         host:str = 'localhost'
         port:int = 5000
         following_interval:int = 10000
+        renewal_age:int = 365
+        deletion_age:int = 90
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -81,6 +84,8 @@ class Settings(object):
     host:str = 'localhost'
     port:int = 5000
     following_interval:int = 10000
+    renewal_age:int = 365
+    deletion_age:int = 90
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -94,6 +99,8 @@ class Settings(object):
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
         'following_interval': _Sections.CONNECTION.value,
+        'renewal_age': _Sections.TILE_MANAGEMENT,
+        'deletion_age': _Sections.TILE_MANAGEMENT,
     }
 
     def __getattribute__(self, name):
