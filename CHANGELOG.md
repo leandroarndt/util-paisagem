@@ -16,6 +16,7 @@ does not provide them — issue #5).
 
 - Fixed an issue which could make download threads run forever in
 background after closing the app in some situations.
+- Application icon
 
 ## 0.3.0
 

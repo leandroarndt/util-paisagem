@@ -112,6 +112,11 @@ class MainWindow(object):
         # Create GUI
         self.resources_path = resources_path
         self.window = tk.Tk()
+        self.window.withdraw()
+        self.window.iconphoto(
+            False,
+            tk.PhotoImage(file=resources_path/'images'/'utilpaisagem.png')
+        )
         self.window.title(
             f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" + str(RC) if RC else ""}'
         )
@@ -406,6 +411,8 @@ class MainWindow(object):
             self.downloader,
             interval=100)
         self.upstream_reader.read()
+
+        self.window.deiconify()
 
     # Menu commands
 
