@@ -12,6 +12,11 @@ not showing the tile image (it now opens the parent folder).
 - Doesn't try to download latitudes greater than 85 degrees (ArcGIS
 does not provide them — issue #5).
 
+### 0.4.1
+
+- Fixed an issue which could make download threads run forever in
+background after closing the app in some situations.
+
 ## 0.3.0
 
 - Windows installer
