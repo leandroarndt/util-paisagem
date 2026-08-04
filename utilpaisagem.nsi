@@ -36,10 +36,11 @@ Section
 
     File /r dist\nsis\*.*
 
-    CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" ; 0 SW_SHOWMINIMIZED
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}\Get the latest version.lnk" "https://github.com/leandroarndt/util-paisagem/releases/latest" "" "$INSTDIR\resources\images\utilpaisagem.ico"
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}\Using ${APP_NAME}.lnk" "https://github.com/leandroarndt/util-paisagem/wiki/usage" "" "$INSTDIR\resources\images\utilpaisagem.ico"
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" 0 SW_SHOWMINIMIZED
+    ; CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" 0 SW_SHOWMINIMIZED
+    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\Get the latest version.lnk" "https://github.com/leandroarndt/util-paisagem/releases/latest" "" "$INSTDIR\resources\images\utilpaisagem.ico"
+    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\Using ${APP_NAME}.lnk" "https://github.com/leandroarndt/util-paisagem/wiki/usage" "" "$INSTDIR\resources\images\utilpaisagem.ico"
  
     # create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
