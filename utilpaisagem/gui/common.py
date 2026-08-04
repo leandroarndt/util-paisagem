@@ -99,8 +99,8 @@ class Settings(object):
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
         'following_interval': _Sections.CONNECTION.value,
-        'renewal_age': _Sections.TILE_MANAGEMENT,
-        'deletion_age': _Sections.TILE_MANAGEMENT,
+        'renewal_age': _Sections.TILE_MANAGEMENT.value,
+        'deletion_age': _Sections.TILE_MANAGEMENT.value,
     }
 
     def __getattribute__(self, name):
