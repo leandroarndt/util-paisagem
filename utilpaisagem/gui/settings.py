@@ -367,6 +367,7 @@ class SettingsWindow(object):
                     title=_('Invalid folder'),
                     message=_('Please choose a folder named "Orthophotos".')
                 )
+                return
             if path.name != 'Orthophotos': # Normalize
                 path = path.rename(path.parent / 'Orthophotos')
             self.orthophotos_var.set(path)
