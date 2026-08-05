@@ -1,4 +1,5 @@
 """Settings window and ini file reader."""
+from typing import TYPE_CHECKING, List, Dict
 import math
 from decimal import Decimal
 from pathlib import Path
@@ -8,6 +9,9 @@ from tkinter import filedialog
 from babel.numbers import format_decimal
 from utilpaisagem.gui.common import Settings, PADDING, LOCALE
 from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
+
+if TYPE_CHECKING:
+    from utilpaisagem.gui.main import MainWindow
 
 class Distance(ttk.Frame):
     resolution:int
@@ -65,9 +69,9 @@ class Distance(ttk.Frame):
 class SettingsWindow(object):
     # Útil paisagem things
     settings:Settings
-    sizes:list
-    distances:list
-    main_window:object # MainWindow object. Import cannot be done due to recurrence.
+    sizes:List
+    distances:List
+    main_window:MainWindow # MainWindow object. Import cannot be done due to recurrence.
 
     # GUI
     window:tk.Toplevel
