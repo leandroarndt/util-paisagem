@@ -1,6 +1,7 @@
-import tkinter as tk
 from typing import List, Dict, TYPE_CHECKING
+import tkinter as tk
 from queue import Queue
+from math import ceil
 from tkintermapview.canvas_polygon import CanvasPolygon
 from utilpaisagem.gui.map_widget import MapWidget
 from utilpaisagem.gui.common import Settings
@@ -50,8 +51,18 @@ class GreatTile(ManagedTile):
     def __init__(self, coordinates:Coordinates, intermap:MapWidget, *args, **kwargs):
         super().__init__(
             coordinates=coordinates,
-            index=-1*abs(int((gt.coordinates.lon_left-180)/10) * 1000 \
-                - int((gt.coordinates.lat_top+90)/10)), # -3601 to -1
+            index=-1*abs(int((self.coordinates.lon_left-180)/10) * 100 \
+                - int((self.coordinates.lat_top+90)/10)) - 1, # -3619 to -1
+            color=TileColors.great_tile,
+            intermap=intermap, *args, **kwargs
+        )
+
+class DegreeTile(ManagedTile):
+    def __init__(self, coordinates:Coordinates, intermap:MapWidget, *args, **kwargs):
+        super().__init__(
+            coordinates=coordinates,
+            index=-1*abs(ceil(self.coordinates.lon_left-180) * 1000 \
+                - ceil(self.coordinates.lat_top+90))*10000 - 10000, # -360181000 to -10000
             color=TileColors.great_tile,
             intermap=intermap, *args, **kwargs
         )
