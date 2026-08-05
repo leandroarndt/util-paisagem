@@ -18,6 +18,12 @@ does not provide them — issue #5).
 time in background after closing the app in some situations.
 - Application icon
 
+### 0.4.2
+
+- Fixed issue with wrong path being renamed at the settings window.
+[Reported and corrected by Zakharov at the FlightGear
+Forum.](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440908#p440904)
+
 ## 0.3.0
 
 - Windows installer
