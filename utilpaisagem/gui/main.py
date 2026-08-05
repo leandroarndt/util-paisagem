@@ -32,6 +32,7 @@ class MainWindow(object):
     connection:TelnetConnection
     downloader:Downloader
     settings:Settings
+    tile_manager:TileManager
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -399,6 +400,7 @@ class MainWindow(object):
             upstream_queue=self.upstream_queue,
             )
         self.download_manager.clear()
+        self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
 
         # Init downloader
         self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
