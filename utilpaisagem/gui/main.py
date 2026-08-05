@@ -10,7 +10,7 @@ from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
 from PIL import Image, ImageTk
-from tkintermapview import TkinterMapView
+from utilpaisagem.gui.map_widget import MapWidget
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
@@ -57,7 +57,7 @@ class MainWindow(object):
     search_input:ttk.Entry
     search_button:ttk.Button
     map_frame:ttk.Frame
-    map_widget:TkinterMapView
+    map_widget:MapWidget
     tile_polygon:CanvasPolygon
     waypoints:list[CanvasPositionMarker]
     marker:CanvasPositionMarker
@@ -219,7 +219,7 @@ class MainWindow(object):
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.search_button.grid(column=2, row=0)
         # TODO resize map properly, store window size and map coordinates
-        self.map_widget = TkinterMapView(self.map_frame, width=800, height=600)
+        self.map_widget = MapWidget(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
         self.map_widget.add_right_click_menu_command(
