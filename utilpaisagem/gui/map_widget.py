@@ -13,10 +13,10 @@ class MapWidget(TkinterMapView):
         """Returns a Coordinates object covering the entirety of the map widget area."""
         top, left = self.convert_canvas_coords_to_decimal_coords(0, 0)
         bottom, right = self.convert_canvas_coords_to_decimal_coords(self.width, self.height)
-        updated = False
+        self.updated = False
         return Coordinates(lat1=top, lat2=bottom, lon1=left, lon2=right)
 
-    def draw_move(self, *args, **kwrags):
+    def draw_move(self, *args, **kwargs):
         super().draw_move(*args, **kwargs)
         self.updated = True
     
