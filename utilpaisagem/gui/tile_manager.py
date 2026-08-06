@@ -4,11 +4,24 @@ import tkinter as tk
 from queue import Queue
 from math import ceil
 from pathlib import Path
+from threading import Thread
 from tkintermapview.canvas_polygon import CanvasPolygon
 from utilpaisagem.gui.map_widget import MapWidget
 from utilpaisagem.gui.common import Settings
 from utilpaisagem.scenery.common import Coordinates
 from utilpaisagem.scenery.tile import Tile
+if 'DEBUG' in os.environ:
+    print('*** TILE MANAGER DEBUG MODE ***')
+    from pympler.asizeof import asized
+    from datetime import datetime
+    DEBUG = True
+else:
+    DEBUG = False
+
+def dir_has_contents(dir:Path):
+    for item in os.scandir():
+        return True
+    return False
 
 class TileColors:
         great_tile = 'hotpink4'
@@ -27,17 +40,22 @@ class ManagedTile(object):
     polygon:CanvasPolygon
     intermap:MapWidget
 
+    count = 0
+
     def __init__(
         self,
         coordinates:Coordinates,
         index:int,
-        color:str,
+        state:str,
         map_widget:MapWidget
     ):
         self.settings = Settings()
         self.coordinates, self.index, self.state, self.map_widget = \
-            coordinates, index, color, map_widget
+            coordinates, index, state, map_widget
         self.polygon = None
+
+        if DEBUG:
+            ManagedTile.count += 1
 
     def draw(self):
         if self.polygon is None or self.polygon.deleted():
@@ -53,12 +71,10 @@ class ManagedTile(object):
                 border_width=2,
             )
         else:
-        #     self.map_widget.canvas.itemconfigure(self.polygon, state=tk.NORMAL)
             self.map_widget.canvas.itemconfigure(self.polygon.canvas_polygon, state=tk.NORMAL)
 
     def hide(self):
         if self.polygon is not None:
-            # self.polygon.delete()
             self.map_widget.canvas.itemconfigure(self.polygon.canvas_polygon, state=tk.HIDDEN)
 
 class DegreeTile(ManagedTile):
@@ -81,7 +97,7 @@ class DegreeTile(ManagedTile):
         super().__init__(
             coordinates=coordinates,
             index=self.coordinates_to_index(coordinates),
-            color=TileColors.degree_tile,
+            state=TileColors.degree_tile,
             map_widget=map_widget, *args, **kwargs
         )
         self.path = path
@@ -98,32 +114,30 @@ class DegreeTile(ManagedTile):
                         self.tiles[tile.index] = ManagedTile(
                             coordinates=tile.coordinates,
                             index=tile.index,
-                            color=TileColors.failed,
+                            state=TileColors.failed,
                             map_widget=self.map_widget,
                         )
                     elif tile.is_old(log, item.parent / (item.stem + '.log')):
                         self.tiles[tile.index] = ManagedTile(
                             coordinates=tile.coordinates,
                             index=tile.index,
-                            color=TileColors.old,
+                            state=TileColors.old,
                             map_widget=self.map_widget,
                         )
                     else:
                         self.tiles[tile.index] = ManagedTile(
                             coordinates=tile.coordinates,
                             index=tile.index,
-                            color=TileColors.good,
+                            state=TileColors.good,
                             map_widget=self.map_widget,
                         )
-                    self.tiles[tile.index].draw()
                 elif item.suffix.lower() == '.png' or item.suffix.lower() == '.dds':
                     self.tiles[int(item.stem)] = ManagedTile(
                         coordinates=Tile.index_to_coordinates(int(item.stem)),
                         index=int(item.stem),
-                        color=TileColors.failed,
+                        state=TileColors.failed,
                         map_widget=self.map_widget,
                     )
-                    self.tiles[int(item.stem)].draw()
 
 class GreatTile(ManagedTile):
     tiles:List[DegreeTile]
@@ -132,7 +146,7 @@ class GreatTile(ManagedTile):
         super().__init__(
             coordinates=coordinates,
             index=self.coordinates_to_index(coordinates),
-            color=TileColors.great_tile,
+            state=TileColors.great_tile,
             map_widget=map_widget, *args, **kwargs
         )
         self.path = self.get_path(self.coordinates)
@@ -159,7 +173,7 @@ class GreatTile(ManagedTile):
         self.tiles = {}
         for item in self.path.iterdir():
             if item.is_dir():
-                if os.listdir(item):
+                if dir_has_contents(item):
                     lat_bottom = -int(item.name[5:]) if item.name[4] == 's' else int(item.name[5:])
                     lon_left = -int(item.name[1:4]) if item.name[0] == 'w' else int(item.name[1:4])
                     dt = DegreeTile(
@@ -173,16 +187,22 @@ class GreatTile(ManagedTile):
                         path=item,
                     )
                     self.tiles[dt.index] = dt
-                    dt.draw()
-                    dt.find_tiles()
                 else:
                     os.rmdir(item) # Removes empty folder
 
 
 class TileManager(object):
+    class DetailLevels:
+        great_tile = 0
+        degree_tile = 1
+        tile = 2
+
     settings:Settings
 
     great_tiles:Dict
+    active_tiles:List
+    detail_level:int
+    map_tiles:List
     
     upstream_queue:Queue
     map_widget:MapWidget
@@ -192,13 +212,18 @@ class TileManager(object):
         self.settings = Settings()
         self.tile_queue = Queue()
         self.upstream_queue, self.map_widget = upstream_queue, map_widget
-        self.find_great_tiles()
+        self.active_tiles = []
+        self.map_tiles = []
+        self.map_widget.after(200, self.update)
 
     def find_great_tiles(self):
+        if DEBUG:
+            start = datetime.now()
+            print(f'Starting benchmark at {start}...', flush=True)
         self.great_tiles = {}
         for item in Path(self.settings.orthophotos_folder).iterdir():
             if item.is_dir():
-                if os.listdir(item):
+                if dir_has_contents(item):
                     lat_bottom = -int(item.name[5:]) if item.name[4] == 's' else int(item.name[5:])
                     lon_left = -int(item.name[1:4]) if item.name[0] == 'w' else int(item.name[1:4])
                     gt = GreatTile(
@@ -210,10 +235,45 @@ class TileManager(object):
                         ),
                         map_widget=self.map_widget,
                     )
-                    gt.draw()
-                    gt.find_degree_tiles()
                 else:
                     os.rmdir(item) # Removes empty folder
+
+        if DEBUG:
+            print(f'Time spent processing tiles: {datetime.now() - start}')
+            print(f'Total: {ManagedTile.count} tiles.')
+            print(f'Memory used to manage {ManagedTile.count} tiles: {asized(self)}')
+            for gt in self.great_tiles.values():
+                print(f'Memory used by a single tile: {asized(tile)}')
+                break
+    
+    def update(self):
+        if self.map_widget.updated:
+            if DEBUG:
+                print('Updated coords:', self.map_widget.get_canvas_coords())
+            self.update_active_tiles()
+        self.map_widget.after(200, self.update)
+    
+    def update_active_tiles(self):
+        self.active_tiles = []
+        canvas_limits = self.map_widget.get_canvas_coords()
+        if canvas_limits.lat_top - canvas_limits.lat_bottom > 12 or \
+            canvas_limits.lon_right - canvas_limits.lon_left > 12:
+            self.detail_level = TileManager.DetailLevels.great_tile
+        elif canvas_limits.lat_top - canvas_limits.lat_bottom > 1.2 or \
+            canvas_limits.lon_right - canvas_limits.lon_left > 1.2:
+            self.detail_level = TileManager.DetailLevels.degree_tile
+        else:
+            self.detail_level = TileManager.DetailLevels.tile
+        for tile in self.great_tiles:
+            if tile.coordinates.lat_top > canvas_limits.lat_bottom and \
+                tile.coordinates.lat_bottom < canvas_limits.lat_top and \
+                tile.coordinates.lon_left < canvas_limits.lon_right and \
+                tile.coordinates.lon_right > canvas_limits.lon_left:
+                if DEBUG: print(f'Great tile {tile.index} inside canvas.')
+                if self.detail_level == TileManager.DetailLevels.great_tile:
+                    self.active_tiles.append(tile)
+
+            
 
 class TileScraper(object):
     pass
