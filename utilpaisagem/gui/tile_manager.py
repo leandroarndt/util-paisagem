@@ -1,4 +1,4 @@
-from typing import List, Dict, TYPE_CHECKING
+from typing import List, Dict, Union, TYPE_CHECKING
 import os, configparser
 import tkinter as tk
 from queue import Queue
@@ -57,8 +57,8 @@ class ManagedTile(object):
         if DEBUG:
             ManagedTile.count += 1
 
-    def draw(self):
-        if self.polygon is None or self.polygon.deleted():
+    def draw(self, polygon:CanvasPolygon=None):
+        if self.polygon is None or self.polygon.deleted:
             self.polygon = self.map_widget.set_polygon(
                 [
                     (self.coordinates.lat_top, self.coordinates.lon_left),
@@ -91,7 +91,7 @@ class DegreeTile(ManagedTile):
             coordinates(Coordinates)
         """
         return -1*abs(ceil(coordinates.lon_left-180) * 1000 \
-                - ceil(coordinates.lat_top+90))*10000 - 10000, # -360181000 to -10000
+                - ceil(coordinates.lat_top+90))*10000 - 10000 # -360181000 to -10000
 
     def __init__(self, coordinates:Coordinates, map_widget:MapWidget, path:Path, *args, **kwargs):
         super().__init__(
@@ -167,7 +167,7 @@ class GreatTile(ManagedTile):
             coordinates(Coordinates)
         """
         return -1*abs(int((coordinates.lon_left-180)/10) * 100 \
-                - int((coordinates.lat_top+90)/10)) - 1, # -3619 to -1
+                - int((coordinates.lat_top+90)/10)) - 1 # -3619 to -1
 
     def find_degree_tiles(self):
         self.tiles = {}
@@ -251,37 +251,41 @@ class TileManager(object):
     def update(self):
         if self.map_widget.updated:
             try:
-                if DEBUG:
-                    print('Updated coords:', self.map_widget.get_canvas_coords())
                 self.update_active_tiles()
             except OverflowError:
                 pass # Needs to wait until ready
+            except ValueError:
+                pass # Randomly throws "ValueError: math domain error"
+                     # at tkintermapview\utility_functions.py", line 12
         self.map_widget.after(200, self.update)
     
     def update_active_tiles(self):
         self.active_tiles = []
         canvas_limits = self.map_widget.get_canvas_coords()
-        if canvas_limits.lat_top - canvas_limits.lat_bottom > 12 or \
-            canvas_limits.lon_right - canvas_limits.lon_left > 12:
+        if canvas_limits.lat_top - canvas_limits.lat_bottom > 11 or \
+            canvas_limits.lon_right - canvas_limits.lon_left > 11:
             self.detail_level = TileManager.DetailLevels.great_tile
-        elif canvas_limits.lat_top - canvas_limits.lat_bottom > 1.2 or \
-            canvas_limits.lon_right - canvas_limits.lon_left > 1.2:
+        elif canvas_limits.lat_top - canvas_limits.lat_bottom > 1.1 or \
+            canvas_limits.lon_right - canvas_limits.lon_left > 1.1:
             self.detail_level = TileManager.DetailLevels.degree_tile
         else:
             self.detail_level = TileManager.DetailLevels.tile
-        for tile in self.great_tiles:
-            print(f'{tile.coordinates.lat_top} > {canvas_limits.lat_bottom} = {tile.coordinates.lat_top > canvas_limits.lat_bottom}')
-            print(f'{tile.coordinates.lat_bottom} < {canvas_limits.lat_top} = {tile.coordinates.lat_bottom < canvas_limits.lat_top}')
-            print(f'{tile.coordinates.lon_left} < {canvas_limits.lon_right} = {tile.coordinates.lon_left < canvas_limits.lon_right}')
-            print(f'{tile.coordinates.lon_right} > {canvas_limits.lon_left} = {tile.coordinates.lon_right > canvas_limits.lon_left}')
+        for tile in self.great_tiles.values():
             if tile.coordinates.lat_top > canvas_limits.lat_bottom and \
                 tile.coordinates.lat_bottom < canvas_limits.lat_top and \
                 tile.coordinates.lon_left < canvas_limits.lon_right and \
                 tile.coordinates.lon_right > canvas_limits.lon_left:
-                if DEBUG: print(f'Great tile {tile.index} inside canvas.')
                 if self.detail_level == TileManager.DetailLevels.great_tile:
                     self.active_tiles.append(tile)
-
+            else:
+                tile.hide()
+        for tile in self.active_tiles:
+            if self.detail_level == TileManager.DetailLevels.great_tile:
+                tile.draw()
+            elif self.detail_level == TileManager.DetailLevels.degree_tile: 
+                pass
+            else:
+                pass
             
 
 class TileScraper(object):
