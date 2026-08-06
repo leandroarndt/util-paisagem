@@ -1,6 +1,7 @@
 import webbrowser
 import tkinter as tk
 import pyperclip
+from threading import Thread
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from pathlib import Path
@@ -401,6 +402,8 @@ class MainWindow(object):
             )
         self.download_manager.clear()
         self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
+        find_tiles = Thread(target=self.tile_manager.find_great_tiles)
+        find_tiles.start()
 
         # Init downloader
         self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
