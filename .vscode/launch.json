@@ -12,7 +12,8 @@
             "module": "utilpaisagem",
             "env": {
                 "DEBUG": "true",
-            }
+            },
+            "justMyCode": false,
         }
     ]
 }
