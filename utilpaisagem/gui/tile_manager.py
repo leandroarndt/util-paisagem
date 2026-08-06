@@ -213,7 +213,8 @@ class TileManager(object):
         self.tile_queue = Queue()
         self.upstream_queue, self.map_widget = upstream_queue, map_widget
         self.active_tiles = []
-        self.map_tiles = []
+        self.great_tiles = {}
+        self.map_tiles = {}
         self.map_widget.after(200, self.update)
 
     def find_great_tiles(self):
@@ -235,6 +236,7 @@ class TileManager(object):
                         ),
                         map_widget=self.map_widget,
                     )
+                    self.great_tiles[gt.index] = gt
                 else:
                     os.rmdir(item) # Removes empty folder
 
@@ -243,14 +245,17 @@ class TileManager(object):
             print(f'Total: {ManagedTile.count} tiles.')
             print(f'Memory used to manage {ManagedTile.count} tiles: {asized(self)}')
             for gt in self.great_tiles.values():
-                print(f'Memory used by a single tile: {asized(tile)}')
+                print(f'Memory used by a single tile: {asized(gt)}')
                 break
     
     def update(self):
         if self.map_widget.updated:
-            if DEBUG:
-                print('Updated coords:', self.map_widget.get_canvas_coords())
-            self.update_active_tiles()
+            try:
+                if DEBUG:
+                    print('Updated coords:', self.map_widget.get_canvas_coords())
+                self.update_active_tiles()
+            except OverflowError:
+                pass # Needs to wait until ready
         self.map_widget.after(200, self.update)
     
     def update_active_tiles(self):
@@ -265,6 +270,10 @@ class TileManager(object):
         else:
             self.detail_level = TileManager.DetailLevels.tile
         for tile in self.great_tiles:
+            print(f'{tile.coordinates.lat_top} > {canvas_limits.lat_bottom} = {tile.coordinates.lat_top > canvas_limits.lat_bottom}')
+            print(f'{tile.coordinates.lat_bottom} < {canvas_limits.lat_top} = {tile.coordinates.lat_bottom < canvas_limits.lat_top}')
+            print(f'{tile.coordinates.lon_left} < {canvas_limits.lon_right} = {tile.coordinates.lon_left < canvas_limits.lon_right}')
+            print(f'{tile.coordinates.lon_right} > {canvas_limits.lon_left} = {tile.coordinates.lon_right > canvas_limits.lon_left}')
             if tile.coordinates.lat_top > canvas_limits.lat_bottom and \
                 tile.coordinates.lat_bottom < canvas_limits.lat_top and \
                 tile.coordinates.lon_left < canvas_limits.lon_right and \
