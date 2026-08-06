@@ -171,6 +171,17 @@ class Tile(object):
             Path(f'{lon_dir}{abs(math.floor(self.coordinates.lon_left)):03}' + \
             f'{lat_dir}{abs(math.floor(self.coordinates.lat_bottom)):02}')
 
+    def is_failed(self, log:configparser.ConfigParser, logpath:Path):
+        if log['INFO']['success'] != 'True' or ast.literal_eval(log['INFO']['failures']) != []:
+            return True
+        return False
+
+    def is_old(self, log:configparser.ConfigParser, logpath:Path):
+        if datetime.now() - datetime.fromtimestamp(os.path.getmtime(logpath)) > \
+            timedelta(days=self.settings.renewal_age):
+            return True
+        return False
+
     def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart', upstream_queue:Queue=None):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
@@ -277,7 +288,7 @@ class Tile(object):
                             self
                         ))
                     raise AssertionError
-                if log['INFO']['success'] != 'True' or ast.literal_eval(log['INFO']['failures']) != []:
+                if self.is_failed(log, logpath):
                     if self.upstream_queue is None:
                         print('Failure on previous download. Downloading again.')
                     else:
@@ -310,7 +321,7 @@ class Tile(object):
                             self    
                         ))
                     raise AssertionError
-                if datetime.now() - datetime.fromtimestamp(os.path.getmtime(logpath)) > timedelta(days=self.settings.renewal_age):
+                if self.is_old(log, logpath):
                     raise NeedsRenewalError
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
