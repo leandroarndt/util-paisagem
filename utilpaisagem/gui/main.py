@@ -21,7 +21,7 @@ from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
-from utilpaisagem.gui.tile_manager import TileManager, TileColors, BORDER_WIDTH
+from utilpaisagem.gui.tile_manager import TileManager, TileColors
 
 class MainWindow(object):
     """
@@ -526,7 +526,6 @@ class MainWindow(object):
             ],
             fill_color=None,
             outline_color=TileColors.selected,
-            border_width=BORDER_WIDTH,
         )
         if fit_map:
             self.map_widget.fit_bounding_box(

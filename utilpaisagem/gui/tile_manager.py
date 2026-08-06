@@ -9,10 +9,9 @@ from utilpaisagem.gui.map_widget import MapWidget
 from utilpaisagem.gui.common import Settings
 from utilpaisagem.scenery.common import Coordinates
 
-BORDER_WIDTH = 3
-
 class TileColors:
-        great_tile = 'green'
+        great_tile = 'hotpink4'
+        degree_tile = 'hotpink2'
         good = 'green2'
         failed = 'yellow2'
         old = 'slategray3'
@@ -49,7 +48,7 @@ class ManagedTile(object):
                 ],
                 outline_color=self.state,
                 fill_color=None,
-                border_width=BORDER_WIDTH
+                border_width=1
             )
         else:
             self.map_widget.canvas.itemconfigure(self.polygon, state=tk.NORMAL)
@@ -77,7 +76,7 @@ class DegreeTile(ManagedTile):
         super().__init__(
             coordinates=coordinates,
             index=self.coordinates_to_index(coordinates),
-            color=TileColors.failed,
+            color=TileColors.degree_tile,
             map_widget=map_widget, *args, **kwargs
         )
         self.tiles = {}
