@@ -61,34 +61,56 @@ class ManagedTile(object):
 class DegreeTile(ManagedTile):
     tiles:Dict
 
+    @staticmethod
+    def coordinates_to_index(coordinates:Coordinates) -> int:
+        """
+        Returns a unique integer index from coordinates.
+        Ranges from -360181000 to -10000.
+
+        Arguments:
+            coordinates(Coordinates)
+        """
+        return -1*abs(ceil(coordinates.lon_left-180) * 1000 \
+                - ceil(coordinates.lat_top+90))*10000 - 10000, # -360181000 to -10000
+
     def __init__(self, coordinates:Coordinates, map_widget:MapWidget, *args, **kwargs):
         super().__init__(
             coordinates=coordinates,
-            index=-1*abs(ceil(coordinates.lon_left-180) * 1000 \
-                - ceil(coordinates.lat_top+90))*10000 - 10000, # -360181000 to -10000
+            index=self.coordinates_to_index(coordinates),
             color=TileColors.failed,
             map_widget=map_widget, *args, **kwargs
         )
         self.tiles = {}
 
 class GreatTile(ManagedTile):
-    degree_tiles:List[DegreeTile]
+    tiles:List[DegreeTile]
 
     def __init__(self, coordinates:Coordinates, map_widget:MapWidget, *args, **kwargs):
         super().__init__(
             coordinates=coordinates,
-            index=-1*abs(int((coordinates.lon_left-180)/10) * 100 \
-                - int((coordinates.lat_top+90)/10)) - 1, # -3619 to -1
+            index=self.coordinates_to_index(coordinates),
             color=TileColors.great_tile,
             map_widget=map_widget, *args, **kwargs
         )
         self.path = None
     
+    @staticmethod
+    def coordinates_to_index(coordinates:Coordinates) -> int:
+        """
+        Returns a unique integer index from coordinates.
+        Ranges from -3619 to -1.
+
+        Arguments:
+            coordinates(Coordinates)
+        """
+        return -1*abs(int((coordinates.lon_left-180)/10) * 100 \
+                - int((coordinates.lat_top+90)/10)) - 1, # -3619 to -1
+
     def find_degree_tiles(self):
         self.path = Path(self.settings.orthophotos_folder) / \
             (f'{'w' if self.coordinates.lon_left < 0 else 'e'}{abs(self.coordinates.lon_left):03}' + \
             f'{'s' if self.coordinates.lat_bottom < 0 else 'n'}{abs(self.coordinates.lat_bottom):-02}')
-        self.degree_tiles = {}
+        self.tiles = {}
         for item in self.path.iterdir():
             if item.is_dir():
                 if os.listdir(item):
@@ -104,6 +126,7 @@ class GreatTile(ManagedTile):
                         ),
                         map_widget=self.map_widget,
                     )
+                    self.tiles[dt.index] = dt
                     dt.draw()
                 else:
                     os.rmdir(item) # Removes empty folder
