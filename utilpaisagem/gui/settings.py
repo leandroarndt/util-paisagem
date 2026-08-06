@@ -12,7 +12,10 @@ from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
 
 if TYPE_CHECKING:
     from utilpaisagem.gui.main import MainWindow
-
+else:
+    class MainWindow:
+        pass
+    
 class Distance(ttk.Frame):
     resolution:int
     distance:tk.IntVar
