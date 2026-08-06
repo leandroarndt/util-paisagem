@@ -195,8 +195,8 @@ class GreatTile(ManagedTile):
 class TileManager(object):
     class DetailLevels:
         great_tile = 0
-        degree_tile = 1
-        tile = 2
+        degree_tile = 30
+        tile = 3
 
     settings:Settings
 
@@ -286,20 +286,20 @@ class TileManager(object):
                     if not tile.tiles:
                         tile.find_degree_tiles()
                     for dt in tile.tiles.values():
-                        if dt.coordinates.lat_top > canvas_limits.lat_bottom and \
-                            dt.coordinates.lat_bottom < canvas_limits.lat_top and \
-                            dt.coordinates.lon_left < canvas_limits.lon_right and \
-                            dt.coordinates.lon_right > canvas_limits.lon_left:
+                        if dt.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.degree_tile and \
+                            dt.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.degree_tile and \
+                            dt.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.degree_tile and \
+                            dt.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.degree_tile:
                             if self.detail_level == TileManager.DetailLevels.degree_tile:
                                 self.active_tiles.append(dt)
                             else:
                                 if not dt.tiles:
                                     dt.find_tiles()
                                 for t in dt.tiles.values():
-                                    if t.coordinates.lat_top > canvas_limits.lat_bottom and \
-                                        t.coordinates.lat_bottom < canvas_limits.lat_top and \
-                                        t.coordinates.lon_left < canvas_limits.lon_right and \
-                                        t.coordinates.lon_right > canvas_limits.lon_left:
+                                    if t.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.tile and \
+                                        t.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.tile and \
+                                        t.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.tile and \
+                                        t.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.tile:
                                         self.active_tiles.append(t)
                                     else:
                                         t.hide()
