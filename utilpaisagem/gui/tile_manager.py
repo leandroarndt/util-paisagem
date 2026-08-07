@@ -7,7 +7,7 @@ from pathlib import Path
 from threading import Thread
 from tkintermapview.canvas_polygon import CanvasPolygon
 from utilpaisagem.gui.map_widget import MapWidget
-from utilpaisagem.gui.common import Settings
+from utilpaisagem.gui.common import Settings, format_status
 from utilpaisagem.scenery.common import Coordinates
 from utilpaisagem.scenery.tile import Tile
 if 'DEBUG' in os.environ:
@@ -39,6 +39,7 @@ class ManagedTile(object):
     state:str
     polygon:CanvasPolygon
     intermap:MapWidget
+    upstream_queue:Queue
 
     count = 0
 
@@ -47,11 +48,12 @@ class ManagedTile(object):
         coordinates:Coordinates,
         index:int,
         state:str,
-        map_widget:MapWidget
+        map_widget:MapWidget,
+        upstream_queue:Queue
     ):
         self.settings = Settings()
-        self.coordinates, self.index, self.state, self.map_widget = \
-            coordinates, index, state, map_widget
+        self.coordinates, self.index, self.state, self.map_widget, self.upstream_queue = \
+            coordinates, index, state, map_widget, upstream_queue
         self.polygon = None
 
         if DEBUG:
@@ -118,6 +120,7 @@ class DegreeTile(ManagedTile):
                             index=tile.index,
                             state=TileColors.failed,
                             map_widget=self.map_widget,
+                            upstream_queue=self.upstream_queue,
                         )
                     elif tile.is_old(log, item.parent / (item.stem + '.log')):
                         self.tiles[tile.index] = ManagedTile(
@@ -125,6 +128,7 @@ class DegreeTile(ManagedTile):
                             index=tile.index,
                             state=TileColors.old,
                             map_widget=self.map_widget,
+                            upstream_queue=self.upstream_queue,
                         )
                     else:
                         self.tiles[tile.index] = ManagedTile(
@@ -132,6 +136,7 @@ class DegreeTile(ManagedTile):
                             index=tile.index,
                             state=TileColors.good,
                             map_widget=self.map_widget,
+                            upstream_queue=self.upstream_queue,
                         )
                 elif item.suffix.lower() == '.png' or item.suffix.lower() == '.dds':
                     self.tiles[int(item.stem)] = ManagedTile(
@@ -139,6 +144,7 @@ class DegreeTile(ManagedTile):
                         index=int(item.stem),
                         state=TileColors.failed,
                         map_widget=self.map_widget,
+                        upstream_queue=self.upstream_queue,
                     )
 
 class GreatTile(ManagedTile):
@@ -188,10 +194,17 @@ class GreatTile(ManagedTile):
                         ),
                         map_widget=self.map_widget,
                         path=item,
+                        upstream_queue=self.upstream_queue,
                     )
                     self.tiles[dt.index] = dt
                     dt.find_tiles()
                     try:
+                        self.upstream_queue.put_nowait(
+                            format_status(
+                                _('Finished scanning folder {folder}').format(folder=self.path.name),
+                                self,
+                            )
+                        )
                         self.map_widget.master.update()
                         self.map_widget.master.update_idletasks()
                     except RuntimeError as e: # Happens if app closed before finishing
@@ -227,6 +240,7 @@ class TileManager(object):
         self.map_widget.after(200, self.update)
 
     def find_great_tiles(self):
+        self.upstream_queue.put_nowait(format_status(_('Searching for tiles to display'), self))
         def find_degrees():
             nonlocal all_gts
             while all_gts:
@@ -250,6 +264,7 @@ class TileManager(object):
                             lon2=lon_left+10
                         ),
                         map_widget=self.map_widget,
+                        upstream_queue=self.upstream_queue,
                     )
                     self.great_tiles[gt.index] = gt
                 else:
@@ -269,6 +284,8 @@ class TileManager(object):
         for t in threads:
             t.join()
         self.map_widget.updated = True
+
+        self.upstream_queue.put_nowait(format_status(_('Finished searching for tiles to dislay.'), self))
 
         if DEBUG:
             print(f'Time spent processing tiles: {datetime.now() - start}')
