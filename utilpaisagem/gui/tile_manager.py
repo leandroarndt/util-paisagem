@@ -75,7 +75,9 @@ class ManagedTile(object):
 
     def hide(self):
         if self.polygon is not None:
-            self.map_widget.canvas.itemconfigure(self.polygon.canvas_polygon, state=tk.HIDDEN)
+            # self.map_widget.canvas.itemconfigure(self.polygon.canvas_polygon, state=tk.HIDDEN)
+            self.polygon.delete()
+            self.polygon = None
 
 class DegreeTile(ManagedTile):
     tiles:Dict
@@ -271,36 +273,33 @@ class TileManager(object):
         else:
             self.detail_level = TileManager.DetailLevels.tile
 
-        for tile in self.active_tiles:
-            tile.hide()
-        
-        self.active_tiles = []
+        current_active_tiles = []
         for tile in self.great_tiles.values():
             if tile.coordinates.lat_top > canvas_limits.lat_bottom and \
                 tile.coordinates.lat_bottom < canvas_limits.lat_top and \
                 tile.coordinates.lon_left < canvas_limits.lon_right and \
                 tile.coordinates.lon_right > canvas_limits.lon_left:
                 if self.detail_level == TileManager.DetailLevels.great_tile:
-                    self.active_tiles.append(tile)
+                    current_active_tiles.append(tile)
                 else:
                     if not tile.tiles:
                         tile.find_degree_tiles()
                     for dt in tile.tiles.values():
-                        if dt.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.degree_tile and \
-                            dt.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.degree_tile and \
-                            dt.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.degree_tile and \
-                            dt.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.degree_tile:
+                        if dt.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.degree_tile / 4 and \
+                            dt.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.degree_tile / 4 and \
+                            dt.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.degree_tile / 4 and \
+                            dt.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.degree_tile / 4:
                             if self.detail_level == TileManager.DetailLevels.degree_tile:
-                                self.active_tiles.append(dt)
+                                current_active_tiles.append(dt)
                             else:
                                 if not dt.tiles:
                                     dt.find_tiles()
                                 for t in dt.tiles.values():
-                                    if t.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.tile and \
-                                        t.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.tile and \
-                                        t.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.tile and \
-                                        t.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.tile:
-                                        self.active_tiles.append(t)
+                                    if t.coordinates.lat_top > canvas_limits.lat_bottom - TileManager.DetailLevels.tile / 8 and \
+                                        t.coordinates.lat_bottom < canvas_limits.lat_top + TileManager.DetailLevels.tile / 8 and \
+                                        t.coordinates.lon_left < canvas_limits.lon_right + TileManager.DetailLevels.tile / 8 and \
+                                        t.coordinates.lon_right > canvas_limits.lon_left - TileManager.DetailLevels.tile / 8:
+                                        current_active_tiles.append(t)
                                     else:
                                         t.hide()
                         else:
@@ -309,8 +308,14 @@ class TileManager(object):
             else:
                 tile.hide()
 
+        for tile in current_active_tiles:
+            if tile not in self.active_tiles:
+                tile.draw()
         for tile in self.active_tiles:
-            tile.draw()
+            if tile not in current_active_tiles:
+                tile.hide()
+        
+        self.active_tiles = current_active_tiles
             
 
 class TileScraper(object):
