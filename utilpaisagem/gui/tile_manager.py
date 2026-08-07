@@ -19,7 +19,7 @@ else:
     DEBUG = False
 
 def dir_has_contents(dir:Path):
-    for item in os.scandir():
+    for item in os.scandir(dir):
         return True
     return False
 
@@ -201,7 +201,7 @@ class GreatTile(ManagedTile):
                     try:
                         self.upstream_queue.put_nowait(
                             format_status(
-                                _('Finished scanning folder {folder}').format(folder=self.path.name),
+                                _('Finished scanning folder {folder}').format(folder=item),
                                 self,
                             )
                         )
