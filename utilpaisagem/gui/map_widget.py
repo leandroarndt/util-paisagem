@@ -51,7 +51,7 @@ class MapWidget(TkinterMapView):
     updated:bool = True
     unused_polygons:List[CanvasPolygon]
 
-    def __init__(self, position_list, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.unused_polygons = []
         super().__init__(*args, **kwargs)
 
