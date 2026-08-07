@@ -190,6 +190,12 @@ class GreatTile(ManagedTile):
                         path=item,
                     )
                     self.tiles[dt.index] = dt
+                    dt.find_tiles()
+                    try:
+                        self.map_widget.master.update()
+                        self.map_widget.master.update_idletasks()
+                    except RuntimeError as e: # Happens if app closed before finishing
+                        return
                 else:
                     os.rmdir(item) # Removes empty folder
 
@@ -221,6 +227,12 @@ class TileManager(object):
         self.map_widget.after(200, self.update)
 
     def find_great_tiles(self):
+        def find_degrees():
+            nonlocal all_gts
+            while all_gts:
+                gt = all_gts.pop(0)
+                gt.find_degree_tiles()
+
         if DEBUG:
             start = datetime.now()
             print(f'Starting benchmark at {start}...', flush=True)
@@ -243,12 +255,31 @@ class TileManager(object):
                 else:
                     os.rmdir(item) # Removes empty folder
 
+        try:
+            self.map_widget.master.update()
+            self.map_widget.master.update_idletasks()
+        except RuntimeError as e: # Happens if app closed before finishing
+            return
+
+        all_gts = list(self.great_tiles.values())
+        # Should terminate when main thread quits
+        threads = [Thread(target=find_degrees, daemon=True) for x in range(4)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        self.map_widget.updated = True
+
         if DEBUG:
             print(f'Time spent processing tiles: {datetime.now() - start}')
             print(f'Total: {ManagedTile.count} tiles.')
             print(f'Memory used to manage {ManagedTile.count} tiles: {asized(self)}')
             for gt in self.great_tiles.values():
-                print(f'Memory used by a single tile: {asized(gt)}')
+                for dt in gt.tiles.values():
+                    for tile in dt.tiles.values():
+                        print(f'Memory used by a single tile: {asized(tile)}')
+                        break
+                    break
                 break
     
     def update(self):
