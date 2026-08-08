@@ -33,6 +33,7 @@ class ManagedTile(object):
     polygon:CanvasPolygon
     intermap:MapWidget
     upstream_queue:Queue
+    size_queue:Queue
 
     count = 0
 
@@ -42,11 +43,12 @@ class ManagedTile(object):
         index:int,
         state:str,
         map_widget:MapWidget,
-        upstream_queue:Queue
+        upstream_queue,
+        size_queue:Queue
     ):
         self.settings = Settings()
-        self.coordinates, self.index, self.state, self.map_widget, self.upstream_queue = \
-            coordinates, index, state, map_widget, upstream_queue
+        self.coordinates, self.index, self.state, self.map_widget, self.upstream_queue, self.size_queue = \
+            coordinates, index, state, map_widget, upstream_queue, size_queue
         self.polygon = None
 
         if DEBUG:
@@ -114,6 +116,7 @@ class DegreeTile(ManagedTile):
                             state=TileColors.failed,
                             map_widget=self.map_widget,
                             upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
                         )
                     elif tile.is_old(log, item.parent / (item.stem + '.log')):
                         self.tiles[tile.index] = ManagedTile(
@@ -122,6 +125,7 @@ class DegreeTile(ManagedTile):
                             state=TileColors.old,
                             map_widget=self.map_widget,
                             upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
                         )
                     else:
                         self.tiles[tile.index] = ManagedTile(
@@ -130,6 +134,7 @@ class DegreeTile(ManagedTile):
                             state=TileColors.good,
                             map_widget=self.map_widget,
                             upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
                         )
                 elif item.suffix.lower() == '.png' or item.suffix.lower() == '.dds':
                     self.tiles[int(item.stem)] = ManagedTile(
@@ -138,7 +143,9 @@ class DegreeTile(ManagedTile):
                         state=TileColors.failed,
                         map_widget=self.map_widget,
                         upstream_queue=self.upstream_queue,
+                        size_queue=self.size_queue,
                     )
+                self.size_queue.put_nowait(os.path.getsize(item))
 
 class GreatTile(ManagedTile):
     tiles:List[DegreeTile]
@@ -188,6 +195,7 @@ class GreatTile(ManagedTile):
                         map_widget=self.map_widget,
                         path=item,
                         upstream_queue=self.upstream_queue,
+                        size_queue=self.size_queue,
                     )
                     self.tiles[dt.index] = dt
                     dt.find_tiles()
@@ -218,20 +226,30 @@ class TileManager(object):
     active_tiles:List
     detail_level:int
     map_tiles:List
-    size:int
+    disk_usage:int
     
     upstream_queue:Queue
     map_widget:MapWidget
     tile_queue:Queue
+    size_queue:Queue
 
     def __init__(self, upstream_queue:Queue, map_widget:MapWidget):
         self.settings = Settings()
         self.tile_queue = Queue()
+        self.size_queue = Queue()
         self.upstream_queue, self.map_widget = upstream_queue, map_widget
         self.active_tiles = []
         self.great_tiles = {}
         self.map_tiles = {}
         self.map_widget.after(200, self.update)
+        self.disk_usage = 0
+
+        self.map_widget.after(100, self.read_size_queue)
+
+    def read_size_queue(self):
+        while not self.size_queue.empty():
+            self.disk_usage += self.size_queue.get()
+        self.map_widget.after(100, self.read_size_queue)
 
     def find_great_tiles(self):
         self.upstream_queue.put_nowait(format_status(_('Searching for tiles to display'), self))
@@ -259,6 +277,7 @@ class TileManager(object):
                         ),
                         map_widget=self.map_widget,
                         upstream_queue=self.upstream_queue,
+                        size_queue=self.size_queue,
                     )
                     self.great_tiles[gt.index] = gt
                 else:
@@ -284,6 +303,7 @@ class TileManager(object):
         if DEBUG:
             print(f'Time spent processing tiles: {datetime.now() - start}')
             print(f'Total: {ManagedTile.count} tiles.')
+            print(f'Disk usage: {self.disk_usage} bytes.')
             print(f'Memory used to manage {ManagedTile.count} tiles: {asized(self)}')
             for gt in self.great_tiles.values():
                 for dt in gt.tiles.values():
@@ -302,6 +322,7 @@ class TileManager(object):
             gt_index = GreatTile.coordinates_to_index(tile[1])
             dt_index = DegreeTile.coordinates_to_index(tile[1])
             if tile[0] < 0:
+                self.disk_usage -= tile[1]
                 t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(tile[0])
                 try: t.polygon.delete()
                 except AttributeError: pass
@@ -314,6 +335,7 @@ class TileManager(object):
                         try: t.polygon.delete()
                         except AttributeError: pass
             else:
+                self.disk_usage += os.path.getsize(tile[2])
                 try:
                     t = self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]]
                 except KeyError:
@@ -323,9 +345,15 @@ class TileManager(object):
                         state=tile[3],
                         map_widget=self.map_widget,
                         upstream_queue=self.upstream_queue,
+                        size_queue=self.size_queue,
                     )
                     if gt_index not in self.great_tiles:
-                        gt = GreatTile(coordinates=tile[1], map_widget=self.map_widget, upstream_queue=self.upstream_queue)
+                        gt = GreatTile(
+                            coordinates=tile[1],
+                            map_widget=self.map_widget,
+                            upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
+                        )
                         self.great_tiles[gt_index] = gt
                     if dt_index not in self.great_tiles[gt_index].tiles:
                         dt = DegreeTile(
@@ -333,6 +361,7 @@ class TileManager(object):
                             map_widget=self.map_widget,
                             path=tile[2].parent,
                             upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
                         )
                         self.great_tiles[gt_index].tiles[dt_index] = dt
                 if tile[0] not in self.great_tiles[gt_index].tiles[dt_index].tiles:
@@ -408,7 +437,3 @@ class TileManager(object):
                 tile.hide()
         
         self.active_tiles = current_active_tiles
-            
-
-class TileScraper(object):
-    pass

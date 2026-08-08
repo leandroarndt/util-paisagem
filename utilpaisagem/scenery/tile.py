@@ -527,16 +527,19 @@ class Tile(object):
 
 
     def delete_files(self):
+        size = 0
         dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
         for file in dds:
+            size += os.path.getsize(file)
             file.unlink()
         png = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.png', case_sensitive=False)
         for file in png:
+            size += os.path.getsize(file)
             file.unlink()
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
-        self.tile_manager_queue((-self.index,))
+        self.tile_manager_queue.put_nowait((-self.index, size))
 
     @classmethod
     def tile_width(cls, lat):
