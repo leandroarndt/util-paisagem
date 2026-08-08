@@ -27,9 +27,19 @@ class Downloader(object):
     max_downloads:int
     total:int
 
-    def __init__(self, root:tk.Tk, upstream_queue:Queue, download_manager:DownloadManager, interval:int=100, idle_interval:int=1000, max_downloads:int=4):
+    def __init__(
+        self,
+        root:tk.Tk,
+        upstream_queue:Queue,
+        tile_manager_queue:Queue,
+        download_manager:DownloadManager,
+        interval:int=100,
+        idle_interval:int=1000,
+        max_downloads:int=4,
+    ):
         self.root = root
         self.upstream_queue = upstream_queue
+        self.tile_manager_queue = tile_manager_queue
         self.download_manager = download_manager
         self.settings = Settings()
         self.interval = interval
@@ -48,6 +58,7 @@ class Downloader(object):
             upstream_queue=self.upstream_queue,
             download_res=self.settings.download_res,
             compress=self.settings.image_format,
+            tile_manager_queue=self.tile_manager_queue
         )
         self.wait_queue.put_nowait(tile.index)
 

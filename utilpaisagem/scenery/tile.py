@@ -1,3 +1,4 @@
+from typing import Union
 from numbers import Number
 from pathlib import Path
 from urllib.error import URLError, ContentTooShortError
@@ -10,7 +11,7 @@ import math, tempfile, shutil, os, configparser, ast
 from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
-from utilpaisagem.gui.common import format_status, Settings, QUIT
+from utilpaisagem.gui.common import format_status, Settings, TileColors, QUIT
 
 class NeedsRenewalError(Exception):
     pass
@@ -25,7 +26,8 @@ class Tile(object):
     index:int
     coordinates:Coordinates
     resolution:int
-    upstream_queue:Queue|None
+    upstream_queue:Union[Queue|None]
+    tile_manager_queue:Union[Queue|None]
     settings:Settings
 
     def __init__(
@@ -34,7 +36,7 @@ class Tile(object):
         lat:Number=float('nan'),
         lon:Number=float('nan'), 
         resolution:int=DOWNLOAD_RES,
-        upstream_queue:Queue|None=None,
+        upstream_queue:Union[Queue|None]=None,
     ):
         """
         New Tile object defined by either index or by coordinates.
@@ -182,7 +184,15 @@ class Tile(object):
             return True
         return False
 
-    def retrieve(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart', upstream_queue:Queue=None):
+    def retrieve(
+        self,
+        path:Path,
+        image_service:ImageService,
+        download_res:int=DOWNLOAD_RES,
+        compress:str='smart',
+        upstream_queue:Union[Queue|None]=None,
+        tile_manager_queue:Union[Queue|None]=None
+    ):
         """
         Tests if the image exists and is not needed to regenerate it. If Ok, touch the
         file in order to know that it has been used. The image should be generated again if it is smaller than the demanded
@@ -193,6 +203,8 @@ class Tile(object):
             image_service(ImagerService): image downloader
             download_res(int): exponent of two representing vertical image size
             compress(str): compression method, either 'png', 'dds' or 'smart'. Defaults to 'smart'
+            upstream_queue(Queue): queue for user communication
+            tile_manager_queue(Queue): queue for the TileManager
         """
         if not image_service.can_download(self.coordinates):
             if self.upstream_queue is None:
@@ -434,8 +446,26 @@ class Tile(object):
                 }
                 with open(path / f'{self.index}.log', 'w') as logfile:
                     log.write(logfile)
+                try:
+                    tile_manager_queue.put_nowait((
+                        self.index,
+                        self.coordinates,
+                        filename,
+                        TileColors.good,
+                    ))
+                except AttributeError:
+                    pass
 
         except (URLError, ContentTooShortError) as e:
+            try:
+                tile_manager_queue.put_nowait((
+                    self.index,
+                    self.coordinates,
+                    filename,
+                    TileColors.failed,
+                ))
+            except AttributeError:
+                pass
             if self.resolution > MIN_RES:
                 if self.upstream_queue is None:
                     print(f'Error downloading cell {self.index}[{line}][{cell}]: {e}.')
@@ -469,6 +499,17 @@ class Tile(object):
             if QUIT.is_set:
                 return
             else:
+                if (self.get_path(path) / (self.index + '.png')).exists() or \
+                    (self.get_path(path) / (self.index + '.dds')).exists():
+                    try:
+                        tile_manager_queue.put_nowait((
+                            self.index,
+                            self.coordinates,
+                            filename,
+                            TileColors.failed,
+                        ))
+                    except AttributeError:
+                        pass
                 raise e
 
     def files_exist(self) -> bool:
@@ -495,6 +536,7 @@ class Tile(object):
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
+        self.tile_manager_queue((-self.index,))
 
     @classmethod
     def tile_width(cls, lat):
