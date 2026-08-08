@@ -474,9 +474,24 @@ class Tile(object):
         (FlightGear uses a variable tile width according to the latitude.
         See https://wiki.flightgear.org/Tile_Index_Scheme).
         """
-        width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[89,12],[90.1,12]]
+
+        width_table=(
+            (89, 12),
+            (86, 4),
+            (83, 2),
+            (76, 1),
+            (62, 0.5),
+            (22, 0.25),
+            (-22, 0.125),
+            (-62, 0.25),
+            (-76, 0.5),
+            (-83, 1),
+            (-86, 2),
+            (-89, 4),
+            (-90, 12),
+        )
         for i in range(len(width_table)):
-            if abs(lat)>=width_table[i][0] and abs(lat)<width_table[i+1][0]:
+            if lat>=width_table[i][0]:
                 return width_table[i][1]
 
     @classmethod
