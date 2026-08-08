@@ -452,7 +452,7 @@ class MainWindow(object):
             message=_('Are you sure you want to delete tile {index}?').format(index=self.index)
         )
         if answer:
-            Tile(self.index).delete_files()
+            Tile(self.index).delete_files(self.tile_manager.tile_queue)
 
     # Validation
     def validate_float(self, input:str):

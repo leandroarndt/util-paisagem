@@ -244,12 +244,12 @@ class TileManager(object):
         self.map_widget.after(200, self.update)
         self.disk_usage = 0
 
-        self.map_widget.after(100, self.read_size_queue)
+        self.map_widget.after(200, self.read_size_queue)
 
     def read_size_queue(self):
         while not self.size_queue.empty():
-            self.disk_usage += self.size_queue.get()
-        self.map_widget.after(100, self.read_size_queue)
+            self.disk_usage += self.size_queue.get_nowait()
+        self.map_widget.after(200, self.read_size_queue)
 
     def find_great_tiles(self):
         self.upstream_queue.put_nowait(format_status(_('Searching for tiles to display'), self))
@@ -322,7 +322,7 @@ class TileManager(object):
             gt_index = GreatTile.coordinates_to_index(tile[1])
             dt_index = DegreeTile.coordinates_to_index(tile[1])
             if tile[0] < 0:
-                self.disk_usage -= tile[1]
+                self.size_queue.put_nowait(-tile[2])
                 t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(tile[0])
                 try: t.polygon.delete()
                 except AttributeError: pass
@@ -335,7 +335,7 @@ class TileManager(object):
                         try: t.polygon.delete()
                         except AttributeError: pass
             else:
-                self.disk_usage += os.path.getsize(tile[2])
+                self.size_queue.put_nowait(os.path.getsize(tile[2]))
                 try:
                     t = self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]]
                 except KeyError:
@@ -366,12 +366,17 @@ class TileManager(object):
                         self.great_tiles[gt_index].tiles[dt_index] = dt
                 if tile[0] not in self.great_tiles[gt_index].tiles[dt_index].tiles:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]] = t
+                if self.great_tiles[gt_index].polygon is None:
+                    self.great_tiles[gt_index].draw()
+                if self.great_tiles[gt_index].tiles[dt_index].polygon is None:
+                    self.great_tiles[gt_index].tiles[dt_index].draw()
+                if self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None:
+                    self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].draw()
                 else:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].state = tile[3]
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon.update(
                         color=tile[3]
                     )
-
 
         if updated_tiles or self.map_widget.updated:
             try:
@@ -380,9 +385,10 @@ class TileManager(object):
                 pass # Needs to wait until ready
             except ValueError:
                 pass # Randomly throws "ValueError: math domain error"
-                     # at tkintermapview\utility_functions.py", line 12
+                    # at tkintermapview\utility_functions.py", line 12
+
         self.map_widget.after(200, self.update)
-    
+
     def update_active_tiles(self):
         canvas_limits = self.map_widget.get_canvas_coords()
         if canvas_limits.lat_top - canvas_limits.lat_bottom > 30 or \

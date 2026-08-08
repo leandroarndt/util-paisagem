@@ -450,7 +450,7 @@ class Tile(object):
                     tile_manager_queue.put_nowait((
                         self.index,
                         self.coordinates,
-                        filename,
+                        self.get_path(self.settings.orthophotos_folder) / filename.name,
                         TileColors.good,
                     ))
                 except AttributeError:
@@ -461,7 +461,7 @@ class Tile(object):
                 tile_manager_queue.put_nowait((
                     self.index,
                     self.coordinates,
-                    filename,
+                    self.get_path(self.settings.orthophotos_folder) / filename.name,
                     TileColors.failed,
                 ))
             except AttributeError:
@@ -505,7 +505,7 @@ class Tile(object):
                         tile_manager_queue.put_nowait((
                             self.index,
                             self.coordinates,
-                            filename,
+                            self.get_path(self.settings.orthophotos_folder) / filename.name,
                             TileColors.failed,
                         ))
                     except AttributeError:
@@ -526,7 +526,7 @@ class Tile(object):
         return False
 
 
-    def delete_files(self):
+    def delete_files(self, tile_manager_queue:Queue):
         size = 0
         dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
         for file in dds:
@@ -539,7 +539,7 @@ class Tile(object):
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
-        self.tile_manager_queue.put_nowait((-self.index, size))
+        tile_manager_queue.put_nowait((-self.index, self.coordinates, size))
 
     @classmethod
     def tile_width(cls, lat):
@@ -550,7 +550,7 @@ class Tile(object):
         """
         width_table=[[0,0.125],[22,0.25],[62,0.5],[76,1],[83,2],[86,4],[89,12],[90.1,12]]
         for i in range(len(width_table)):
-            if abs(lat)>=width_table[i][0] and abs(lat)<width_table[i+1][0]:
+            if abs(lat)>width_table[i][0] and abs(lat)<=width_table[i+1][0]:
                 return width_table[i][1]
 
     @classmethod
