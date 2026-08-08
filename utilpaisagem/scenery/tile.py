@@ -450,7 +450,7 @@ class Tile(object):
                     tile_manager_queue.put_nowait((
                         self.index,
                         self.coordinates,
-                        filename,
+                        self.get_path(self.settings.orthophotos_folder) / filename.name,
                         TileColors.good,
                     ))
                 except AttributeError:
@@ -461,7 +461,7 @@ class Tile(object):
                 tile_manager_queue.put_nowait((
                     self.index,
                     self.coordinates,
-                    filename,
+                    self.get_path(self.settings.orthophotos_folder) / filename.name,
                     TileColors.failed,
                 ))
             except AttributeError:
@@ -505,7 +505,7 @@ class Tile(object):
                         tile_manager_queue.put_nowait((
                             self.index,
                             self.coordinates,
-                            filename,
+                            self.get_path(self.settings.orthophotos_folder) / filename.name,
                             TileColors.failed,
                         ))
                     except AttributeError:
@@ -526,7 +526,7 @@ class Tile(object):
         return False
 
 
-    def delete_files(self):
+    def delete_files(self, tile_manager_queue:Queue):
         size = 0
         dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
         for file in dds:
@@ -539,7 +539,7 @@ class Tile(object):
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
-        self.tile_manager_queue.put_nowait((-self.index, size))
+        tile_manager_queue.put_nowait((-self.index, self.coordinates, size))
 
     @classmethod
     def tile_width(cls, lat):
