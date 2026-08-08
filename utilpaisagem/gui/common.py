@@ -30,6 +30,16 @@ def format_status(text:str, obj) -> str:
 
 QUIT = Event()
 
+# Map tiles
+
+class TileColors:
+        great_tile = 'hotpink4'
+        degree_tile = 'hotpink2'
+        good = 'green2'
+        failed = 'yellow2'
+        old = 'slategray3'
+        selected = 'darkturquoise'
+
 # Preferences
 
 class _Sections(Enum):

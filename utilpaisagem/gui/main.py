@@ -406,7 +406,13 @@ class MainWindow(object):
         find_tiles.start()
 
         # Init downloader
-        self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
+        self.downloader = Downloader(
+            self.window,
+            upstream_queue=self.upstream_queue,
+            tile_manager_queue=self.tile_manager.tile_queue,
+            download_manager=self.download_manager,
+            interval=100,
+        )
         self.downloader.download()
 
         # Init upstream reader
@@ -529,6 +535,7 @@ class MainWindow(object):
             ],
             fill_color=None,
             outline_color=TileColors.selected,
+            border_width=5
         )
         if fit_map:
             self.map_widget.fit_bounding_box(

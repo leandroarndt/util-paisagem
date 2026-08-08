@@ -3,21 +3,20 @@
 ## 0.5.0 (NEXT)
 
 **TODO:**
-- Tile visualization:
-  - Great tiles
-  - Tiles
 - Disk space management
   - Maximum space
   - Time since last use
 
 **DONE:**
-- Tile renewal (new image download) after configurable amount of time
+- Tile renewal (new image download) after configurable amount of time.
+- Tile visualizaton, including their state: good, downloaded after error management,
+or needing renewal.
 
 ## 0.4.0
 
 - Added image file format to the settings.
 - Added threading to tile download and the corresponding setting
-to the GUI
+to the GUI.
 - Empties waypoint name on deletion.
 - Moved download resolution to the "download" tab in settings.
 - Fixed issue #6 about Windows installations (with embedable Python)

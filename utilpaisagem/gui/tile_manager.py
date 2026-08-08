@@ -7,9 +7,10 @@ from pathlib import Path
 from threading import Thread
 from tkintermapview.canvas_polygon import CanvasPolygon
 from utilpaisagem.gui.map_widget import MapWidget
-from utilpaisagem.gui.common import Settings, format_status
+from utilpaisagem.gui.common import Settings, format_status, TileColors
 from utilpaisagem.scenery.common import Coordinates
 from utilpaisagem.scenery.tile import Tile
+
 if 'DEBUG' in os.environ:
     print('*** TILE MANAGER DEBUG MODE ***')
     from pympler.asizeof import asized
@@ -22,14 +23,6 @@ def dir_has_contents(dir:Path):
     for item in os.scandir(dir):
         return True
     return False
-
-class TileColors:
-        great_tile = 'hotpink4'
-        degree_tile = 'hotpink2'
-        good = 'green2'
-        failed = 'yellow2'
-        old = 'slategray3'
-        selected = 'darkturquoise'
 
 class ManagedTile(object):
     coordinates:Coordinates
@@ -225,6 +218,7 @@ class TileManager(object):
     active_tiles:List
     detail_level:int
     map_tiles:List
+    size:int
     
     upstream_queue:Queue
     map_widget:MapWidget
@@ -285,7 +279,7 @@ class TileManager(object):
             t.join()
         self.map_widget.updated = True
 
-        self.upstream_queue.put_nowait(format_status(_('Finished searching for tiles to dislay.'), self))
+        self.upstream_queue.put_nowait(format_status(_('Finished searching for tiles to display.'), self))
 
         if DEBUG:
             print(f'Time spent processing tiles: {datetime.now() - start}')
@@ -300,7 +294,57 @@ class TileManager(object):
                 break
     
     def update(self):
-        if self.map_widget.updated:
+        updated_tiles = []
+
+        while not self.tile_queue.empty():
+            updated_tiles.append(self.tile_queue.get_nowait())
+        for tile in updated_tiles:
+            gt_index = GreatTile.coordinates_to_index(tile[1])
+            dt_index = DegreeTile.coordinates_to_index(tile[1])
+            if tile[0] < 0:
+                t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(tile[0])
+                try: t.polygon.delete()
+                except AttributeError: pass
+                if not self.great_tiles[gt_index].tiles[dt_index]:
+                    t = self.great_tiles[gt_index].tiles.pop[dt_index]
+                    try: t.polygon.delete()
+                    except AttributeError: pass
+                    if not self.great_tiles[gt_index]:
+                        t = self.great_tiles.pop(gt_index)
+                        try: t.polygon.delete()
+                        except AttributeError: pass
+            else:
+                try:
+                    t = self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]]
+                except KeyError:
+                    t = ManagedTile(
+                        coordinates=tile[1],
+                        index=tile[0],
+                        state=tile[3],
+                        map_widget=self.map_widget,
+                        upstream_queue=self.upstream_queue,
+                    )
+                    if gt_index not in self.great_tiles:
+                        gt = GreatTile(coordinates=tile[1], map_widget=self.map_widget, upstream_queue=self.upstream_queue)
+                        self.great_tiles[gt_index] = gt
+                    if dt_index not in self.great_tiles[gt_index].tiles:
+                        dt = DegreeTile(
+                            coordinates=tile[1],
+                            map_widget=self.map_widget,
+                            path=tile[2].parent,
+                            upstream_queue=self.upstream_queue,
+                        )
+                        self.great_tiles[gt_index].tiles[dt_index] = dt
+                if tile[0] not in self.great_tiles[gt_index].tiles[dt_index].tiles:
+                    self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]] = t
+                else:
+                    self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].state = tile[3]
+                    self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon.update(
+                        color=tile[3]
+                    )
+
+
+        if updated_tiles or self.map_widget.updated:
             try:
                 self.update_active_tiles()
             except OverflowError:
