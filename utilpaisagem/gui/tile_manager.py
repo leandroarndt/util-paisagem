@@ -1,5 +1,5 @@
 from typing import List, Dict, Union, TYPE_CHECKING
-import os, configparser
+import os, configparser, math
 import tkinter as tk
 from queue import Queue
 from math import ceil
@@ -83,14 +83,22 @@ class DegreeTile(ManagedTile):
     @staticmethod
     def coordinates_to_index(coordinates:Coordinates) -> int:
         """
-        Returns a unique integer index from coordinates.
-        Ranges from -360181000 to -10000.
+        Returns a unique index from coordinates, corresponding to
+        the second part of the tile path.
 
         Arguments:
             coordinates(Coordinates)
         """
-        return -1*abs(ceil(coordinates.lon_left-180) * 1000 \
-                - ceil(coordinates.lat_top+90))*10000 - 10000 # -360181000 to -10000
+        if coordinates.lat_median > 0:
+            lat_dir = 'n'
+        else:
+            lat_dir = 's'
+        if coordinates.lon_median > 0:
+            lon_dir = 'e'
+        else:
+            lon_dir = 'w'
+        return f'{lon_dir}{abs(math.floor(coordinates.lon_left)):03}' + \
+            f'{lat_dir}{abs(math.floor(coordinates.lat_bottom)):02}'
 
     def __init__(self, coordinates:Coordinates, map_widget:MapWidget, path:Path, *args, **kwargs):
         super().__init__(
@@ -169,14 +177,22 @@ class GreatTile(ManagedTile):
     @staticmethod
     def coordinates_to_index(coordinates:Coordinates) -> int:
         """
-        Returns a unique integer index from coordinates.
-        Ranges from -3619 to -1.
+        Returns a unique index from coordinates, corresponding to
+        the first part of the tile path.
 
         Arguments:
             coordinates(Coordinates)
         """
-        return -1*abs(int((coordinates.lon_left-180)/10) * 100 \
-                - int((coordinates.lat_top+90)/10)) - 1 # -3619 to -1
+        if coordinates.lat_median > 0:
+            lat_dir = 'n'
+        else:
+            lat_dir = 's'
+        if coordinates.lon_median > 0:
+            lon_dir = 'e'
+        else:
+            lon_dir = 'w'
+        return f'{lon_dir}{abs(math.floor(coordinates.lon_left/10)) * 10:03}' + \
+            f'{lat_dir}{abs(math.floor(coordinates.lat_bottom / 10) * 10):02}'
 
     def find_degree_tiles(self):
         self.tiles = {}
@@ -319,11 +335,10 @@ class TileManager(object):
         while not self.tile_queue.empty():
             updated_tiles.append(self.tile_queue.get_nowait())
         for tile in updated_tiles:
-            gt_index = GreatTile.coordinates_to_index(tile[1])
-            dt_index = DegreeTile.coordinates_to_index(tile[1])
+            gt_index, dt_index = tile[-1]
             if tile[0] < 0:
                 self.size_queue.put_nowait(-tile[2])
-                t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(tile[0])
+                t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(abs(tile[0]))
                 try: t.polygon.delete()
                 except AttributeError: pass
                 if not self.great_tiles[gt_index].tiles[dt_index]:

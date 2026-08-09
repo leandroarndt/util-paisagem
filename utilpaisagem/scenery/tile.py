@@ -452,6 +452,7 @@ class Tile(object):
                         self.coordinates,
                         self.get_path(self.settings.orthophotos_folder) / filename.name,
                         TileColors.good,
+                        str(self.get_path(Path())).split('/'),
                     ))
                 except AttributeError:
                     pass
@@ -463,6 +464,7 @@ class Tile(object):
                     self.coordinates,
                     self.get_path(self.settings.orthophotos_folder) / filename.name,
                     TileColors.failed,
+                    str(self.get_path(Path())).split('/'),
                 ))
             except AttributeError:
                 pass
@@ -507,6 +509,7 @@ class Tile(object):
                             self.coordinates,
                             self.get_path(self.settings.orthophotos_folder) / filename.name,
                             TileColors.failed,
+                            str(self.get_path(Path())).split('/'),
                         ))
                     except AttributeError:
                         pass
@@ -539,7 +542,7 @@ class Tile(object):
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
-        tile_manager_queue.put_nowait((-self.index, self.coordinates, size))
+        tile_manager_queue.put_nowait((-self.index, self.coordinates, size, str(self.get_path(Path())).split('/')))
 
     @classmethod
     def tile_width(cls, lat):
