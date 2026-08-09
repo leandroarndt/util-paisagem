@@ -2,7 +2,7 @@ from pathlib import Path
 
 VERSION = 0
 SUBVERSION = 4
-REVISION = 2
+REVISION = 3
 RC = 0
 
 base_path = Path(__file__).parent.parent
