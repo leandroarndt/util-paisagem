@@ -24,6 +24,38 @@ def dir_has_contents(dir:Path):
         return True
     return False
 
+class TileAge(object):
+    index:int
+    age:float
+
+    def __init__(self, index:int, age:float):
+        self.index, self.age = index, age
+
+    def __eq__(self, other):
+        return self.index == other.index
+    
+    def __lt__(self, other):
+        return self.age < other.age
+    
+    def __le__(self, other):
+        return self.age <= other.age
+    
+    def __gt__(self, other):
+        return self.age > other.age
+    
+    def __ge__(self, other):
+        return self.age >= other.age
+
+class AgeList(list):
+    def put(self, item:TileAge):
+        if item in self:
+            self.pop(self.index(item))
+        for i in range(len(self)):
+            if item > self[i]:
+                self.insert(i, item)
+                return
+        self.append(item)
+
 class ManagedTile(object):
     coordinates:Coordinates
     settings:Settings
