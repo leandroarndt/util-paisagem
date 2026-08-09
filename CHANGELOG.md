@@ -11,6 +11,7 @@
 - Tile renewal (new image download) after configurable amount of time.
 - Tile visualizaton, including their state: good, downloaded after error management,
 or needing renewal.
+- Shows disk usage by scenery images.
 
 ## 0.4.0
 
