@@ -1,11 +1,11 @@
 # Útil paisagem changelog
 
-## 0.5.0 (NEXT)
+## 0.5.0rc1
 
-- Tile renewal (new image download) after configurable amount of time.
-- Tile visualizaton, including their state: good, downloaded after error management,
+- Renews tiles (new image download) after configurable amount of time.
+- Provides tile visualizaton, including their state: good, downloaded after error management,
 or needing renewal.
-- Limits disk usage.
+- Limits disk usage based on user preferences.
 
 ## 0.4.0
 
