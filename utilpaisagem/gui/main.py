@@ -17,6 +17,7 @@ from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
 from showinfm import show_in_file_manager
 from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path
+from utilpaisagem.scenery.common import METER_SIZE
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
@@ -721,7 +722,7 @@ class MainWindow(object):
     def download_route(self):
         distances = list(self.settings.distances.keys())
         distances.sort()
-        step = distances[0]
+        step = METER_SIZE / 1000 # distances[0]
         route = self.waypoints.copy()
         route.reverse() # DownloadManager puts last center first
         for i, wp in enumerate(route[:-1]):
