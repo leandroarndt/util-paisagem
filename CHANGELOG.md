@@ -2,16 +2,10 @@
 
 ## 0.5.0 (NEXT)
 
-**TODO:**
-- Disk space management
-  - Maximum space
-  - Time since last use
-
-**DONE:**
 - Tile renewal (new image download) after configurable amount of time.
 - Tile visualizaton, including their state: good, downloaded after error management,
 or needing renewal.
-- Shows disk usage by scenery images.
+- Limits disk usage.
 
 ## 0.4.0
 

@@ -3,9 +3,12 @@ import os, configparser, math
 import tkinter as tk
 from queue import Queue
 from math import ceil
+from decimal import Decimal
 from pathlib import Path
 from threading import Thread
+from datetime import datetime
 from tkintermapview.canvas_polygon import CanvasPolygon
+from babel.numbers import format_decimal
 from utilpaisagem.gui.map_widget import MapWidget
 from utilpaisagem.gui.common import Settings, format_status, TileColors
 from utilpaisagem.scenery.common import Coordinates
@@ -28,11 +31,15 @@ class TileAge(object):
     index:int
     age:float
 
-    def __init__(self, index:int, age:float):
-        self.index, self.age = index, age
+    def __init__(self, index:int, timestamp:float):
+        self.index, self.age = index, datetime.now() - datetime.fromtimestamp(timestamp)
 
     def __eq__(self, other):
-        return self.index == other.index
+        if isinstance(other, TileAge):
+            return self.index == other.index
+        elif isinstance(other, int):
+            return self.index == other
+        raise ValueError(f'Cannot compare TileAge with object of type {type(other)}')
     
     def __lt__(self, other):
         return self.age < other.age
@@ -149,7 +156,7 @@ class DegreeTile(ManagedTile):
 
     def find_tiles(self):
         for item in self.path.iterdir():
-            if item.stem.isdigit():
+            if item.stem.isdigit() and (item.suffix.lower() == '.png' or item.suffix.lower() == '.dds'):
                 if (item.parent / (item.stem + '.log')).exists():
                     log = configparser.ConfigParser()
                     log.read(item.parent / (item.stem + '.log'))
@@ -190,7 +197,7 @@ class DegreeTile(ManagedTile):
                         upstream_queue=self.upstream_queue,
                         size_queue=self.size_queue,
                     )
-                self.size_queue.put_nowait(os.path.getsize(item))
+                self.size_queue.put_nowait((TileAge(int(item.stem), os.path.getmtime(item.with_suffix('.log'))), os.path.getsize(item)))
 
 class GreatTile(ManagedTile):
     tiles:List[DegreeTile]
@@ -255,7 +262,7 @@ class GreatTile(ManagedTile):
                     try:
                         self.upstream_queue.put_nowait(
                             format_status(
-                                _('Finished scanning folder {folder}').format(folder=item),
+                                _('Finished scanning folder "{folder}".').format(folder=item),
                                 self,
                             )
                         )
@@ -280,6 +287,8 @@ class TileManager(object):
     detail_level:int
     map_tiles:List
     disk_usage:int
+    tile_list:AgeList
+    search_complete:bool
     
     upstream_queue:Queue
     map_widget:MapWidget
@@ -296,12 +305,33 @@ class TileManager(object):
         self.map_tiles = {}
         self.map_widget.after(200, self.update)
         self.disk_usage = 0
+        self.tile_list = AgeList()
+        self.search_complete = False
 
         self.map_widget.after(200, self.read_size_queue)
 
     def read_size_queue(self):
         while not self.size_queue.empty():
-            self.disk_usage += self.size_queue.get_nowait()
+            item = self.size_queue.get_nowait()
+            if isinstance(item[0], TileAge):
+                self.tile_list.put(item[0])
+            else:
+                self.tile_list.pop(self.tile_list.index(item[0]))
+            self.disk_usage += item[1]
+
+        if self.search_complete:
+            if self.disk_usage > self.settings.max_disk_usage:
+                self.upstream_queue.put_nowait(format_status(
+                    'Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles.'.format(
+                        space=format_decimal(Decimal(self.disk_usage).quantize(Decimal('1.00'))),
+                        limit=format_decimal(Decimal(self.settings.max_disk_usage).quantize(Decimal('1.00'))),
+                    ),
+                    self,
+                ))
+            while self.disk_usage > self.settings.max_disk_usage:
+                t = Tile(self.tile_list.pop(0).index)
+                t.delete_files() # It already communicates with TileManager.tile_queue
+        
         self.map_widget.after(200, self.read_size_queue)
 
     def find_great_tiles(self):
@@ -351,7 +381,11 @@ class TileManager(object):
             t.join()
         self.map_widget.updated = True
 
-        self.upstream_queue.put_nowait(format_status(_('Finished searching for tiles to display.'), self))
+        self.upstream_queue.put_nowait(
+            format_status(_('Finished searching for tiles to display. Disk space used: {space} MB.').format(
+                space=format_decimal(Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
+            ), self))
+        self.search_complete = True
 
         if DEBUG:
             print(f'Time spent processing tiles: {datetime.now() - start}')
@@ -374,10 +408,14 @@ class TileManager(object):
         for tile in updated_tiles:
             gt_index, dt_index = tile[-1]
             if tile[0] < 0:
-                self.size_queue.put_nowait(-tile[2])
                 t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(abs(tile[0]))
                 try: t.polygon.delete()
                 except AttributeError: pass
+                try:
+                    # self.tile_list.pop(self.tile_list.index(abs(tile[0]))) # Fails if put by size reader
+                    self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
+                except IndexError:
+                    pass # self.read_size_queue() poped it already
                 if not self.great_tiles[gt_index].tiles[dt_index]:
                     t = self.great_tiles[gt_index].tiles.pop[dt_index]
                     try: t.polygon.delete()
@@ -387,7 +425,7 @@ class TileManager(object):
                         try: t.polygon.delete()
                         except AttributeError: pass
             else:
-                self.size_queue.put_nowait(os.path.getsize(tile[2]))
+                self.size_queue.put_nowait((TileAge(tile[0], os.path.getmtime(tile[2].with_suffix('.log'))), os.path.getsize(tile[2])))
                 try:
                     t = self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]]
                 except KeyError:
