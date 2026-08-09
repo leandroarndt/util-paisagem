@@ -1,7 +1,7 @@
 ﻿!include MUI2.nsh
 
 !define APP_NAME "Util Paisagem"
-!define APP_VERSION "0.4.1"
+!define APP_VERSION "0.4.3"
 !define APP_ICON "resources\images\utilpaisagem.ico"
 !define MUI_ICON "${APP_ICON}"
 !define MUI_UNICON "${APP_ICON}"
@@ -36,7 +36,7 @@ Section
 
     File /r dist\nsis\*.*
 
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" 0 SW_SHOWMINIMIZED
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\pythonw.exe" "run.py" "$INSTDIR\resources\images\utilpaisagem.ico"; 0 SW_SHOWMINIMIZED
     ; CreateDirectory "$SMPROGRAMS\${APP_NAME}"
     ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" 0 SW_SHOWMINIMIZED
     ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\Get the latest version.lnk" "https://github.com/leandroarndt/util-paisagem/releases/latest" "" "$INSTDIR\resources\images\utilpaisagem.ico"

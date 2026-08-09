@@ -47,6 +47,7 @@ if __name__ == '__main__':
     print('Copying resource files:')
     (dest / 'resources').mkdir()
     resources = [(data_files('resources/images', ['*.png',]))]
+    resources.append((data_files('resources/images', ['*.ico',])))
     for folder in Path('resources/locale').iterdir():
         if folder.is_dir():
             resources.append((data_files(f'resources/locale/{folder.name}/LC_MESSAGES', ['*.mo'])))

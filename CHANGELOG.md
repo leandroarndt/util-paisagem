@@ -24,6 +24,11 @@ time in background after closing the app in some situations.
 [Reported and corrected by Zakharov at the FlightGear
 Forum.](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440908#p440904)
 
+### 0.4.3
+
+- Corrects tile width calculations on some parts of the southern
+hemisphere.
+
 ## 0.3.0
 
 - Windows installer
