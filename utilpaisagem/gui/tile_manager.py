@@ -56,17 +56,22 @@ class ManagedTile(object):
 
     def draw(self, polygon:CanvasPolygon=None):
         if self.polygon is None or self.polygon.deleted:
-            self.polygon = self.map_widget.set_polygon(
-                [
-                    (self.coordinates.lat_top, self.coordinates.lon_left),
-                    (self.coordinates.lat_top, self.coordinates.lon_right),
-                    (self.coordinates.lat_bottom, self.coordinates.lon_right),
-                    (self.coordinates.lat_bottom, self.coordinates.lon_left)
-                ],
-                outline_color=self.state,
-                fill_color=None,
-                border_width=2,
-            )
+            try:
+                self.polygon = self.map_widget.set_polygon(
+                    [
+                        (self.coordinates.lat_top, self.coordinates.lon_left),
+                        (self.coordinates.lat_top, self.coordinates.lon_right),
+                        (self.coordinates.lat_bottom, self.coordinates.lon_right),
+                        (self.coordinates.lat_bottom, self.coordinates.lon_left)
+                    ],
+                    outline_color=self.state,
+                    fill_color=None,
+                    border_width=2,
+                )
+            except ValueError:
+                pass # tkintermapview/utility_functions.py", line 12:
+                     # ytile = (1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n
+                     # ValueError: [math.log] expected a positive input, got 0.0
         else:
             self.map_widget.canvas.itemconfigure(self.polygon.canvas_polygon, state=tk.NORMAL)
 
@@ -381,11 +386,13 @@ class TileManager(object):
                         self.great_tiles[gt_index].tiles[dt_index] = dt
                 if tile[0] not in self.great_tiles[gt_index].tiles[dt_index].tiles:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]] = t
-                if self.great_tiles[gt_index].polygon is None:
+                if self.great_tiles[gt_index].polygon is None and \
+                    self.detail_level == TileManager.DetailLevels.great_tile:
                     self.great_tiles[gt_index].draw()
-                if self.great_tiles[gt_index].tiles[dt_index].polygon is None:
+                elif self.great_tiles[gt_index].tiles[dt_index].polygon is None and \
+                    self.detail_level == TileManager.DetailLevels.degree_tile:
                     self.great_tiles[gt_index].tiles[dt_index].draw()
-                if self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None:
+                elif self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].draw()
                 else:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].state = tile[3]
