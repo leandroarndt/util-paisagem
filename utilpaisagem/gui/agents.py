@@ -1,8 +1,10 @@
 from pathlib import Path
 from threading import Thread
 from queue import Queue, ShutDown, Empty
+from decimal import Decimal
 import tkinter as tk
 import os
+from babel.numbers import format_decimal
 from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGCommunicationError, FGConnectionError
 from utilpaisagem.scenery.download_manager import DownloadManager
@@ -10,6 +12,7 @@ from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.scenery.common import DOWNLOAD_RES
 from utilpaisagem.gui.common import format_status, Settings
+from utilpaisagem.gui.tile_manager import TileManager
 
 class Downloader(object):
     """
@@ -178,6 +181,7 @@ class UpstreamReader(object):
     Reads the upstream queue and puts its content at the status bar.
     """
     upstream_queue:Queue
+    tile_manager:TileManager
     downloader:Downloader
     root:tk.Tk
     interval:int
@@ -189,11 +193,13 @@ class UpstreamReader(object):
         root:tk.Tk,
         status_var:tk.StringVar,
         upstream_queue:Queue,
+        tile_manager:TileManager,
         downloader:Downloader,
         interval:int=100,
     ):
         self.root = root
         self.upstream_queue = upstream_queue
+        self.tile_manager = tile_manager
         self.interval = interval
         self.downloader = downloader
         self.status_var = status_var
@@ -224,10 +230,13 @@ class UpstreamReader(object):
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
             self.status_var.set(format_status(
-                _('All {total} tiles have been processed.').format(
+                _('All {total} tiles have been processed. Used disk space: {space} MB.').format(
                     total=self.downloader.download_queue.qsize() + \
                         self.downloader.finished_downloads + \
-                        self.downloader.current_downloads
+                        self.downloader.current_downloads,
+                    space = format_decimal(
+                        Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'))
+                    ),
                 ),
                 self
             ))

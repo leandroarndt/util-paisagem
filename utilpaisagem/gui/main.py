@@ -421,6 +421,7 @@ class MainWindow(object):
             self.window,
             self.status_var,
             self.upstream_queue,
+            self.tile_manager,
             self.downloader,
             interval=100)
         self.upstream_reader.read()

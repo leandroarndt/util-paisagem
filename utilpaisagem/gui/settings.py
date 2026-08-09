@@ -74,7 +74,7 @@ class SettingsWindow(object):
     settings:Settings
     sizes:List
     distances:List
-    main_window:MainWindow # MainWindow object. Import cannot be done due to recurrence.
+    main_window:MainWindow
 
     # GUI
     window:tk.Toplevel
@@ -125,6 +125,8 @@ class SettingsWindow(object):
     renewal_age_var:tk.IntVar
     renewal_age_label:ttk.Label
     renewal_age_entry:ttk.Entry
+    disk_usage_frame:ttk.Labelframe
+    disk_space_label:ttk.Label
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -339,9 +341,24 @@ class SettingsWindow(object):
             text=_('Days until downloading new image for tile:'),
         )
         self.renewal_age_entry = ttk.Entry(self.tile_age_frame, textvariable=self.renewal_age_var)
+        self.disk_usage_frame = ttk.Labelframe(
+            self.tile_management_tab,
+            text=_('Disk usage'),
+            padding=PADDING,
+        )
+        self.disk_space_label = ttk.Label(
+            self.disk_usage_frame,
+            text=_('Disk space used: {space} MB').format(
+                space=format_decimal(
+                    Decimal(self.main_window.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'))
+                ),
+            ),
+        )
         self.tile_age_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.renewal_age_label.grid(column=0, row=0, sticky=tk.E)
         self.renewal_age_entry.grid(column=1, row=0, sticky=tk.W)
+        self.disk_usage_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
+        self.disk_space_label.grid(column=0, row=0, sticky=tk.W)
 
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
