@@ -77,6 +77,7 @@ class Settings(object):
         renewal_age:int = 365
         deletion_age:int = 90
         max_disk_usage:int = 5 GB
+        auto_clean:bool = True
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -98,6 +99,7 @@ class Settings(object):
     renewal_age:int = 365
     deletion_age:int = 90
     max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
+    auto_clean:bool = True
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -114,6 +116,7 @@ class Settings(object):
         'renewal_age': _Sections.TILE_MANAGEMENT.value,
         'deletion_age': _Sections.TILE_MANAGEMENT.value,
         'max_disk_usage': _Sections.TILE_MANAGEMENT.value,
+        'auto_clean': _Sections.TILE_MANAGEMENT.value,
     }
 
     def __getattribute__(self, name):

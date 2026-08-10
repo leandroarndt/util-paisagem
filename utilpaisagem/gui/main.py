@@ -143,8 +143,13 @@ class MainWindow(object):
         )
         self.file_menu.add_separator()
         self.file_menu.add_command(
+            label=_('Rescan downloaded tiles'),
+            command=self.scan_tiles,
+        )
+        self.file_menu.add_separator()
+        self.file_menu.add_command(
             label=_('Quit'),
-            command=lambda: self.window.destroy(),
+            command=self.close,
         )
         self.edit_menu = tk.Menu(self.menu)
         self.edit_menu.add_command(
@@ -403,8 +408,7 @@ class MainWindow(object):
             )
         self.download_manager.clear()
         self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
-        find_tiles = Thread(target=self.tile_manager.find_great_tiles)
-        find_tiles.start()
+        self.scan_tiles()
 
         # Init downloader
         self.downloader = Downloader(
@@ -455,6 +459,10 @@ class MainWindow(object):
         )
         if answer:
             Tile(self.index).delete_files(self.tile_manager.tile_queue)
+    
+    def scan_tiles(self):
+        find_tiles = Thread(target=self.tile_manager.find_great_tiles)
+        find_tiles.start()
 
     # Validation
     def validate_float(self, input:str):

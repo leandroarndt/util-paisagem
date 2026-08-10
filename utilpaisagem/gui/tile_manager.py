@@ -289,6 +289,7 @@ class TileManager(object):
     disk_usage:int
     tile_list:AgeList
     search_complete:bool
+    deleting_tiles:bool
     
     upstream_queue:Queue
     map_widget:MapWidget
@@ -307,6 +308,7 @@ class TileManager(object):
         self.disk_usage = 0
         self.tile_list = AgeList()
         self.search_complete = False
+        self.deleting_tiles = False
 
         self.map_widget.after(200, self.read_size_queue)
 
@@ -318,9 +320,16 @@ class TileManager(object):
             else:
                 self.tile_list.pop(self.tile_list.index(item[0]))
             self.disk_usage += item[1]
+        
+        if self.settings.auto_clean:
+            self.enforce_storage_limits()
 
+        self.map_widget.after(200, self.read_size_queue)
+    
+    def enforce_storage_limits(self):
         if self.search_complete:
             if self.disk_usage > self.settings.max_disk_usage:
+                self.deleting_tiles = True
                 self.upstream_queue.put_nowait(format_status(
                     'Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles.'.format(
                         space=format_decimal(Decimal(self.disk_usage).quantize(Decimal('1.00'))),
@@ -331,17 +340,41 @@ class TileManager(object):
             while self.disk_usage > self.settings.max_disk_usage:
                 t = Tile(self.tile_list.pop(0).index)
                 t.delete_files() # It already communicates with TileManager.tile_queue
-        
-        self.map_widget.after(200, self.read_size_queue)
+            self.deleting_tiles = False
 
     def find_great_tiles(self):
-        self.upstream_queue.put_nowait(format_status(_('Searching for tiles to display'), self))
         def find_degrees():
             nonlocal all_gts
             while all_gts:
                 gt = all_gts.pop(0)
                 gt.find_degree_tiles()
+        
+        print('aqui')
+        if self.deleting_tiles:
+            return # Tasks may not be concomitant
 
+        # Halts disk space management
+        self.search_complete = False
+
+        # Inform user
+        self.upstream_queue.put_nowait(format_status(_('Searching for tiles to display'), self))
+
+        # Reset tile management
+        gt_keys = list(self.great_tiles.keys())
+        for gt_key in gt_keys:
+            gt = self.great_tiles.pop(gt_key)
+            dt_keys = list(gt.tiles.keys())
+            for dt_key in dt_keys:
+                dt = gt.tiles.pop(dt_key)
+                tile_keys = list(dt.tiles.keys())
+                for tile_key in tile_keys:
+                    tile = dt.tiles.pop(tile_key)
+                    tile.hide()
+                dt.hide()
+            gt.hide()
+        self.disk_usage = 0
+
+        # Scan orthophotos folder
         if DEBUG:
             start = datetime.now()
             print(f'Starting benchmark at {start}...', flush=True)
