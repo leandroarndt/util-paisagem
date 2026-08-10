@@ -526,11 +526,11 @@ class TileManager(object):
 
     def update_active_tiles(self):
         canvas_limits = self.map_widget.get_canvas_coords()
-        if canvas_limits.lat_top - canvas_limits.lat_bottom > 30 or \
-            canvas_limits.lon_right - canvas_limits.lon_left > 30:
+        if canvas_limits.lat_top - canvas_limits.lat_bottom > self.settings.detail_degree or \
+            canvas_limits.lon_right - canvas_limits.lon_left > self.settings.detail_degree:
             self.detail_level = self.settings.detail_zero
-        elif canvas_limits.lat_top - canvas_limits.lat_bottom > 3 or \
-            canvas_limits.lon_right - canvas_limits.lon_left > 3:
+        elif canvas_limits.lat_top - canvas_limits.lat_bottom > self.settings.detail_tile or \
+            canvas_limits.lon_right - canvas_limits.lon_left > self.settings.detail_tile:
             self.detail_level = self.settings.detail_degree
         else:
             self.detail_level = self.settings.detail_tile

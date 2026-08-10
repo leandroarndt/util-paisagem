@@ -135,6 +135,14 @@ class SettingsWindow(object):
     auto_clean_var:tk.BooleanVar
     auto_clean_entry:ttk.Checkbutton
     disk_space_label:ttk.Label
+    interface_tab:ttk.Frame
+    detail_frame:ttk.LabelFrame
+    detail_degree_var:tk.IntVar
+    detail_degree_label:ttk.Label
+    detail_degree_entry:ttk.Spinbox
+    detail_tile_var:tk.IntVar
+    detail_tile_label:ttk.Label
+    detail_tile_entry:ttk.Spinbox
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -396,7 +404,42 @@ class SettingsWindow(object):
         self.disk_space_label.grid(column=0, row=2, sticky=tk.W)
         self.tile_age_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.disk_usage_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
-
+        # Interface
+        self.interface_tab = ttk.Frame(self.notebook, padding=PADDING)
+        self.interface_tab.columnconfigure(0, weight=10)
+        self.notebook.add(self.interface_tab, text=_('Interface'))
+        # Detail levels
+        self.detail_frame = ttk.LabelFrame(
+            self.interface_tab,
+            text=_('Detail levels'),
+        )
+        self.detail_degree_var = tk.IntVar(self.detail_frame, value=self.settings.detail_degree)
+        self.detail_degree_label = ttk.Label(
+            self.detail_frame,
+            text=_('Maximum latitude and longitude range for 1 degree tiles display:')
+        )
+        self.detail_degree_entry = ttk.Spinbox(
+            self.detail_frame,
+            textvariable=self.detail_degree_var,
+            from_=2,
+            to=180,
+        )
+        self.detail_tile_var = tk.IntVar(self.detail_frame, value=self.settings.detail_tile)
+        self.detail_tile_label = ttk.Label(
+            self.detail_frame,
+            text=_('Maximum latitude and longitude range for scenery tiles display:'),
+        )
+        self.detail_tile_entry = ttk.Spinbox(
+            self.detail_frame,
+            textvariable=self.detail_tile_var,
+            from_=1,
+            to=180,
+        )
+        self.detail_degree_label.grid(column=0, row=0, sticky=tk.E)
+        self.detail_degree_entry.grid(column=1, row=0, sticky=tk.W)
+        self.detail_tile_label.grid(column=0, row=1, sticky=tk.E)
+        self.detail_tile_entry.grid(column=1, row=1, sticky=tk.W)
+        self.detail_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
@@ -553,6 +596,20 @@ class SettingsWindow(object):
                 message=_('Invalid value in disk usage limit configuration. Please inform an integer value.')
             )
         self.settings.auto_clean = self.auto_clean_var.get()
+        try:
+            self.settings.detail_degree = int(self.detail_degree_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                title=_('Invalid value'),
+                message=_('Invalid value in degree tile visualization configuration. Please inform an integer value.')
+            )
+        try:
+            self.settings.detail_tile = int(self.detail_tile_var.get())
+        except tk.TclError:
+            tk.messagebox.showerror(
+                title=_('Invalid value'),
+                message=_('Invalid value in scenery tile visualization configuration. Please inform an integer value.')
+            )
     
     def apply_and_close(self):
         self.apply()
