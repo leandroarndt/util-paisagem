@@ -327,13 +327,25 @@ class TileManager(object):
         self.map_widget.after(200, self.read_size_queue)
     
     def enforce_storage_limits(self):
+        if not self.settings.auto_clean and self.disk_usage < self.settings.max_disk_usage:
+            self.upstream_queue.put_nowait(format_status(
+                _('Current disk usage ({space} MB) does not exceed limit ({limit} MB).').format(
+                    space=format_decimal(
+                        Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))
+                    ),
+                    limit=format_decimal(
+                        Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00'))
+                    ),
+                ),
+                self,
+            ))
         if self.search_complete:
             if self.disk_usage > self.settings.max_disk_usage:
                 self.deleting_tiles = True
                 self.upstream_queue.put_nowait(format_status(
-                    'Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles.'.format(
-                        space=format_decimal(Decimal(self.disk_usage).quantize(Decimal('1.00'))),
-                        limit=format_decimal(Decimal(self.settings.max_disk_usage).quantize(Decimal('1.00'))),
+                    _('Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles.').format(
+                        space=format_decimal(Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
+                        limit=format_decimal(Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
                     ),
                     self,
                 ))

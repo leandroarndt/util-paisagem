@@ -146,6 +146,10 @@ class MainWindow(object):
             label=_('Rescan downloaded tiles'),
             command=self.scan_tiles,
         )
+        self.file_menu.add_command(
+            label=_('Enforce disk usage limit'),
+            command=lambda: self.tile_manager.enforce_storage_limits(),
+        )
         self.file_menu.add_separator()
         self.file_menu.add_command(
             label=_('Quit'),
