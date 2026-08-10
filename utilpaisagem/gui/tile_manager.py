@@ -197,7 +197,10 @@ class DegreeTile(ManagedTile):
                         upstream_queue=self.upstream_queue,
                         size_queue=self.size_queue,
                     )
-                self.size_queue.put_nowait((TileAge(int(item.stem), os.path.getmtime(item.with_suffix('.log'))), os.path.getsize(item)))
+                try:
+                    self.size_queue.put_nowait((TileAge(int(item.stem), os.path.getmtime(item.with_suffix('.log'))), os.path.getsize(item)))
+                except FileNotFoundError:
+                    self.size_queue.put_nowait((TileAge(int(item.stem), 0)))
 
 class GreatTile(ManagedTile):
     tiles:List[DegreeTile]
