@@ -7,3 +7,4 @@ LatLon23
 pyshortcuts
 pyperclip
 show-in-file-manager
+github3.py

@@ -2,14 +2,10 @@
 
 ## 0.5.0rc2
 
-**TODO:**
-
-- Interface settings: detail level
-- Updater
-
-**DONE:**
-- Manually rescan tiles
-- Manual clean
+- Manually rescan tiles ("File" menu).
+- Implemented manual disk limit enforcement.
+- Implemented interface settings (map detail level).
+- Automatically searchs for upgrades at startup.
 
 ## 0.5.0rc1
 
