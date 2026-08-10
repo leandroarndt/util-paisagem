@@ -49,6 +49,7 @@ class _Sections(Enum):
     RANGE = 'RANGE'
     CONNECTION = 'CONNECTION'
     TILE_MANAGEMENT = 'TILE_MANAGEMENT'
+    INTERFACE = 'INTERFACE'
 
 class Settings(object):
     """
@@ -100,6 +101,9 @@ class Settings(object):
     deletion_age:int = 90
     max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
     auto_clean:bool = True
+    detail_degree = 30
+    detail_tile = 3
+    detail_zero = 0
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -117,6 +121,8 @@ class Settings(object):
         'deletion_age': _Sections.TILE_MANAGEMENT.value,
         'max_disk_usage': _Sections.TILE_MANAGEMENT.value,
         'auto_clean': _Sections.TILE_MANAGEMENT.value,
+        'detail_degree': _Sections.INTERFACE.value,
+        'detail_tile': _Sections.INTERFACE.value,
     }
 
     def __getattribute__(self, name):
@@ -143,6 +149,10 @@ class Settings(object):
             super().__delattr__(name)
     
     def __init__(self):
+        # Static values
+        self.detail_zero = 0
+
+        # Everything else
         self.__class__._file = Path(appdirs.user_config_dir(appname='utilpaisagem')) / 'utilpaisagem.ini'
         if not hasattr(self.__class__, '_settings'):
             create = not self.__class__._file.exists()
