@@ -1,5 +1,16 @@
 # Útil paisagem changelog
 
+## 0.5.0rc2
+
+**TODO:**
+
+- Interface settings: detail level
+- Updater
+
+**DONE:**
+- Manually rescan tiles
+- Manual clean
+
 ## 0.5.0rc1
 
 - Renews tiles (new image download) after configurable amount of time.
