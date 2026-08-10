@@ -24,6 +24,7 @@ from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
 from utilpaisagem.gui.tile_manager import TileManager, TileColors
+from utilpaisagem.gui.upgrader import Upgrader
 
 class MainWindow(object):
     """
@@ -435,6 +436,10 @@ class MainWindow(object):
         self.upstream_reader.read()
 
         self.window.deiconify()
+
+        upgrader = Upgrader()
+        upgrade_thread = Thread(target=upgrader.run)
+        upgrade_thread.start()
 
     # Menu commands
 
