@@ -132,6 +132,8 @@ class SettingsWindow(object):
     disk_space_limit_var:tk.IntVar
     disk_space_limit_label:ttk.Label
     disk_space_limit_input:ttk.Entry
+    auto_clean_var:tk.BooleanVar
+    auto_clean_entry:ttk.Checkbutton
     disk_space_label:ttk.Label
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
@@ -374,6 +376,12 @@ class SettingsWindow(object):
             text=_('Maximum disk usage in megabytes:'),
         )
         self.disk_space_limit_input = ttk.Entry(self.disk_usage_frame, textvariable=self.disk_space_limit_var)
+        self.auto_clean_var = tk.BooleanVar(self.disk_usage_frame, self.settings.auto_clean)
+        self.auto_clean_entry = ttk.Checkbutton(
+            self.disk_usage_frame,
+            text=_('Automatically enforce disk usage limit'),
+            variable=self.auto_clean_var,
+        )
         self.disk_space_label = ttk.Label(
             self.disk_usage_frame,
             text=_('Disk space used: {space} MB').format(
@@ -384,7 +392,8 @@ class SettingsWindow(object):
         )
         self.disk_space_limit_label.grid(column=0, row=0, sticky=tk.E)
         self.disk_space_limit_input.grid(column=1, row=0, sticky=tk.W)
-        self.disk_space_label.grid(column=0, row=1, sticky=tk.W)
+        self.auto_clean_entry.grid(column=0, row=1, sticky=tk.W)
+        self.disk_space_label.grid(column=0, row=2, sticky=tk.W)
         self.tile_age_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.disk_usage_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
 
@@ -530,19 +539,20 @@ class SettingsWindow(object):
             )
             return
         try:
-            self.settings.deletion_age =int(self.deletion_age_var.get())
+            self.settings.deletion_age = int(self.deletion_age_var.get())
         except tk.TclError:
             tk.messagebox.showerror(
                 title=_('Invalid value'),
                 message=_('Invalid value in tile deletion age configuration. Please inform an integer value.')
             )
         try:
-            self.settings.max_disk_usage =int(self.disk_space_limit_var.get() * 1024 ** 2)
+            self.settings.max_disk_usage = int(self.disk_space_limit_var.get() * 1024 ** 2)
         except tk.TclError:
             tk.messagebox.showerror(
                 title=_('Invalid value'),
                 message=_('Invalid value in disk usage limit configuration. Please inform an integer value.')
             )
+        self.settings.auto_clean = self.auto_clean_var.get()
     
     def apply_and_close(self):
         self.apply()
