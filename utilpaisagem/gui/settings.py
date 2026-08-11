@@ -125,7 +125,7 @@ class SettingsWindow(object):
     renewal_age_var:tk.IntVar
     renewal_age_label:ttk.Label
     renewal_age_entry:ttk.Entry
-    deletion_age_var:tkIntVar
+    deletion_age_var:tk.IntVar
     deletion_age_label:ttk.Label
     deletion_age_input:ttk.Entry
     disk_usage_frame:ttk.Labelframe
