@@ -513,10 +513,10 @@ class TileManager(object):
                 except AttributeError: pass
                 if gt_index in self.great_tiles:
                     if dt_index in self.great_tiles[gt_index].tiles:
-                        if not self.great_tiles[gt_index].tiles[dt_index]:
+                        if not self.great_tiles[gt_index].tiles[dt_index].tiles:
                             t = self.great_tiles[gt_index].tiles.pop(dt_index)
                             t.hide()
-                    if not self.great_tiles[gt_index]:
+                    if not self.great_tiles[gt_index].tiles:
                         t = self.great_tiles.pop(gt_index)
                         t.hide()
                 # if not self.great_tiles[gt_index].tiles[dt_index]:
