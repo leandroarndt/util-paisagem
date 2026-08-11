@@ -9,7 +9,11 @@
             "name": "Python Debugger: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "utilpaisagem"
+            "module": "utilpaisagem",
+            "env": {
+                "DEBUG": "true",
+            },
+            "justMyCode": false,
         }
     ]
 }

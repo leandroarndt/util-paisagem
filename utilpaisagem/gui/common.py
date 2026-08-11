@@ -30,6 +30,16 @@ def format_status(text:str, obj) -> str:
 
 QUIT = Event()
 
+# Map tiles
+
+class TileColors:
+        great_tile = 'hotpink4'
+        degree_tile = 'hotpink2'
+        good = 'green2'
+        failed = 'yellow2'
+        old = 'slategray3'
+        selected = 'darkturquoise'
+
 # Preferences
 
 class _Sections(Enum):
@@ -38,6 +48,8 @@ class _Sections(Enum):
     DOWNLOAD = 'DOWNLOAD'
     RANGE = 'RANGE'
     CONNECTION = 'CONNECTION'
+    TILE_MANAGEMENT = 'TILE_MANAGEMENT'
+    INTERFACE = 'INTERFACE'
 
 class Settings(object):
     """
@@ -63,6 +75,10 @@ class Settings(object):
         host:str = 'localhost'
         port:int = 5000
         following_interval:int = 10000
+        renewal_age:int = 365
+        deletion_age:int = 90
+        max_disk_usage:int = 5 GB
+        auto_clean:bool = True
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -81,6 +97,13 @@ class Settings(object):
     host:str = 'localhost'
     port:int = 5000
     following_interval:int = 10000
+    renewal_age:int = 365
+    deletion_age:int = 90
+    max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
+    auto_clean:bool = True
+    detail_degree = 30
+    detail_tile = 3
+    detail_zero = 0
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -94,6 +117,12 @@ class Settings(object):
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
         'following_interval': _Sections.CONNECTION.value,
+        'renewal_age': _Sections.TILE_MANAGEMENT.value,
+        'deletion_age': _Sections.TILE_MANAGEMENT.value,
+        'max_disk_usage': _Sections.TILE_MANAGEMENT.value,
+        'auto_clean': _Sections.TILE_MANAGEMENT.value,
+        'detail_degree': _Sections.INTERFACE.value,
+        'detail_tile': _Sections.INTERFACE.value,
     }
 
     def __getattribute__(self, name):
@@ -120,6 +149,10 @@ class Settings(object):
             super().__delattr__(name)
     
     def __init__(self):
+        # Static values
+        self.detail_zero = 0
+
+        # Everything else
         self.__class__._file = Path(appdirs.user_config_dir(appname='utilpaisagem')) / 'utilpaisagem.ini'
         if not hasattr(self.__class__, '_settings'):
             create = not self.__class__._file.exists()

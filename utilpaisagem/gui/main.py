@@ -1,6 +1,7 @@
 import webbrowser
 import tkinter as tk
 import pyperclip
+from threading import Thread
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from pathlib import Path
@@ -10,17 +11,20 @@ from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
 from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
 from PIL import Image, ImageTk
-from tkintermapview import TkinterMapView
+from utilpaisagem.gui.map_widget import MapWidget
 from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
 from showinfm import show_in_file_manager
 from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path
+from utilpaisagem.scenery.common import METER_SIZE
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
 from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
+from utilpaisagem.gui.tile_manager import TileManager, TileColors
+from utilpaisagem.gui.upgrader import Upgrader
 
 class MainWindow(object):
     """
@@ -31,6 +35,7 @@ class MainWindow(object):
     connection:TelnetConnection
     downloader:Downloader
     settings:Settings
+    tile_manager:TileManager
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -55,7 +60,7 @@ class MainWindow(object):
     search_input:ttk.Entry
     search_button:ttk.Button
     map_frame:ttk.Frame
-    map_widget:TkinterMapView
+    map_widget:MapWidget
     tile_polygon:CanvasPolygon
     waypoints:list[CanvasPositionMarker]
     marker:CanvasPositionMarker
@@ -139,8 +144,17 @@ class MainWindow(object):
         )
         self.file_menu.add_separator()
         self.file_menu.add_command(
+            label=_('Rescan downloaded tiles'),
+            command=self.scan_tiles,
+        )
+        self.file_menu.add_command(
+            label=_('Enforce disk usage limit'),
+            command=lambda: self.tile_manager.enforce_storage_limits(),
+        )
+        self.file_menu.add_separator()
+        self.file_menu.add_command(
             label=_('Quit'),
-            command=lambda: self.window.destroy(),
+            command=self.close,
         )
         self.edit_menu = tk.Menu(self.menu)
         self.edit_menu.add_command(
@@ -217,7 +231,7 @@ class MainWindow(object):
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.search_button.grid(column=2, row=0)
         # TODO resize map properly, store window size and map coordinates
-        self.map_widget = TkinterMapView(self.map_frame, width=800, height=600)
+        self.map_widget = MapWidget(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
         self.map_widget.add_right_click_menu_command(
@@ -398,9 +412,17 @@ class MainWindow(object):
             upstream_queue=self.upstream_queue,
             )
         self.download_manager.clear()
+        self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
+        self.scan_tiles()
 
         # Init downloader
-        self.downloader = Downloader(self.window, self.upstream_queue, self.download_manager, 100)
+        self.downloader = Downloader(
+            self.window,
+            upstream_queue=self.upstream_queue,
+            tile_manager_queue=self.tile_manager.tile_queue,
+            download_manager=self.download_manager,
+            interval=100,
+        )
         self.downloader.download()
 
         # Init upstream reader
@@ -408,11 +430,16 @@ class MainWindow(object):
             self.window,
             self.status_var,
             self.upstream_queue,
+            self.tile_manager,
             self.downloader,
             interval=100)
         self.upstream_reader.read()
 
         self.window.deiconify()
+
+        upgrader = Upgrader()
+        upgrade_thread = Thread(target=upgrader.run)
+        upgrade_thread.start()
 
     # Menu commands
 
@@ -440,7 +467,11 @@ class MainWindow(object):
             message=_('Are you sure you want to delete tile {index}?').format(index=self.index)
         )
         if answer:
-            Tile(self.index).delete_files()
+            Tile(self.index).delete_files(self.tile_manager.tile_queue)
+    
+    def scan_tiles(self):
+        find_tiles = Thread(target=self.tile_manager.find_great_tiles)
+        find_tiles.start()
 
     # Validation
     def validate_float(self, input:str):
@@ -522,6 +553,8 @@ class MainWindow(object):
                 (coordinates.lat_bottom, coordinates.lon_left)
             ],
             fill_color=None,
+            outline_color=TileColors.selected,
+            border_width=5
         )
         if fit_map:
             self.map_widget.fit_bounding_box(
@@ -707,7 +740,7 @@ class MainWindow(object):
     def download_route(self):
         distances = list(self.settings.distances.keys())
         distances.sort()
-        step = distances[0]
+        step = METER_SIZE / 1000 # distances[0]
         route = self.waypoints.copy()
         route.reverse() # DownloadManager puts last center first
         for i, wp in enumerate(route[:-1]):

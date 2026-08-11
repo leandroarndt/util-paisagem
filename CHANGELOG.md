@@ -1,10 +1,18 @@
 # Útil paisagem changelog
 
+## 0.5.0
+
+- Renews tiles (new image download) after configurable amount of time.
+- Provides tile visualizaton, including their state: good, downloaded after error management,
+or needing renewal.
+- Limits disk usage based on user preferences.
+- Automatically searchs for upgrades at startup.
+
 ## 0.4.0
 
 - Added image file format to the settings.
 - Added threading to tile download and the corresponding setting
-to the GUI
+to the GUI.
 - Empties waypoint name on deletion.
 - Moved download resolution to the "download" tab in settings.
 - Fixed issue #6 about Windows installations (with embedable Python)
