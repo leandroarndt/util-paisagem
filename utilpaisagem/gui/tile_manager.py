@@ -519,14 +519,6 @@ class TileManager(object):
                     if not self.great_tiles[gt_index].tiles:
                         t = self.great_tiles.pop(gt_index)
                         t.hide()
-                # if not self.great_tiles[gt_index].tiles[dt_index]:
-                #     t = self.great_tiles[gt_index].tiles.pop(dt_index)
-                #     try: t.polygon.delete()
-                #     except AttributeError: pass
-                #     if not self.great_tiles[gt_index]:
-                #         t = self.great_tiles.pop(gt_index)
-                #         try: t.polygon.delete()
-                #         except AttributeError: pass
             else:
                 self.size_queue.put_nowait((TileAge(tile[0], os.path.getmtime(tile[2].with_suffix('.log'))), os.path.getsize(tile[2])))
                 try:
