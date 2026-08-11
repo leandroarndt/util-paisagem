@@ -143,6 +143,26 @@ class DegreeTile(ManagedTile):
             lon_dir = 'w'
         return f'{lon_dir}{abs(math.floor(coordinates.lon_left)):03}' + \
             f'{lat_dir}{abs(math.floor(coordinates.lat_bottom)):02}'
+    
+    @staticmethod
+    def index_to_coordinates(index:str) -> Coordinates:
+        if 'w' in index:
+            x_sign = -1
+        else:
+            x_sign = 1
+        index = index.strip('we')
+        if 'n' in index:
+            y_sign = 1
+            bottom, left = index.split('n')
+        else:
+            y_sign = -1
+            bottom, left = index.split('s')
+        return Coordinates(
+            lat1=y_sign * int(bottom) + 1,
+            lon1=x_sign * int(left) + 1,
+            lat2=y_sign * int(bottom),
+            lon2=x_sign * int(left),
+        )
 
     def __init__(self, coordinates:Coordinates, map_widget:MapWidget, path:Path, *args, **kwargs):
         super().__init__(
@@ -240,6 +260,26 @@ class GreatTile(ManagedTile):
             lon_dir = 'w'
         return f'{lon_dir}{abs(math.floor(coordinates.lon_left/10)) * 10:03}' + \
             f'{lat_dir}{abs(math.floor(coordinates.lat_bottom / 10) * 10):02}'
+    
+    @staticmethod
+    def index_to_coordinates(index:str) -> Coordinates:
+        if 'w' in index:
+            x_sign = -1
+        else:
+            x_sign = 1
+        index = index.strip('we')
+        if 'n' in index:
+            y_sign = 1
+            left, bottom = index.split('n')
+        else:
+            y_sign = -1
+            left, bottom = index.split('s')
+        return Coordinates(
+            lat1=y_sign * int(bottom) + 10,
+            lon1=x_sign * int(left) + 10,
+            lat2=y_sign * int(bottom),
+            lon2=x_sign * int(left),
+        )
 
     def find_degree_tiles(self):
         self.tiles = {}
@@ -316,7 +356,10 @@ class TileManager(object):
             if isinstance(item[0], TileAge):
                 self.tile_list.put(item[0])
             else:
-                self.tile_list.pop(self.tile_list.index(item[0]))
+                try:
+                    self.tile_list.pop(self.tile_list.index(item[0]))
+                except ValueError:
+                    pass # already poped from tile_list
             self.disk_usage += item[1]
         
         if self.settings.auto_clean:
@@ -451,22 +494,39 @@ class TileManager(object):
         for tile in updated_tiles:
             gt_index, dt_index = tile[-1]
             if tile[0] < 0:
-                t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(abs(tile[0]))
-                try: t.polygon.delete()
-                except AttributeError: pass
                 try:
                     # self.tile_list.pop(self.tile_list.index(abs(tile[0]))) # Fails if put by size reader
                     self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
                 except IndexError:
                     pass # self.read_size_queue() poped it already
-                if not self.great_tiles[gt_index].tiles[dt_index]:
-                    t = self.great_tiles[gt_index].tiles.pop(dt_index)
-                    try: t.polygon.delete()
-                    except AttributeError: pass
+                try:
+                    t = self.great_tiles[gt_index].tiles[dt_index].tiles.pop(abs(tile[0]))
+                except KeyError:
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Could not delete tile {index}: not found.').format(
+                            index=abs(tile[0]),
+                        ),
+                        self,
+                    ))
+                    continue
+                try: t.polygon.delete()
+                except AttributeError: pass
+                if gt_index in self.great_tiles:
+                    if dt_index in self.great_tiles[gt_index].tiles:
+                        if not self.great_tiles[gt_index].tiles[dt_index]:
+                            t = self.great_tiles[gt_index].tiles.pop(dt_index)
+                            t.hide()
                     if not self.great_tiles[gt_index]:
                         t = self.great_tiles.pop(gt_index)
-                        try: t.polygon.delete()
-                        except AttributeError: pass
+                        t.hide()
+                # if not self.great_tiles[gt_index].tiles[dt_index]:
+                #     t = self.great_tiles[gt_index].tiles.pop(dt_index)
+                #     try: t.polygon.delete()
+                #     except AttributeError: pass
+                #     if not self.great_tiles[gt_index]:
+                #         t = self.great_tiles.pop(gt_index)
+                #         try: t.polygon.delete()
+                #         except AttributeError: pass
             else:
                 self.size_queue.put_nowait((TileAge(tile[0], os.path.getmtime(tile[2].with_suffix('.log'))), os.path.getsize(tile[2])))
                 try:
@@ -482,7 +542,7 @@ class TileManager(object):
                     )
                     if gt_index not in self.great_tiles:
                         gt = GreatTile(
-                            coordinates=tile[1],
+                            coordinates=GreatTile.index_to_coordinates(gt_index),
                             map_widget=self.map_widget,
                             upstream_queue=self.upstream_queue,
                             size_queue=self.size_queue,
@@ -490,7 +550,7 @@ class TileManager(object):
                         self.great_tiles[gt_index] = gt
                     if dt_index not in self.great_tiles[gt_index].tiles:
                         dt = DegreeTile(
-                            coordinates=tile[1],
+                            coordinates=DegreeTile.index_to_coordinates(dt_index),
                             map_widget=self.map_widget,
                             path=tile[2].parent,
                             upstream_queue=self.upstream_queue,
