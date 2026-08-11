@@ -1,7 +1,7 @@
 ﻿!include MUI2.nsh
 
 !define APP_NAME "Util Paisagem"
-!define APP_VERSION "0.5.0rc1"
+!define APP_VERSION "0.5.0rc2"
 !define APP_ICON "resources\images\utilpaisagem.ico"
 !define MUI_ICON "${APP_ICON}"
 !define MUI_UNICON "${APP_ICON}"
