@@ -1,18 +1,12 @@
 # Útil paisagem changelog
 
-## 0.5.0rc2
-
-- Manually rescan tiles ("File" menu).
-- Implemented manual disk limit enforcement.
-- Implemented interface settings (map detail level).
-- Automatically searchs for upgrades at startup.
-
-## 0.5.0rc1
+## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.
 - Provides tile visualizaton, including their state: good, downloaded after error management,
 or needing renewal.
 - Limits disk usage based on user preferences.
+- Automatically searchs for upgrades at startup.
 
 ## 0.4.0
 
