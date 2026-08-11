@@ -153,10 +153,10 @@ class DegreeTile(ManagedTile):
         index = index.strip('we')
         if 'n' in index:
             y_sign = 1
-            bottom, left = index.split('n')
+            left, bottom = index.split('n')
         else:
             y_sign = -1
-            bottom, left = index.split('s')
+            left, bottom = index.split('s')
         return Coordinates(
             lat1=y_sign * int(bottom) + 1,
             lon1=x_sign * int(left) + 1,
