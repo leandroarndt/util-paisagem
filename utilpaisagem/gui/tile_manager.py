@@ -200,7 +200,7 @@ class DegreeTile(ManagedTile):
                 try:
                     self.size_queue.put_nowait((TileAge(int(item.stem), os.path.getmtime(item.with_suffix('.log'))), os.path.getsize(item)))
                 except FileNotFoundError:
-                    self.size_queue.put_nowait((TileAge(int(item.stem), 0)))
+                    self.size_queue.put_nowait((TileAge(int(item.stem), 0), os.path.getsize(item)))
 
 class GreatTile(ManagedTile):
     tiles:List[DegreeTile]
@@ -460,7 +460,7 @@ class TileManager(object):
                 except IndexError:
                     pass # self.read_size_queue() poped it already
                 if not self.great_tiles[gt_index].tiles[dt_index]:
-                    t = self.great_tiles[gt_index].tiles.pop[dt_index]
+                    t = self.great_tiles[gt_index].tiles.pop(dt_index)
                     try: t.polygon.delete()
                     except AttributeError: pass
                     if not self.great_tiles[gt_index]:
