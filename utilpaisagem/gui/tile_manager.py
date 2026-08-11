@@ -435,20 +435,26 @@ class TileManager(object):
         for item in Path(self.settings.orthophotos_folder).iterdir():
             if item.is_dir():
                 if dir_has_contents(item):
-                    lat_bottom = -int(item.name[5:]) if item.name[4] == 's' else int(item.name[5:])
-                    lon_left = -int(item.name[1:4]) if item.name[0] == 'w' else int(item.name[1:4])
-                    gt = GreatTile(
-                        coordinates=Coordinates(
-                            lat1=lat_bottom,
-                            lon1=lon_left,
-                            lat2=lat_bottom+10,
-                            lon2=lon_left+10
-                        ),
-                        map_widget=self.map_widget,
-                        upstream_queue=self.upstream_queue,
-                        size_queue=self.size_queue,
-                    )
-                    self.great_tiles[gt.index] = gt
+                    for subitem in item.iterdir():
+                        if not dir_has_contents(subitem):
+                            os.rmdir(subitem)
+                    if dir_has_contents(item):
+                        lat_bottom = -int(item.name[5:]) if item.name[4] == 's' else int(item.name[5:])
+                        lon_left = -int(item.name[1:4]) if item.name[0] == 'w' else int(item.name[1:4])
+                        gt = GreatTile(
+                            coordinates=Coordinates(
+                                lat1=lat_bottom,
+                                lon1=lon_left,
+                                lat2=lat_bottom+10,
+                                lon2=lon_left+10
+                            ),
+                            map_widget=self.map_widget,
+                            upstream_queue=self.upstream_queue,
+                            size_queue=self.size_queue,
+                        )
+                        self.great_tiles[gt.index] = gt
+                    else:
+                        os.rmdir(item)
                 else:
                     os.rmdir(item) # Removes empty folder
 
