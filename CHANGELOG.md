@@ -6,7 +6,7 @@
 - Provides tile visualizaton, including their state: good, downloaded after error management,
 or needing renewal.
 - Limits disk usage based on user preferences.
-- Automatically searchs for upgrades at startup.
+- Automatically searches for upgrades at startup.
 
 ### 0.5.1
 
