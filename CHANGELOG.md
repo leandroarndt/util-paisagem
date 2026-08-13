@@ -1,5 +1,18 @@
 # Útil paisagem changelog
 
+## 0.6.0
+
+**TODO:**
+
+- New image providers
+- Non-blocking aircraft position retrieval
+- Use LatLon23 to create regions
+  - Also, a tile should not be added if another with greater resolution is queued
+- Use scenery folder on the settings window instead of "Orthophotos"
+- Delete region
+
+**DONE:**
+
 ## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.
