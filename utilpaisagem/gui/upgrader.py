@@ -116,7 +116,7 @@ class Upgrader(object):
             if Tag(r.tag_name) > newest_tag:
                 newest_tag = Tag(r.tag_name)
                 self.newest = r
-        if self.current > newest_tag:
+        if self.current >= newest_tag:
             print('Newest version already installed.')
         else:
             print(f'Found new version {newest_tag}.')

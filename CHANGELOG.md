@@ -8,6 +8,10 @@ or needing renewal.
 - Limits disk usage based on user preferences.
 - Automatically searchs for upgrades at startup.
 
+### 0.5.1
+
+- Fixed new version message when using the latest available one.
+
 ## 0.4.0
 
 - Added image file format to the settings.
