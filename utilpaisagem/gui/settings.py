@@ -9,6 +9,7 @@ from tkinter import filedialog
 from babel.numbers import format_decimal
 from utilpaisagem.gui.common import Settings, PADDING, LOCALE
 from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
+from utilpaisagem.scenery.image_service import IMAGE_SERVICES
 
 if TYPE_CHECKING:
     from utilpaisagem.gui.main import MainWindow
@@ -100,6 +101,15 @@ class SettingsWindow(object):
     interval_label:ttk.Label
     interval_input:ttk.Entry
     interval_seconds_label:ttk.Label
+    download_tab:ttk.Frame
+    image_service_frame:ttk.LabelFrame
+    image_service_var:tk.StringVar
+    image_service_label:ttk.Label
+    image_service_entry:ttk.Combobox
+    image_service_full_name_var:tk.StringVar
+    image_service_full_name_label:ttk.Label
+    image_service_license_var:t.StringVar
+    image_service_license_label:ttk.Label
     download_frame:ttk.LabelFrame
     radius_var:tk.IntVar
     radius_label:ttk.Label
@@ -250,9 +260,55 @@ class SettingsWindow(object):
         self.download_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.download_tab.columnconfigure(0, weight=10)
         self.notebook.add(self.download_tab, text=_('Download'))
+        # Image services
+        self.image_service_frame = ttk.LabelFrame(
+            self.download_tab,
+            text=_('Image service')
+        )
+        self.image_service_frame.columnconfigure(0, weight=0)
+        self.image_service_frame.columnconfigure(1, weight=10)
+        self.image_service_var = tk.StringVar(
+            self.image_service_frame,
+            value=self.settings.image_service
+        )
+        self.image_service_var.trace('w', self.change_image_service)
+        self.image_service_label = ttk.Label(
+            self.image_service_frame,
+            text=_('Image service:')
+        )
+        self.image_service_entry = ttk.Combobox(
+            self.image_service_frame,
+            values=list(IMAGE_SERVICES.keys()),
+            textvariable=self.image_service_var,
+        )
+        self.image_service_description_var = tk.StringVar(
+            self.image_service_frame,
+            value=IMAGE_SERVICES[self.settings.image_service].description,
+        )
+        self.image_service_description_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_description_var,
+        )
+        self.image_service_license_var = tk.StringVar(
+            self.image_service_frame,
+            value=_('Image service license at {link}').format(
+                link=IMAGE_SERVICES[self.settings.image_service].license_link
+            ),
+        )
+        self.image_service_license_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_license_var,
+        )
+        self.image_service_label.grid(column=0, row=0, sticky=tk.E)
+        self.image_service_entry.grid(column=1, row=0, sticky=tk.W)
+        self.image_service_description_label.grid(column=0, row=1, columnspan=2, sticky=tk.W)
+        self.image_service_license_label.grid(column=0, row=2, columnspan=2, sticky=tk.W)
         # Threading and download range
-        self.download_frame = ttk.LabelFrame(self.download_tab, text=_('Download'), padding=PADDING)
-        self.download_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.download_frame = ttk.LabelFrame(
+            self.download_tab,
+            text=_('Download'),
+            padding=PADDING
+        )
         self.radius_var = tk.IntVar(self.download_frame, value=self.settings.radius)
         self.radius_label = ttk.Label(
             self.download_frame,
@@ -320,6 +376,8 @@ class SettingsWindow(object):
         self.tiles_input.grid(column=1, row=3, sticky=tk.W+tk.E)
         self.threads_label.grid(column=0, row=4, sticky=tk.E)
         self.threads_input.grid(column=1, row=4, sticky=tk.W+tk.E)
+        self.image_service_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.download_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Image tab
         self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.image_tab.rowconfigure(0, weight=10)
@@ -502,6 +560,12 @@ class SettingsWindow(object):
                 path = path.rename(path.parent / 'Orthophotos')
             self.orthophotos_var.set(path)
 
+    def change_image_service(self, *args, **kwargs):
+        self.image_service_description_var.set(IMAGE_SERVICES[self.image_service_var.get()].description)
+        self.image_service_license_var.set(_('Image service license at {link}').format(
+            link=IMAGE_SERVICES[self.image_service_var.get()].license_link,
+        ))
+
     def cancel(self):
         self.settings.reload()
         self.window.destroy()
@@ -526,6 +590,7 @@ class SettingsWindow(object):
                     message=_('Invalid value in following interval configuration. Please inform an integer value.'),
             )
             return
+        self.settings.image_service = self.image_service_var.get()
         try:
             self.settings.radius = int(self.radius_var.get())
         except tk.TclError:
