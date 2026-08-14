@@ -25,6 +25,7 @@ from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCA
 from utilpaisagem.gui.settings import SettingsWindow
 from utilpaisagem.gui.tile_manager import TileManager, TileColors
 from utilpaisagem.gui.upgrader import Upgrader
+from utilpaisagem.airports.aptdat import FGAirports
 
 class MainWindow(object):
     """
@@ -36,6 +37,7 @@ class MainWindow(object):
     downloader:Downloader
     settings:Settings
     tile_manager:TileManager
+    fg_airports:FGAirports
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -230,7 +232,7 @@ class MainWindow(object):
         self.search_label.grid(column=0, row=0)
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.search_button.grid(column=2, row=0)
-        # TODO resize map properly, store window size and map coordinates
+        # TODO store window size and map coordinates
         self.map_widget = MapWidget(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
@@ -414,6 +416,23 @@ class MainWindow(object):
         self.download_manager.clear()
         self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
         self.scan_tiles()
+
+        self.fg_airports = None
+        def open_aptdat():
+            nonlocal self
+            path = Path(self.settings.fgdata_folder) / 'Airports' / 'apt.dat.gz'
+            if not path.exists():
+                path = Path(self.settings.fgdata_folder) / 'fgdata_2024_1' / 'Airports' / 'apt.dat.gz'
+                if path.exists():
+                    self.settings.fgdata_folder = Path(self.settings.fgdata_folder) / 'fgdata_2024_1'
+                    self.settings.save()
+            self.fg_airports = FGAirports(path)
+            self.upstream_queue.put_nowait(format_status(
+                _('FlightGear airports have been loaded.'),
+                self,
+            ))
+        load_airports = Thread(target=open_aptdat)
+        load_airports.start()
 
         # Init downloader
         self.downloader = Downloader(
@@ -656,7 +675,20 @@ class MainWindow(object):
         self.waypoint_name_var.set('')
 
     def search(self, *args, **kwargs):
-        marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
+        airport = None
+        if self.fg_airports is not None:
+            if len(self.search_var.get()) == 4:
+                airport = self.fg_airports.search_by_id(self.search_var.get())
+            else:
+                airport = self.fg_airports.search_by_name(self.search_var.get())
+        if airport is not None:
+            marker = self.map_widget.set_marker(
+                deg_x=airport.latitude, # Don't ask me
+                deg_y=airport.longitude,
+                text=self.search_var.get(),
+            )
+        else:
+            marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
         if isinstance(marker, CanvasPositionMarker):
             self.lat, self.lon = marker.position
             self.lat_var.set(str(self.lat))
