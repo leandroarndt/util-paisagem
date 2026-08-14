@@ -426,11 +426,18 @@ class MainWindow(object):
                 if path.exists():
                     self.settings.fgdata_folder = Path(self.settings.fgdata_folder) / 'fgdata_2024_1'
                     self.settings.save()
-            self.fg_airports = FGAirports(path)
-            self.upstream_queue.put_nowait(format_status(
-                _('FlightGear airports have been loaded.'),
-                self,
-            ))
+            try:
+                self.fg_airports = FGAirports(path)
+                self.upstream_queue.put_nowait(format_status(
+                    _('FlightGear airports have been loaded.'),
+                    self,
+                ))
+            except FileNotFoundError:
+                self.upstream_queue.put_nowait(format_status(
+                    _('FlightGear airports file not found at {path}.').format(
+                        path=Path(self.settings.fgdata_folder) / 'Airports' / 'apt.dat.gz'),
+                    self,
+                ))
         load_airports = Thread(target=open_aptdat)
         load_airports.start()
 
