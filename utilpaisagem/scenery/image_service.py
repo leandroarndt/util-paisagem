@@ -1,3 +1,4 @@
+from typing import MutableMapping
 from pathlib import Path
 from urllib import request
 from numbers import Number
@@ -7,7 +8,7 @@ from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 
 class ImageService(object):
     """
-    Base class for image services. It has a `download` method, a `full_name` string,
+    Base class for image services. It has a `download` method, a `description` string,
     a license_link string and an `availability_area` string. ImageService objects may
     be compared and ordered by their names.
 
@@ -16,7 +17,7 @@ class ImageService(object):
     """
 
     name:str
-    full_name:str
+    description:str
     license_link:str
     availability_area:str
     max_size:int = 2**DOWNLOAD_RES
@@ -105,7 +106,7 @@ class ImageService(object):
 class _ArcGIS(ImageService):
     def __init__(self):
         self.name = 'ArcGIS'
-        self.full_name = 'Worldwide service under restrictive license'
+        self.description = 'ArcGIS worldwide service under restrictive license'
         self.license_link = 'https://www.esri.com/en-us/legal/terms/full-master-agreement'
         self.availability_area = _('Worldwide')
         self.max_size = 4096
@@ -121,7 +122,7 @@ class _ArcGIS(ImageService):
 class _PNOA(ImageService):
     def __init__(self):
         self.name = 'PNOA'
-        self.full_name = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional'
+        self.description = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional (CC-BY 4.0)'
         self.license_link = 'https://creativecommons.org/licenses/by/4.0/'
         self.availability_area = _('Spain')
     
@@ -138,7 +139,7 @@ class _PNOA(ImageService):
 class _USGS(ImageService):
     def __init__(self):
         self.name = 'USGS'
-        self.full_name = 'U.S. Geographical Surveys'
+        self.description = 'U.S. Geographical Surveys (public domain)'
         self.license_link = 'https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits'
         self.availability_area = _('USA')
     
@@ -157,7 +158,7 @@ _IMAGE_SERVICES = [
     _USGS(),
 ]
 
-IMAGE_SERVICES = OrderedDict()
+IMAGE_SERVICES:MutableMapping[str, ImageService] = OrderedDict()
 _IMAGE_SERVICES.sort()
 for im in _IMAGE_SERVICES:
     IMAGE_SERVICES[im.name] = im
