@@ -84,6 +84,7 @@ class Settings(object):
     _settings:configparser.ConfigParser
     fgdata_folder:str = str(Path.home() / '.fgdata' / 'fgdata_2024_1')
     orthophotos_folder:str = str(Path('%(fgdata_folder)s') / 'utilpais agem' / 'Orthophotos')
+    image_service:str = 'ArcGIS'
     tile_threads:int = 4
     image_threads:int = 4
     radius:int = 50
@@ -108,6 +109,7 @@ class Settings(object):
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
         'orthophotos_folder': _Sections.PATH.value,
+        'image_service': _Sections.DOWNLOAD.value,
         'tile_threads': _Sections.DOWNLOAD.value,
         'image_threads': _Sections.DOWNLOAD.value,
         'download_res': _Sections.DOWNLOAD.value,

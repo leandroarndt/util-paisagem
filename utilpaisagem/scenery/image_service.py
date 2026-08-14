@@ -1,22 +1,40 @@
 from pathlib import Path
 from urllib import request
 from numbers import Number
+from collections import OrderedDict
 from urllib.error import URLError, ContentTooShortError
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 
 class ImageService(object):
     """
-    Base class for image services. It has a `download` method, a `description` string,
-    a license_link string and an `availability_area` string.
+    Base class for image services. It has a `download` method, a `full_name` string,
+    a license_link string and an `availability_area` string. ImageService objects may
+    be compared and ordered by their names.
+
     Each child class should define its strings and a `_url` method, which returns a URL
     from `coordinates`, `width` and `height` parameters.
     """
 
     name:str
-    description:str
+    full_name:str
     license_link:str
     availability_area:str
     max_size:int = 2**DOWNLOAD_RES
+
+    def __gt__(self, other):
+        return self.name > other.name
+    
+    def __ge__(self, other):
+        return self.name >= other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
+    
+    def __le__(self, other):
+        return self.name <= other.name
+    
+    def __lt__(self, other):
+        return self.name < other.name
 
     def _get_url(self, coordinates:Coordinates, width:int, height:int):
         """
@@ -87,9 +105,9 @@ class ImageService(object):
 class _ArcGIS(ImageService):
     def __init__(self):
         self.name = 'ArcGIS'
-        self.description = 'Worldwide service under restrictive license'
+        self.full_name = 'Worldwide service under restrictive license'
         self.license_link = 'https://www.esri.com/en-us/legal/terms/full-master-agreement'
-        self.availability_area = 'Worldwide'
+        self.availability_area = _('Worldwide')
         self.max_size = 4096
 
     def can_download(self, coordinates:Coordinates) -> bool:
@@ -103,9 +121,9 @@ class _ArcGIS(ImageService):
 class _PNOA(ImageService):
     def __init__(self):
         self.name = 'PNOA'
-        self.description = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional'
+        self.full_name = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional'
         self.license_link = 'https://creativecommons.org/licenses/by/4.0/'
-        self.availability_area = 'Spain'
+        self.availability_area = _('Spain')
     
     def can_download(self, coordinates:Coordinates) -> bool:
         # https://www.ign.es/wms-inspire/pnoa-ma?Request=GetCapabilities&Service=WMS
@@ -120,9 +138,9 @@ class _PNOA(ImageService):
 class _USGS(ImageService):
     def __init__(self):
         self.name = 'USGS'
-        self.description = 'U.S. Geographical Surveys'
+        self.full_name = 'U.S. Geographical Surveys'
         self.license_link = 'https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits'
-        self.availability_area = 'USA'
+        self.availability_area = _('USA')
     
     #TODO
     def can_download(self, coordinates:Coordinates) -> bool:
@@ -133,8 +151,13 @@ class _USGS(ImageService):
 
 # There is no need for a singleton. This list is only a centralized place
 # for image service classes stored in order to facilitate GUI development.
-IMAGE_SERVICES = [
+_IMAGE_SERVICES = [
     _ArcGIS(),
     # _PNOA(), # Not working. No photoscenery tool for FG can get its images
     _USGS(),
 ]
+
+IMAGE_SERVICES = OrderedDict()
+_IMAGE_SERVICES.sort()
+for im in _IMAGE_SERVICES:
+    IMAGE_SERVICES[im.name] = im
