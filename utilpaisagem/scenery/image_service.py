@@ -100,10 +100,41 @@ class _ArcGIS(ImageService):
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
         return f'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&imageSR=4326&size={width},{height}&format=png24&f=image'
 
+class _PNOA(ImageService):
+    def __init__(self):
+        self.name = 'PNOA'
+        self.description = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional'
+        self.license_link = 'https://creativecommons.org/licenses/by/4.0/'
+        self.availability_area = 'Spain'
+    
+    def can_download(self, coordinates:Coordinates) -> bool:
+        # https://www.ign.es/wms-inspire/pnoa-ma?Request=GetCapabilities&Service=WMS
+        return coordinates.lon_left >= -19.0 and \
+            coordinates.lat_bottom >= 27.0 and \
+            coordinates.lon_right <= 5.0 and \
+            coordinates.lat_top <= 44.0
+    
+    def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
+        return f'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS|VERSION=1.1.1|REQUEST=GetMap|LAYERS=OI.OrthoimageCoverage|SRS=EPSG:4326|BBOX={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}|WIDTH={width}|HEIGHT={height}|FORMAT=image/png'
 
+class _USGS(ImageService):
+    def __init__(self):
+        self.name = 'USGS'
+        self.description = 'U.S. Geographical Surveys'
+        self.license_link = 'https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits'
+        self.availability_area = 'USA'
+    
+    #TODO
+    def can_download(self, coordinates:Coordinates) -> bool:
+        return True
+    
+    def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
+        return f'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&size={height},{width}&imageSR=4326&format=png24&f=image'
 
 # There is no need for a singleton. This list is only a centralized place
 # for image service classes stored in order to facilitate GUI development.
 IMAGE_SERVICES = [
     _ArcGIS(),
+    # _PNOA(), # Not working. No photoscenery tool for FG can get its images
+    _USGS(),
 ]
