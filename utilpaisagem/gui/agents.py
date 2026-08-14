@@ -146,7 +146,8 @@ class Follower(object):
             self.upstream_queue.put_nowait(format_status(_('Sucessfuly connected to Flightgear.'), self))
     
     def follow(self):
-        if not self.downstream_queue.is_shutdown: # If the following has not been canceled
+        def get_pos():
+            nonlocal self
             try:
                 self.lat = self.connection.get_prop('/position/latitude-deg')
                 self.lon = self.connection.get_prop('/position/longitude-deg')
@@ -162,7 +163,6 @@ class Follower(object):
                 )
                 self.main_window.place_aircraft(self.lat, self.lon, active=False)
                 self.main_window.window.after(self.settings.following_interval*10, self.follow)
-                # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=self.lat, lon=self.lon) # Update download manager center
                 self.main_window.place_aircraft(self.lat, self.lon, active=True)
@@ -170,9 +170,11 @@ class Follower(object):
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=self.lat, lon=self.lon), self)
                 )
                 self.main_window.window.after(self.settings.following_interval, self.follow)
+        if not self.downstream_queue.is_shutdown: # If the following has not been canceled
+            thread = Thread(target=get_pos)
+            thread.start()
         else:
-            self.close_connection()
-    
+            self.close_connection()    
     def close_connection(self):
         self.connection.sock.close()
 

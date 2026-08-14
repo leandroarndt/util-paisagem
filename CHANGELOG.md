@@ -5,7 +5,6 @@
 **TODO:**
 
 - New image providers
-- Non-blocking aircraft position retrieval
 - Use LatLon23 to create regions
   - Also, a tile should not be added if another with greater resolution is queued
 - Use scenery folder on the settings window instead of "Orthophotos"
@@ -14,6 +13,7 @@
 **DONE:**
 
 - Search airports at apt.dat first.
+- Non-blocking aircraft position retrieval.
 
 ## 0.5.0
 
