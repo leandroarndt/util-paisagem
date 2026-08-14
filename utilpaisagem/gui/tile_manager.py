@@ -473,9 +473,7 @@ class TileManager(object):
         self.map_widget.updated = True
 
         self.upstream_queue.put_nowait(
-            format_status(_('Finished searching for tiles to display. Disk space used: {space} MB.').format(
-                space=format_decimal(Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
-            ), self))
+            format_status(_('Finished searching for tiles to display.'), self))
         self.search_complete = True
 
         if DEBUG:
