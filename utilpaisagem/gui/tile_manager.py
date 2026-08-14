@@ -425,7 +425,6 @@ class TileManager(object):
                 gt = all_gts.pop(0)
                 gt.find_degree_tiles()
         
-        print('aqui')
         if self.deleting_tiles:
             return # Tasks may not be concomitant
 
