@@ -134,7 +134,8 @@ class _PNOA(ImageService):
             coordinates.lat_top <= 44.0
     
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
-        return f'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS|VERSION=1.1.1|REQUEST=GetMap|LAYERS=OI.OrthoimageCoverage|SRS=EPSG:4326|BBOX={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}|WIDTH={width}|HEIGHT={height}|FORMAT=image/png'
+        # return f'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS|VERSION=1.1.1|REQUEST=GetMap|LAYERS=OI.OrthoimageCoverage|SRS=EPSG:4326|BBOX={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}|WIDTH={width}|HEIGHT={height}|FORMAT=image/png'
+        return f'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS|VERSION=1.3.0|REQUEST=GetMap|LAYERS=OI.OrthoimageCoverage|CRS=EPSG:4326|BBOX={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}|WIDTH={width}|HEIGHT={height}|FORMAT=image/png'
 
 class _USGS(ImageService):
     def __init__(self):
@@ -150,12 +151,27 @@ class _USGS(ImageService):
     def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
         return f'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/export?bbox={coordinates.lon_left},{coordinates.lat_top},{coordinates.lon_right},{coordinates.lat_bottom}&bboxSR=4326&size={height},{width}&imageSR=4326&format=png24&f=image'
 
+class _Bayern(ImageService):
+    def __init__(self):
+        self.name = 'Geobaisdaten Bayern'
+        self.description = 'Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung'
+        self.license_link = 'https://creativecommons.org/licenses/by/4.0/deed.de'
+        self.availability_area = _('Bavaria (Deutschland)')
+
+    #TODO
+    def can_download(self, coordinates:Coordinates) -> bool:
+        return True
+    
+    def _get_url(self, coordinates:Coordinates, width:int, height:int) -> str:
+        return f''
+
 # There is no need for a singleton. This list is only a centralized place
 # for image service classes stored in order to facilitate GUI development.
 _IMAGE_SERVICES = [
     _ArcGIS(),
     # _PNOA(), # Not working. No photoscenery tool for FG can get its images
     _USGS(),
+    # _Bayern(), # TODO
 ]
 
 IMAGE_SERVICES:MutableMapping[str, ImageService] = OrderedDict()
