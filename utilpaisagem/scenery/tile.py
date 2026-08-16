@@ -452,7 +452,7 @@ class Tile(object):
                         self.coordinates,
                         self.get_path(self.settings.orthophotos_folder) / filename.name,
                         TileColors.good,
-                        str(self.get_path(Path())).split('/'),
+                        str(self.get_path(Path())).split(os.sep),
                     ))
                 except AttributeError:
                     pass
@@ -464,7 +464,7 @@ class Tile(object):
                     self.coordinates,
                     self.get_path(self.settings.orthophotos_folder) / filename.name,
                     TileColors.failed,
-                    str(self.get_path(Path())).split('/'),
+                    str(self.get_path(Path())).split(os.sep),
                 ))
             except AttributeError:
                 pass
@@ -509,7 +509,7 @@ class Tile(object):
                             self.coordinates,
                             self.get_path(self.settings.orthophotos_folder) / filename.name,
                             TileColors.failed,
-                            str(self.get_path(Path())).split('/'),
+                            str(self.get_path(Path())).split(os.sep),
                         ))
                     except AttributeError:
                         pass
@@ -529,7 +529,7 @@ class Tile(object):
         return False
 
 
-    def delete_files(self, tile_manager_queue:Queue):
+    def delete_files(self, tile_manager_queue:Queue, auto_clean=False):
         size = 0
         dds = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.dds', case_sensitive=False)
         for file in dds:
@@ -542,7 +542,10 @@ class Tile(object):
         log = self.get_path(self.settings.orthophotos_folder).glob(f'{self.index}.log', case_sensitive=False)
         for file in log:
             file.unlink()
-        tile_manager_queue.put_nowait((-self.index, self.coordinates, size, str(self.get_path(Path())).split('/')))
+        if auto_clean:
+            tile_manager_queue.put_nowait((-self.index, self.coordinates, 0, str(self.get_path(Path())).split(os.sep)))
+        else:
+            tile_manager_queue.put_nowait((-self.index, self.coordinates, size, str(self.get_path(Path())).split(os.sep)))
 
     @classmethod
     def tile_width(cls, lat):
