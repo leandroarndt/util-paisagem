@@ -394,7 +394,8 @@ class SettingsWindow(object):
             self.disk_usage_frame,
             text=_('Disk space used: {space} MB').format(
                 space=format_decimal(
-                    Decimal(self.main_window.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'))
+                    Decimal(self.main_window.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
+                    locale=LOCALE
                 ),
             ),
         )
