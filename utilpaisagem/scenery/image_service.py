@@ -93,7 +93,7 @@ class _ArcGIS(ImageService):
         self.max_size = 4096
 
     def can_download(self, coordinates:Coordinates):
-        if coordinates.lat_top > 89 or coordinates.lat_bottom < -89:
+        if coordinates.lat_top > 86 or coordinates.lat_bottom < -86:
             return False
         return True
 
