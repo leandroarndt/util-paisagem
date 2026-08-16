@@ -398,9 +398,24 @@ class TileManager(object):
                     ),
                     self,
                 ))
-            while self.disk_usage > self.settings.max_disk_usage:
-                t = Tile(self.tile_list.pop(0).index)
-                t.delete_files(tile_manager_queue=self.tile_queue) # It already communicates with TileManager.tile_queue
+                while self.disk_usage > self.settings.max_disk_usage:# and self.tile_list:
+                    t = Tile(self.tile_list.pop(0).index)
+                    path = t.get_path(self.settings.orthophotos_folder)
+                    if (path / f'{t.index}.png').exists():
+                        self.disk_usage -= os.path.getsize(path / f'{t.index}.png')
+                    elif (path / f'{t.index}.dds').exists():
+                        self.disk_usage -= os.path.getsize(path / f'{t.index}.dds')
+                    self.disk_usage -= os.path.getsize(t.get_path(self.settings.orthophotos_folder))
+                    t.delete_files(tile_manager_queue=self.tile_queue, auto_clean=True) # It already communicates with TileManager.tile_queue
+                self.upstream_queue.put_nowait(format_status(
+                    _('Finished deleting unused tiles. Current disk usage: {space} MB.').format(
+                        space=format_decimal(
+                            Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00')),
+                            locale=LOCALE,
+                        ),
+                    ),
+                    self,
+                ))
             self.deleting_tiles = False
 
     def find_great_tiles(self):
