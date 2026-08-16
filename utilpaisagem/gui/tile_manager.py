@@ -10,7 +10,7 @@ from datetime import datetime
 from tkintermapview.canvas_polygon import CanvasPolygon
 from babel.numbers import format_decimal
 from utilpaisagem.gui.map_widget import MapWidget
-from utilpaisagem.gui.common import Settings, format_status, TileColors
+from utilpaisagem.gui.common import Settings, format_status, TileColors, LOCALE
 from utilpaisagem.scenery.common import Coordinates
 from utilpaisagem.scenery.tile import Tile
 
@@ -372,10 +372,12 @@ class TileManager(object):
             self.upstream_queue.put_nowait(format_status(
                 _('Current disk usage ({space} MB) does not exceed limit ({limit} MB).').format(
                     space=format_decimal(
-                        Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))
+                        Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00')),
+                        locale=LOCALE,
                     ),
                     limit=format_decimal(
-                        Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00'))
+                        Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00')),
+                        locale=LOCALE,
                     ),
                 ),
                 self,
@@ -385,14 +387,20 @@ class TileManager(object):
                 self.deleting_tiles = True
                 self.upstream_queue.put_nowait(format_status(
                     _('Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles.').format(
-                        space=format_decimal(Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
-                        limit=format_decimal(Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
+                        space=format_decimal(
+                            Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00')),
+                            locale=LOCALE,
+                        ),
+                        limit=format_decimal(
+                            Decimal(self.settings.max_disk_usage / 1024 ** 2).quantize(Decimal('1.00')),
+                            locale=LOCALE,
+                        ),
                     ),
                     self,
                 ))
             while self.disk_usage > self.settings.max_disk_usage:
                 t = Tile(self.tile_list.pop(0).index)
-                t.delete_files() # It already communicates with TileManager.tile_queue
+                t.delete_files(tile_manager_queue=self.tile_queue) # It already communicates with TileManager.tile_queue
             self.deleting_tiles = False
 
     def find_great_tiles(self):
@@ -474,9 +482,8 @@ class TileManager(object):
         self.map_widget.updated = True
 
         self.upstream_queue.put_nowait(
-            format_status(_('Finished searching for tiles to display. Disk space used: {space} MB.').format(
-                space=format_decimal(Decimal(self.disk_usage / 1024 ** 2).quantize(Decimal('1.00'))),
-            ), self))
+            format_status(_('Finished searching for tiles to display.'), self)
+            )
         self.search_complete = True
 
         if DEBUG:
