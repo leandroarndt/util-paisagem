@@ -11,7 +11,7 @@ import math, tempfile, shutil, os, configparser, ast
 from babel.numbers import format_decimal
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES, MAX_RES
 from utilpaisagem.scenery.image_service import ImageService
-from utilpaisagem.gui.common import format_status, Settings, TileColors, QUIT
+from utilpaisagem.gui.common import format_status, Settings, TileColors, QUIT, LOCALE
 
 class NeedsRenewalError(Exception):
     pass
@@ -221,10 +221,10 @@ class Tile(object):
                 self.upstream_queue.put_nowait(_(
                     'Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not covered by {service_name}'
                 ).format(
-                    lat_top=format_decimal(Decimal(self.coordinates.lat_top).quantize(Decimal('0.001'))),
-                    lon_left=format_decimal(Decimal(self.coordinates.lon_left).quantize(Decimal('0.001'))),
-                    lat_bottom=format_decimal(Decimal(self.coordinates.lat_bottom).quantize(Decimal('0.001'))),
-                    lon_right=format_decimal(Decimal(self.coordinates.lon_right).quantize(Decimal('0.001'))),
+                    lat_top=format_decimal(Decimal(self.coordinates.lat_top).quantize(Decimal('0.001')), locale=LOCALE),
+                    lon_left=format_decimal(Decimal(self.coordinates.lon_left).quantize(Decimal('0.001')), locale=LOCALE),
+                    lat_bottom=format_decimal(Decimal(self.coordinates.lat_bottom).quantize(Decimal('0.001')), locale=LOCALE),
+                    lon_right=format_decimal(Decimal(self.coordinates.lon_right).quantize(Decimal('0.001')), locale=LOCALE),
                     service_name=image_service.name,
                 ))
             return

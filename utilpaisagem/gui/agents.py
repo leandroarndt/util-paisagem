@@ -11,7 +11,7 @@ from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.scenery.common import DOWNLOAD_RES
-from utilpaisagem.gui.common import format_status, Settings
+from utilpaisagem.gui.common import format_status, Settings, LOCALE
 from utilpaisagem.gui.tile_manager import TileManager
 
 class Downloader(object):
@@ -235,7 +235,10 @@ class UpstreamReader(object):
                         self.downloader.finished_downloads + \
                         self.downloader.current_downloads,
                     space = format_decimal(
-                        Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'))
+                        Decimal(
+                            self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'),
+                            locale=LOCALE
+                        )
                     ),
                 ),
                 self
