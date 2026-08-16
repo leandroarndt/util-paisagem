@@ -12,6 +12,14 @@ or needing renewal.
 
 - Fixed new version message when using the latest available one.
 
+### 0.5.2
+
+- Fixed issue with incomplete rendering of the settings window on Windows.
+(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+- Fixed issue with tiles not updating live on Windows.
+(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+- Fixed issue with disk space limit enforcement possibly deleting everything.
+
 ## 0.4.0
 
 - Added image file format to the settings.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem VERSION\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-08-11 15:51-0300\n"
+"POT-Creation-Date: 2026-08-15 22:11-0300\n"
 "PO-Revision-Date: 2026-07-07 12:17-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -523,7 +523,7 @@ msgstr "Concluída a busca na pasta \"{folder}\"."
 msgid "Current disk usage ({space} MB) does not exceed limit ({limit} MB)."
 msgstr "Utilização atual do disco ({space} MB) não excede o limite ({limit} MB)."
 
-#: utilpaisagem/gui/tile_manager.py:387
+#: utilpaisagem/gui/tile_manager.py:389
 #, python-brace-format
 msgid ""
 "Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused"
@@ -532,18 +532,22 @@ msgstr ""
 "Utilização do disco ({space} MB) excede o limite ({limit} MB). Deletando"
 "  ladrilhos não utilizados."
 
-#: utilpaisagem/gui/tile_manager.py:413
-msgid "Searching for tiles to display"
-msgstr "Procurando ladrilhos para mostrar"
-
-#: utilpaisagem/gui/tile_manager.py:477
+#: utilpaisagem/gui/tile_manager.py:411
 #, python-brace-format
-msgid "Finished searching for tiles to display. Disk space used: {space} MB."
+msgid "Finished deleting unused tiles. Current disk usage: {space} MB."
 msgstr ""
-"Concluída a busca por ladrilhos para mostrar. Espaço de armazenamento "
+"Concluída a limpeza de ladrilhos não utilizados. Espaço de armazenamento "
 "usado: {space} MB."
 
-#: utilpaisagem/gui/tile_manager.py:512
+#: utilpaisagem/gui/tile_manager.py:436
+msgid "Searching for tiles to display"
+msgstr "Procurando ladrilhos para exibir"
+
+#: utilpaisagem/gui/tile_manager.py:500
+msgid "Finished searching for tiles to display."
+msgstr "Concluída a busca por ladrilhos para exibir"
+
+#: utilpaisagem/gui/tile_manager.py:534
 #, python-brace-format
 msgid "Could not delete tile {index}: not found."
 msgstr "Não foi possível deletar o ladrilho {index}: não encontrado."
