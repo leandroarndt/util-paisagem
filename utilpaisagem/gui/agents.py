@@ -235,10 +235,8 @@ class UpstreamReader(object):
                         self.downloader.finished_downloads + \
                         self.downloader.current_downloads,
                     space = format_decimal(
-                        Decimal(
-                            self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00'),
-                            locale=LOCALE
-                        )
+                        Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
+                        locale=LOCALE,
                     ),
                 ),
                 self
