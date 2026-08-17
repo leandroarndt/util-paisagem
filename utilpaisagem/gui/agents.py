@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from pathlib import Path
 from threading import Thread
 from queue import Queue, ShutDown, Empty
@@ -13,6 +14,12 @@ from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.scenery.common import DOWNLOAD_RES
 from utilpaisagem.gui.common import format_status, Settings, LOCALE
 from utilpaisagem.gui.tile_manager import TileManager
+
+if TYPE_CHECKING:
+    from utilpaisagem.gui.main import MainWindow
+else:
+    class MainWindow(object):
+        pass
 
 class Downloader(object):
     """
@@ -189,24 +196,30 @@ class UpstreamReader(object):
     interval:int
     status_var:tk.StringVar
     show_tiles:bool
+    settings:Settings
 
     def __init__(
         self,
         root:tk.Tk,
+        main_window,
         status_var:tk.StringVar,
+        disk_usage_var:tk.StringVar,
         upstream_queue:Queue,
         tile_manager:TileManager,
         downloader:Downloader,
         interval:int=100,
     ):
         self.root = root
+        self.main_window = main_window
         self.upstream_queue = upstream_queue
         self.tile_manager = tile_manager
         self.interval = interval
         self.downloader = downloader
         self.status_var = status_var
         self.status_var.set(_('Welcome to Útil paisagem'))
+        self.disk_usage_var = disk_usage_var
         self.show_tiles = False
+        self.settings = Settings()
     
     def read(self):
         if not self.show_tiles:
@@ -232,19 +245,27 @@ class UpstreamReader(object):
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
             self.status_var.set(format_status(
-                _('All {total} tiles have been processed. Used disk space: {space} MB.').format(
+                _('All {total} tiles have been processed.').format(
                     total=self.downloader.download_queue.qsize() + \
                         self.downloader.finished_downloads + \
                         self.downloader.current_downloads,
-                    space = format_decimal(
-                        Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
-                        locale=LOCALE,
-                    ),
                 ),
                 self
             ))
             self.show_tiles = False
         elif msg:
             self.status_var.set(msg)
+        self.disk_usage_var.set(_('Disk space used: {space} MB.').format(
+            space=format_decimal(
+                Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
+                locale=LOCALE
+            )
+        ))
+        if self.tile_manager.disk_usage < self.settings.max_disk_usage * 0.9:
+            self.main_window.disk_usage_label.configure(foreground='darkgreen')
+        elif self.tile_manager.disk_usage < self.settings.max_disk_usage:
+            self.main_window.disk_usage_label.configure(foreground='darkgoldenrod4')
+        else:
+            self.main_window.disk_usage_label.configure(foreground='firebrick')
         self.root.after(self.interval, self.read)
 

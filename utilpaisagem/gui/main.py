@@ -399,7 +399,14 @@ class MainWindow(object):
         # Status bar
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
         self.status_bar = ttk.Label(self.window, textvariable=self.status_var, justify=tk.LEFT)
-        self.status_bar.grid(column=0, row=1, columnspan=2, sticky=tk.W)
+        self.disk_usage_var = tk.StringVar(self.window, '')
+        self.disk_usage_label = ttk.Label(
+            self.window,
+            textvariable=self.disk_usage_var,
+            justify=tk.LEFT
+        )
+        self.status_bar.grid(column=0, row=1, sticky=tk.W)
+        self.disk_usage_label.grid(column=1, row=1, sticky=tk.W)
 
         # Size
         self.window.update()
@@ -453,11 +460,13 @@ class MainWindow(object):
 
         # Init upstream reader
         self.upstream_reader = UpstreamReader(
-            self.window,
-            self.status_var,
-            self.upstream_queue,
-            self.tile_manager,
-            self.downloader,
+            root=self.window,
+            main_window=self,
+            status_var=self.status_var,
+            disk_usage_var=self.disk_usage_var,
+            upstream_queue=self.upstream_queue,
+            tile_manager=self.tile_manager,
+            downloader=self.downloader,
             interval=100)
         self.upstream_reader.read()
 
