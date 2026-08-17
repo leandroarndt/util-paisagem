@@ -2,17 +2,12 @@
 
 ## 0.6.0
 
-**TODO:**
-
-- Use scenery folder on the settings window instead of "Orthophotos"
-- Delete region
-
-**DONE:**
-
-- New image provider
+- New image provider (USGS)
 - Search airports at apt.dat first.
 - Non-blocking aircraft position retrieval.
 - Always displays used disk space at the main window.
+- Delete region
+- Use scenery folder on the settings window instead of "Orthophotos"
 
 ## 0.5.0
 

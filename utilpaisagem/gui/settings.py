@@ -202,7 +202,10 @@ class SettingsWindow(object):
             text=_('Choose folder'),
             command=self.choose_fgdata_dir,
         )
-        self.orthophotos_var = tk.StringVar(self.path_frame, value=self.settings.orthophotos_folder)
+        self.orthophotos_var = tk.StringVar(
+            self.path_frame,
+            value=str(Path(self.settings.orthophotos_folder).parent),
+        )
         self.orthophotos_name = ttk.Label(
             self.path_frame,
             text=_('Path to scenery imagery:'),
@@ -542,23 +545,39 @@ class SettingsWindow(object):
     def choose_orthophotos_dir(self):
         path = tk.filedialog.askdirectory(
             parent=self.window,
-            title=_('Choose "Orthophotos" directory'),
+            title=_('Choose directory for photoscenery'),
             initialdir=self.orthophotos_var.get(),
         )
         if not path:
             return
         path = Path(path)
         path = path.expanduser()
-        if Path(path).is_dir():
-            if path.name.lower() != 'orthophotos': # Invalid path
-                tk.messagebox.showerror(
-                    title=_('Invalid folder'),
-                    message=_('Please choose a folder named "Orthophotos".')
-                )
-                return
-            if path.name != 'Orthophotos': # Normalize
-                path = path.rename(path.parent / 'Orthophotos')
+        # if Path(path).is_dir():
+        #     if path.name.lower() != 'orthophotos': # Invalid path
+        #         tk.messagebox.showerror(
+        #             title=_('Invalid folder'),
+        #             message=_('Please choose a folder named "Orthophotos".')
+        #         )
+        #         return
+        #     if path.name != 'Orthophotos': # Normalize
+        #         path = path.rename(path.parent / 'Orthophotos')
+        #     self.orthophotos_var.set(path)
+        if (path / 'Orthophotos').is_dir():
             self.orthophotos_var.set(path)
+            return
+        if path.name == 'Orthophotos':
+            self.orthophotos_var.set(path.parent)
+            return
+        if path.name.lower() == 'orthophotos':
+            path = path.rename(path.parent / 'Orthophotos')
+            self.orthophotos_var.set(path.parent)
+            return
+        for item in path.iterdir():
+            if item.is_dir() and item.name.lower() == 'orthophotos':
+                item.rename(item.parent / 'Orthophotos')
+                return
+        (path / 'Orthophotos').mkdir()
+        self.orthophotos_var.set(path)
 
     def change_image_service(self, *args, **kwargs):
         self.image_service_description_var.set(IMAGE_SERVICES[self.image_service_var.get()].description)
@@ -572,7 +591,7 @@ class SettingsWindow(object):
 
     def apply(self):
         self.settings.fgdata_folder = self.fg_path_var.get()
-        self.settings.orthophotos_folder = self.orthophotos_var.get()
+        self.settings.orthophotos_folder = str(Path(self.orthophotos_var.get()) / 'Orthophotos')
         self.settings.host = self.host_var.get()
         try:
             self.settings.port = int(self.port_var.get())
