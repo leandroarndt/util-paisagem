@@ -7,9 +7,10 @@ from typing import List
 from pathlib import Path
 from numbers import Number
 from queue import Queue
+from LatLon23 import LatLon
 from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.scenery.tile import Tile
-from utilpaisagem.scenery.common import Coordinates, distance, DOWNLOAD_RES, MIN_RES
+from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 from utilpaisagem.gui.common import Settings
 
 class DownloadManager(object):
@@ -67,6 +68,7 @@ class DownloadManager(object):
             lon(Number): longitude of the region center
             add(bool=True): whether to add each tile to the download queue.
         """
+        center_coordinates = LatLon(lat=lat, lon=lon)
         center_tile = Tile(lat=lat, lon=lon)
         n = 0
         done = []
@@ -78,7 +80,7 @@ class DownloadManager(object):
             for m in ((-1,0), (0,1), (1,0), (0, -1)):
                 next_lat = current.coordinates.lat_median + m[0] * dif_lat
                 next_lon = current.coordinates.lon_median + m[1] * dif_lon
-                dist = distance(lat, lon, next_lat, next_lon)
+                dist = center_coordinates.distance(LatLon(lat=next_lat, lon=next_lon))
                 if dist <= self.settings.radius:
                     res = MIN_RES
                     for d, r in self.settings.distances.items():

@@ -32,24 +32,6 @@ COMPRESSION = {
     _('smallest size'): 'smart',
 }
 
-def distance(lat1:Number, lon1:Number, lat2:Number, lon2:Number):
-    """
-    Returns the great-circle distance between two coordinates in kilometers.
-
-    Arguments:
-        lat1: latitude of coordinate 1
-        lon1: longitude of coordinate 1
-        lat2: latitude of coordinate 2
-        lon2: latitude of coordinate 2
-    """
-    r = 6378.137 # Radius of earth
-    d_lat = lat2 * math.pi / 180 - lat1 * math.pi / 180
-    d_lon = lon2 * math.pi / 180 - lon1 * math.pi / 180
-    a = math.sin(d_lat/2)**2 + math.cos(lat1 * math.pi / 180) \
-        * math.cos(lat2 * math.pi / 180) * math.sin(d_lon/2) ** 2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    return r * c
-
 class Coordinates(object):
     """
     Class used to store tile coordinates.
