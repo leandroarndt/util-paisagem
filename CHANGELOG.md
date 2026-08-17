@@ -4,7 +4,6 @@
 
 **TODO:**
 
-  - Also, a tile should not be added if another with greater resolution is queued
 - Use scenery folder on the settings window instead of "Orthophotos"
 - Delete region
 

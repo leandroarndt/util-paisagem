@@ -144,6 +144,10 @@ class MainWindow(object):
             label=_('Delete tile'),
             command=self.delete_tile,
         )
+        self.file_menu.add_command(
+            label=_('Delete region'),
+            command=self.delete_region,
+        )
         self.file_menu.add_separator()
         self.file_menu.add_command(
             label=_('Rescan downloaded tiles'),
@@ -503,7 +507,26 @@ class MainWindow(object):
         )
         if answer:
             Tile(self.index).delete_files(self.tile_manager.tile_queue)
-    
+ 
+    def delete_region(self):
+        def do_delete():
+            nonlocal self
+            tiles = self.download_manager.get_region(self.lat, self.lon, add=False)
+            while tiles:
+                t = tiles.pop(0)
+                t.delete_files(self.tile_manager.tile_queue)
+
+        answer = tk.messagebox.askyesno(
+            title=_('Delete region?'),
+            message=_('Are you sure you want to delete region centered on {lat}, {lon}?').format(
+                lat=self.lat,
+                lon=self.lon,
+            )
+        )
+        if answer:
+            thread = Thread(target=do_delete)
+            thread.start()
+
     def scan_tiles(self):
         find_tiles = Thread(target=self.tile_manager.find_great_tiles)
         find_tiles.start()

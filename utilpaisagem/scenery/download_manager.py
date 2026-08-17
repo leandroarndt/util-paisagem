@@ -3,9 +3,9 @@ Manages download jobs:
   - create downloaders
   - manage tiles to retrieve
 """
+from typing import List
 from pathlib import Path
 from numbers import Number
-#from collections import OrderedDict
 from queue import Queue
 from utilpaisagem.scenery.image_service import ImageService
 from utilpaisagem.scenery.tile import Tile
@@ -22,7 +22,7 @@ class DownloadManager(object):
         center_lat(Number): center latitude
         center_lon(Number): center longitude
     """
-    queue:list
+    queue:List
     radius:int
     center_lat:Number
     center_lon:Number
@@ -56,20 +56,19 @@ class DownloadManager(object):
     
     def clear(self):
         self.queue.clear()
-        
-    def recenter(self, lat:Number, lon:Number):
+
+    def get_region(self, lat:Number, lon:Number, add=True) -> List[Tile]:
         """
-        Recenters the download manager, attributing greater priority to
-        the new center and its adjacent tiles.
+        Returns list of tiles of a region centered at `lat` and `lon`. If `add` is True,
+        adds them to the download queue.
 
         Arguments:
-            lat(Number): new center latitude
-            lon(Number): new center longitude
+            lat(Number): latitude of the region center
+            lon(Number): longitude of the region center
+            add(bool=True): whether to add each tile to the download queue.
         """
-        self.center_lat, self.center_lon = lat, lon
         center_tile = Tile(lat=lat, lon=lon)
         n = 0
-        self.add(center_tile, n)
         done = []
         todo = [center_tile]
         while todo:
@@ -88,10 +87,23 @@ class DownloadManager(object):
                     next_tile = Tile(lat=next_lat, lon=next_lon, resolution=res, upstream_queue=self.upstream_queue)
                     if next_tile not in done and next_tile not in todo:
                         todo.append(next_tile)
-                    if next_tile not in self.queue:
+                    if add and next_tile not in self.queue:
                         self.add(next_tile, n)
                         n += 1
             done.append(current)
+        return done
+
+    def recenter(self, lat:Number, lon:Number):
+        """
+        Recenters the download manager, attributing greater priority to
+        the new center and its adjacent tiles.
+
+        Arguments:
+            lat(Number): new center latitude
+            lon(Number): new center longitude
+        """
+        self.center_lat, self.center_lon = lat, lon
+        tiles = self.get_region(lat, lon, add=True)
 
     def download_next(self, path:Path, image_service:ImageService, download_res=DOWNLOAD_RES, compress='smart'):
         """
