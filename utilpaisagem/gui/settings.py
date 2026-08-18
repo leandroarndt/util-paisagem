@@ -113,7 +113,7 @@ class SettingsWindow(object):
     image_service_description_label:ttk.Label
     image_service_area_var:tk.StringVar
     image_service_area_label:ttk.Label
-    image_service_license_var:t.StringVar
+    image_service_license_var:tk.StringVar
     image_service_license_label:ttk.Label
     download_frame:ttk.LabelFrame
     radius_var:tk.IntVar
