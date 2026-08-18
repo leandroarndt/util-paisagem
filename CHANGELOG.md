@@ -2,13 +2,16 @@
 
 ## 0.6.0
 
-- New image provider (USGS).
-- Search airports at apt.dat first.
-- Non-blocking aircraft position retrieval.
+- Additional image provider (USGS).
 - Always displays used disk space at the main window.
-- Delete region.
+- Delete region command at "File" menu.
 - Use scenery folder on the settings window instead of "Orthophotos".
 - Shows FlightGear launch parameters at the settings window.
+- Searches airports at apt.dat first.
+- Aircraft position retrieval is now non-blocking.
+
+**Note:** previous "Orthophotos folder" settings are displayed as the
+correspondent scenery folder. This change affects only the user interface.
 
 ## 0.5.0
 
