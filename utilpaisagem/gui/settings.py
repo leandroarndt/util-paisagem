@@ -101,6 +101,9 @@ class SettingsWindow(object):
     interval_label:ttk.Label
     interval_input:ttk.Entry
     interval_seconds_label:ttk.Label
+    fg_options_frame:ttk.Labelframe
+    fg_options_var:tk.StringVar
+    fg_options_label:ttk.Label
     download_tab:ttk.Frame
     image_service_frame:ttk.LabelFrame
     image_service_var:tk.StringVar
@@ -196,7 +199,6 @@ class SettingsWindow(object):
             justify=tk.LEFT,
             font=tk.font.Font(slant='italic'),
         )
-        # TODO
         self.fg_path_button = ttk.Button(
             self.path_frame,
             text=_('Choose folder'),
@@ -228,6 +230,20 @@ class SettingsWindow(object):
         self.orthophotos_name.grid(column=0, row=1, sticky=tk.E)
         self.orthophotos_label.grid(column=1, row=1, sticky=tk.W)
         self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
+        self.fg_options_frame = ttk.LabelFrame(
+            self.flightgear_tab,
+            text=_('FlightGear launch options'),
+        )
+        self.fg_options_frame.columnconfigure(0, weight=10)
+        self.fg_options_var = tk.StringVar(
+            self.fg_options_frame,
+            value=''
+        )
+        self.fg_options_label = ttk.Label(
+            self.fg_options_frame,
+            textvariable=self.fg_options_var,
+        )
+        self.fg_options_label.grid(column=0, row=0, sticky=tk.W)
         # Connection
         self.connection_frame = ttk.Labelframe(
             self.flightgear_tab,
@@ -259,6 +275,7 @@ class SettingsWindow(object):
         self.interval_seconds_label.grid(column=2, row=2, sticky=tk.W)
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.connection_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
+        self.fg_options_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
         # Download tab
         self.download_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.download_tab.columnconfigure(0, weight=10)
@@ -524,6 +541,20 @@ class SettingsWindow(object):
         self.ok_button.grid(column=2, row=0)
         # Place frames
         self.buttons_frame.grid(column=0, row=3, sticky=tk.E)
+
+        self.port_var.trace('w', self.update_options)
+        self.orthophotos_var.trace('w', self.update_options)
+        self.update_options()
+
+    def update_options(self, *args, **kwargs):
+        self.fg_options_var.set(
+            _('''Start FlightGear with the following parameters:
+            --telnet={port}
+            --fg-scenery={scenery_path}''').format(
+                port=self.port_var.get(),
+                scenery_path=self.orthophotos_var.get(),
+            )
+        )
 
     def format_size(self, res:int) -> str:
         """Formats image size to a readable format."""
