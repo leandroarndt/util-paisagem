@@ -405,7 +405,6 @@ class TileManager(object):
                         self.disk_usage -= os.path.getsize(path / f'{t.index}.png')
                     elif (path / f'{t.index}.dds').exists():
                         self.disk_usage -= os.path.getsize(path / f'{t.index}.dds')
-                    self.disk_usage -= os.path.getsize(t.get_path(self.settings.orthophotos_folder))
                     t.delete_files(tile_manager_queue=self.tile_queue, auto_clean=True) # It already communicates with TileManager.tile_queue
                 self.upstream_queue.put_nowait(format_status(
                     _('Finished deleting unused tiles. Current disk usage: {space} MB.').format(
