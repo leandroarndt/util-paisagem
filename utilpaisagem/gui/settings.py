@@ -109,8 +109,10 @@ class SettingsWindow(object):
     image_service_var:tk.StringVar
     image_service_label:ttk.Label
     image_service_entry:ttk.Combobox
-    image_service_full_name_var:tk.StringVar
-    image_service_full_name_label:ttk.Label
+    image_service_description_var:tk.StringVar
+    image_service_description_label:ttk.Label
+    image_service_area_var:tk.StringVar
+    image_service_area_label:ttk.Label
     image_service_license_var:t.StringVar
     image_service_license_label:ttk.Label
     download_frame:ttk.LabelFrame
@@ -232,7 +234,7 @@ class SettingsWindow(object):
         self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
         self.fg_options_frame = ttk.LabelFrame(
             self.flightgear_tab,
-            text=_('FlightGear launch options'),,
+            text=_('FlightGear launch options'),
             padding=PADDING,
         )
         self.fg_options_frame.columnconfigure(0, weight=10)
@@ -310,6 +312,16 @@ class SettingsWindow(object):
             self.image_service_frame,
             textvariable=self.image_service_description_var,
         )
+        self.image_service_area_var = tk.StringVar(
+            self.image_service_frame,
+            value=_('Availability area: {area}').format(
+                area=IMAGE_SERVICES[self.settings.image_service].availability_area
+            )
+        )
+        self.image_service_area_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_area_var,
+        )
         self.image_service_license_var = tk.StringVar(
             self.image_service_frame,
             value=_('Image service license at {link}').format(
@@ -323,7 +335,8 @@ class SettingsWindow(object):
         self.image_service_label.grid(column=0, row=0, sticky=tk.E)
         self.image_service_entry.grid(column=1, row=0, sticky=tk.W)
         self.image_service_description_label.grid(column=0, row=1, columnspan=2, sticky=tk.W)
-        self.image_service_license_label.grid(column=0, row=2, columnspan=2, sticky=tk.W)
+        self.image_service_area_label.grid(column=0, row=2, columnspan=2, sticky=tk.W)
+        self.image_service_license_label.grid(column=0, row=3, columnspan=2, sticky=tk.W)
         # Threading and download range
         self.download_frame = ttk.LabelFrame(
             self.download_tab,
@@ -613,6 +626,9 @@ class SettingsWindow(object):
 
     def change_image_service(self, *args, **kwargs):
         self.image_service_description_var.set(IMAGE_SERVICES[self.image_service_var.get()].description)
+        self.image_service_area_var.set(_('Availability area: {area}').format(
+            area=IMAGE_SERVICES[self.image_service_var.get()].availability_area
+        ))
         self.image_service_license_var.set(_('Image service license at {link}').format(
             link=IMAGE_SERVICES[self.image_service_var.get()].license_link,
         ))
