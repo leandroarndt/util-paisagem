@@ -11,7 +11,8 @@
 - Aircraft position retrieval is now non-blocking.
 
 **Note:** previous "Orthophotos folder" settings are displayed as the
-correspondent scenery folder. This change affects only the user interface.
+correspondent scenery folder. This change affects only the user interface
+and no further action is required from the user.
 
 ## 0.5.0
 
