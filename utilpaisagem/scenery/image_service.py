@@ -106,9 +106,9 @@ class ImageService(object):
 class _ArcGIS(ImageService):
     def __init__(self):
         self.name = 'ArcGIS'
-        self.description = 'ArcGIS worldwide service under restrictive license'
+        self.description = _('ArcGIS worldwide service under restrictive license')
         self.license_link = 'https://www.esri.com/en-us/legal/terms/full-master-agreement'
-        self.availability_area = _('Worldwide')
+        self.availability_area = _('worldwide')
         self.max_size = 4096
 
     def can_download(self, coordinates:Coordinates):
@@ -122,7 +122,7 @@ class _ArcGIS(ImageService):
 class _PNOA(ImageService):
     def __init__(self):
         self.name = 'PNOA'
-        self.description = 'Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional (CC-BY 4.0)'
+        self.description = _('Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional (CC-BY 4.0)')
         self.license_link = 'https://creativecommons.org/licenses/by/4.0/'
         self.availability_area = _('Spain')
     
@@ -140,7 +140,7 @@ class _PNOA(ImageService):
 class _USGS(ImageService):
     def __init__(self):
         self.name = 'USGS'
-        self.description = 'U.S. Geographical Surveys (public domain)'
+        self.description = _('U.S. Geographical Surveys (public domain)')
         self.license_link = 'https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits'
         self.availability_area = _('USA')
     
@@ -154,7 +154,7 @@ class _USGS(ImageService):
 class _Bayern(ImageService):
     def __init__(self):
         self.name = 'Geobaisdaten Bayern'
-        self.description = 'Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung'
+        self.description = _('Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung')
         self.license_link = 'https://creativecommons.org/licenses/by/4.0/deed.de'
         self.availability_area = _('Bavaria (Deutschland)')
 
