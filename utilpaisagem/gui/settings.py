@@ -232,7 +232,8 @@ class SettingsWindow(object):
         self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
         self.fg_options_frame = ttk.LabelFrame(
             self.flightgear_tab,
-            text=_('FlightGear launch options'),
+            text=_('FlightGear launch options'),,
+            padding=PADDING,
         )
         self.fg_options_frame.columnconfigure(0, weight=10)
         self.fg_options_var = tk.StringVar(
