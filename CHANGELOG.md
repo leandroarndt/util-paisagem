@@ -29,9 +29,9 @@ or needing renewal.
 ### 0.5.2
 
 - Fixed issue with incomplete rendering of the settings window on Windows.
-(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+(Reported by [Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
 - Fixed issue with tiles not updating live on Windows.
-(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+(Reported by [Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
 - Fixed issue with disk space limit enforcement possibly deleting everything.
 
 ## 0.4.0
@@ -80,7 +80,7 @@ hemisphere.
   - Copy tile index
   - Settings
 - Search with "return" at the search bar and add waypoint on search with "ctrl+return"
-- Created a workaround for the bug [reported by Patamoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440849#p440835)
+- Created a workaround for the bug [reported by Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440849#p440835)
 which consisted of babel.numbers.format_decimal throwing babel.core.UnknownLocaleError on windows with locale "spanish_CHILE" (issue #3).
 - Corrected images being pushed south on the northern hemisphere ([reported by lomar and Zakharov at the FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533))
 
