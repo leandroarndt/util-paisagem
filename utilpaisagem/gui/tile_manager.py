@@ -584,9 +584,10 @@ class TileManager(object):
                 elif self.great_tiles[gt_index].tiles[dt_index].polygon is None and \
                     self.detail_level == self.settings.detail_degree:
                     self.great_tiles[gt_index].tiles[dt_index].draw()
-                elif self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None:
+                elif self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None and \
+                    self.detail_level == self.settings.detail_tile:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].draw()
-                else:
+                elif self.detail_level == self.settings.detail_tile:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].state = tile[3]
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon.update(
                         color=tile[3]
