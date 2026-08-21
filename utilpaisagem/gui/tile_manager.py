@@ -405,7 +405,6 @@ class TileManager(object):
                         self.disk_usage -= os.path.getsize(path / f'{t.index}.png')
                     elif (path / f'{t.index}.dds').exists():
                         self.disk_usage -= os.path.getsize(path / f'{t.index}.dds')
-                    self.disk_usage -= os.path.getsize(t.get_path(self.settings.orthophotos_folder))
                     t.delete_files(tile_manager_queue=self.tile_queue, auto_clean=True) # It already communicates with TileManager.tile_queue
                 self.upstream_queue.put_nowait(format_status(
                     _('Finished deleting unused tiles. Current disk usage: {space} MB.').format(
@@ -425,7 +424,6 @@ class TileManager(object):
                 gt = all_gts.pop(0)
                 gt.find_degree_tiles()
         
-        print('aqui')
         if self.deleting_tiles:
             return # Tasks may not be concomitant
 
@@ -524,7 +522,8 @@ class TileManager(object):
             if tile[0] < 0:
                 try:
                     # self.tile_list.pop(self.tile_list.index(abs(tile[0]))) # Fails if put by size reader
-                    self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
+                    if tile[2]:
+                        self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
                 except IndexError:
                     pass # self.read_size_queue() poped it already
                 try:
@@ -585,9 +584,10 @@ class TileManager(object):
                 elif self.great_tiles[gt_index].tiles[dt_index].polygon is None and \
                     self.detail_level == self.settings.detail_degree:
                     self.great_tiles[gt_index].tiles[dt_index].draw()
-                elif self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None:
+                elif self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon is None and \
+                    self.detail_level == self.settings.detail_tile:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].draw()
-                else:
+                elif self.detail_level == self.settings.detail_tile:
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].state = tile[3]
                     self.great_tiles[gt_index].tiles[dt_index].tiles[tile[0]].polygon.update(
                         color=tile[3]

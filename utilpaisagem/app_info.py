@@ -1,8 +1,8 @@
 from pathlib import Path
 
 VERSION = 0
-SUBVERSION = 5
-REVISION = 2
+SUBVERSION = 6
+REVISION = 0
 RC = 0
 
 base_path = Path(__file__).parent.parent

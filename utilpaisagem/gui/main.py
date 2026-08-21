@@ -25,6 +25,7 @@ from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCA
 from utilpaisagem.gui.settings import SettingsWindow
 from utilpaisagem.gui.tile_manager import TileManager, TileColors
 from utilpaisagem.gui.upgrader import Upgrader
+from utilpaisagem.airports.aptdat import FGAirports
 
 class MainWindow(object):
     """
@@ -36,6 +37,7 @@ class MainWindow(object):
     downloader:Downloader
     settings:Settings
     tile_manager:TileManager
+    fg_airports:FGAirports
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -142,6 +144,10 @@ class MainWindow(object):
             label=_('Delete tile'),
             command=self.delete_tile,
         )
+        self.file_menu.add_command(
+            label=_('Delete region'),
+            command=self.delete_region,
+        )
         self.file_menu.add_separator()
         self.file_menu.add_command(
             label=_('Rescan downloaded tiles'),
@@ -230,7 +236,7 @@ class MainWindow(object):
         self.search_label.grid(column=0, row=0)
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.search_button.grid(column=2, row=0)
-        # TODO resize map properly, store window size and map coordinates
+        # TODO store window size and map coordinates
         self.map_widget = MapWidget(self.map_frame, width=800, height=600)
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
@@ -397,7 +403,14 @@ class MainWindow(object):
         # Status bar
         self.status_var = tk.StringVar(self.window, _('Welcome to Útil paisagem'))
         self.status_bar = ttk.Label(self.window, textvariable=self.status_var, justify=tk.LEFT)
-        self.status_bar.grid(column=0, row=1, columnspan=2, sticky=tk.W)
+        self.disk_usage_var = tk.StringVar(self.window, '')
+        self.disk_usage_label = ttk.Label(
+            self.window,
+            textvariable=self.disk_usage_var,
+            justify=tk.LEFT
+        )
+        self.status_bar.grid(column=0, row=1, sticky=tk.W)
+        self.disk_usage_label.grid(column=1, row=1, sticky=tk.W)
 
         # Size
         self.window.update()
@@ -415,6 +428,30 @@ class MainWindow(object):
         self.tile_manager = TileManager(self.upstream_queue, self.map_widget)
         self.scan_tiles()
 
+        self.fg_airports = None
+        def open_aptdat():
+            nonlocal self
+            path = Path(self.settings.fgdata_folder) / 'Airports' / 'apt.dat.gz'
+            if not path.exists():
+                path = Path(self.settings.fgdata_folder) / 'fgdata_2024_1' / 'Airports' / 'apt.dat.gz'
+                if path.exists():
+                    self.settings.fgdata_folder = Path(self.settings.fgdata_folder) / 'fgdata_2024_1'
+                    self.settings.save()
+            try:
+                self.fg_airports = FGAirports(path)
+                self.upstream_queue.put_nowait(format_status(
+                    _('FlightGear airports have been loaded.'),
+                    self,
+                ))
+            except FileNotFoundError:
+                self.upstream_queue.put_nowait(format_status(
+                    _('FlightGear airports file not found at {path}.').format(
+                        path=Path(self.settings.fgdata_folder) / 'Airports' / 'apt.dat.gz'),
+                    self,
+                ))
+        load_airports = Thread(target=open_aptdat)
+        load_airports.start()
+
         # Init downloader
         self.downloader = Downloader(
             self.window,
@@ -427,11 +464,13 @@ class MainWindow(object):
 
         # Init upstream reader
         self.upstream_reader = UpstreamReader(
-            self.window,
-            self.status_var,
-            self.upstream_queue,
-            self.tile_manager,
-            self.downloader,
+            root=self.window,
+            main_window=self,
+            status_var=self.status_var,
+            disk_usage_var=self.disk_usage_var,
+            upstream_queue=self.upstream_queue,
+            tile_manager=self.tile_manager,
+            downloader=self.downloader,
             interval=100)
         self.upstream_reader.read()
 
@@ -468,7 +507,26 @@ class MainWindow(object):
         )
         if answer:
             Tile(self.index).delete_files(self.tile_manager.tile_queue)
-    
+ 
+    def delete_region(self):
+        def do_delete():
+            nonlocal self
+            tiles = self.download_manager.get_region(self.lat, self.lon, add=False)
+            while tiles:
+                t = tiles.pop(0)
+                t.delete_files(self.tile_manager.tile_queue)
+
+        answer = tk.messagebox.askyesno(
+            title=_('Delete region?'),
+            message=_('Are you sure you want to delete region centered on {lat}, {lon}?').format(
+                lat=self.lat,
+                lon=self.lon,
+            )
+        )
+        if answer:
+            thread = Thread(target=do_delete)
+            thread.start()
+
     def scan_tiles(self):
         find_tiles = Thread(target=self.tile_manager.find_great_tiles)
         find_tiles.start()
@@ -656,7 +714,20 @@ class MainWindow(object):
         self.waypoint_name_var.set('')
 
     def search(self, *args, **kwargs):
-        marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
+        airport = None
+        if self.fg_airports is not None:
+            if len(self.search_var.get()) == 4:
+                airport = self.fg_airports.search_by_id(self.search_var.get())
+            else:
+                airport = self.fg_airports.search_by_name(self.search_var.get())
+        if airport is not None:
+            marker = self.map_widget.set_marker(
+                deg_x=airport.latitude, # Don't ask me
+                deg_y=airport.longitude,
+                text=self.search_var.get(),
+            )
+        else:
+            marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
         if isinstance(marker, CanvasPositionMarker):
             self.lat, self.lon = marker.position
             self.lat_var.set(str(self.lat))

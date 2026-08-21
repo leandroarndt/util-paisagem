@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from pathlib import Path
 from threading import Thread
 from queue import Queue, ShutDown, Empty
@@ -13,6 +14,12 @@ from utilpaisagem.scenery.image_service import ImageService, IMAGE_SERVICES
 from utilpaisagem.scenery.common import DOWNLOAD_RES
 from utilpaisagem.gui.common import format_status, Settings, LOCALE
 from utilpaisagem.gui.tile_manager import TileManager
+
+if TYPE_CHECKING:
+    from utilpaisagem.gui.main import MainWindow
+else:
+    class MainWindow(object):
+        pass
 
 class Downloader(object):
     """
@@ -57,7 +64,7 @@ class Downloader(object):
         tile:Tile = self.download_queue.get()
         tile.retrieve(
             path=Path(self.settings.orthophotos_folder),
-            image_service=IMAGE_SERVICES[0],
+            image_service=IMAGE_SERVICES[self.settings.image_service],
             upstream_queue=self.upstream_queue,
             download_res=self.settings.download_res,
             compress=self.settings.image_format,
@@ -146,7 +153,8 @@ class Follower(object):
             self.upstream_queue.put_nowait(format_status(_('Sucessfuly connected to Flightgear.'), self))
     
     def follow(self):
-        if not self.downstream_queue.is_shutdown: # If the following has not been canceled
+        def get_pos():
+            nonlocal self
             try:
                 self.lat = self.connection.get_prop('/position/latitude-deg')
                 self.lon = self.connection.get_prop('/position/longitude-deg')
@@ -162,7 +170,6 @@ class Follower(object):
                 )
                 self.main_window.place_aircraft(self.lat, self.lon, active=False)
                 self.main_window.window.after(self.settings.following_interval*10, self.follow)
-                # self.downstream_queue.shutdown(immediate=True) # Tell master thread that we have terminated
             else:
                 self.download_manager.recenter(lat=self.lat, lon=self.lon) # Update download manager center
                 self.main_window.place_aircraft(self.lat, self.lon, active=True)
@@ -170,9 +177,11 @@ class Follower(object):
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=self.lat, lon=self.lon), self)
                 )
                 self.main_window.window.after(self.settings.following_interval, self.follow)
+        if not self.downstream_queue.is_shutdown: # If the following has not been canceled
+            thread = Thread(target=get_pos)
+            thread.start()
         else:
-            self.close_connection()
-    
+            self.close_connection()    
     def close_connection(self):
         self.connection.sock.close()
 
@@ -187,24 +196,30 @@ class UpstreamReader(object):
     interval:int
     status_var:tk.StringVar
     show_tiles:bool
+    settings:Settings
 
     def __init__(
         self,
         root:tk.Tk,
+        main_window,
         status_var:tk.StringVar,
+        disk_usage_var:tk.StringVar,
         upstream_queue:Queue,
         tile_manager:TileManager,
         downloader:Downloader,
         interval:int=100,
     ):
         self.root = root
+        self.main_window = main_window
         self.upstream_queue = upstream_queue
         self.tile_manager = tile_manager
         self.interval = interval
         self.downloader = downloader
         self.status_var = status_var
         self.status_var.set(_('Welcome to Útil paisagem'))
+        self.disk_usage_var = disk_usage_var
         self.show_tiles = False
+        self.settings = Settings()
     
     def read(self):
         if not self.show_tiles:
@@ -230,19 +245,27 @@ class UpstreamReader(object):
             ]))
         elif self.show_tiles and self.downloader.current_downloads == 0:
             self.status_var.set(format_status(
-                _('All {total} tiles have been processed. Used disk space: {space} MB.').format(
+                _('All {total} tiles have been processed.').format(
                     total=self.downloader.download_queue.qsize() + \
                         self.downloader.finished_downloads + \
                         self.downloader.current_downloads,
-                    space = format_decimal(
-                        Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
-                        locale=LOCALE,
-                    ),
                 ),
                 self
             ))
             self.show_tiles = False
         elif msg:
             self.status_var.set(msg)
+        self.disk_usage_var.set(_('Disk space used: {space} MB.').format(
+            space=format_decimal(
+                Decimal(self.tile_manager.disk_usage / 1024**2).quantize(Decimal('1.00')),
+                locale=LOCALE
+            )
+        ))
+        if self.tile_manager.disk_usage < self.settings.max_disk_usage * 0.9:
+            self.main_window.disk_usage_label.configure(foreground='darkgreen')
+        elif self.tile_manager.disk_usage < self.settings.max_disk_usage:
+            self.main_window.disk_usage_label.configure(foreground='darkgoldenrod4')
+        else:
+            self.main_window.disk_usage_label.configure(foreground='firebrick')
         self.root.after(self.interval, self.read)
 

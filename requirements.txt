@@ -8,3 +8,4 @@ pyshortcuts
 pyperclip
 show-in-file-manager
 github3.py
+xplane-airports

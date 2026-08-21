@@ -9,6 +9,7 @@ from tkinter import filedialog
 from babel.numbers import format_decimal
 from utilpaisagem.gui.common import Settings, PADDING, LOCALE
 from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
+from utilpaisagem.scenery.image_service import IMAGE_SERVICES
 
 if TYPE_CHECKING:
     from utilpaisagem.gui.main import MainWindow
@@ -100,6 +101,20 @@ class SettingsWindow(object):
     interval_label:ttk.Label
     interval_input:ttk.Entry
     interval_seconds_label:ttk.Label
+    fg_options_frame:ttk.Labelframe
+    fg_options_var:tk.StringVar
+    fg_options_label:ttk.Label
+    download_tab:ttk.Frame
+    image_service_frame:ttk.LabelFrame
+    image_service_var:tk.StringVar
+    image_service_label:ttk.Label
+    image_service_entry:ttk.Combobox
+    image_service_description_var:tk.StringVar
+    image_service_description_label:ttk.Label
+    image_service_area_var:tk.StringVar
+    image_service_area_label:ttk.Label
+    image_service_license_var:tk.StringVar
+    image_service_license_label:ttk.Label
     download_frame:ttk.LabelFrame
     radius_var:tk.IntVar
     radius_label:ttk.Label
@@ -186,13 +201,15 @@ class SettingsWindow(object):
             justify=tk.LEFT,
             font=tk.font.Font(slant='italic'),
         )
-        # TODO
         self.fg_path_button = ttk.Button(
             self.path_frame,
             text=_('Choose folder'),
             command=self.choose_fgdata_dir,
         )
-        self.orthophotos_var = tk.StringVar(self.path_frame, value=self.settings.orthophotos_folder)
+        self.orthophotos_var = tk.StringVar(
+            self.path_frame,
+            value=str(Path(self.settings.orthophotos_folder).parent),
+        )
         self.orthophotos_name = ttk.Label(
             self.path_frame,
             text=_('Path to scenery imagery:'),
@@ -215,6 +232,21 @@ class SettingsWindow(object):
         self.orthophotos_name.grid(column=0, row=1, sticky=tk.E)
         self.orthophotos_label.grid(column=1, row=1, sticky=tk.W)
         self.orthophotos_button.grid(column=2, row=1, sticky=tk.E)
+        self.fg_options_frame = ttk.LabelFrame(
+            self.flightgear_tab,
+            text=_('FlightGear launch options'),
+            padding=PADDING,
+        )
+        self.fg_options_frame.columnconfigure(0, weight=10)
+        self.fg_options_var = tk.StringVar(
+            self.fg_options_frame,
+            value=''
+        )
+        self.fg_options_label = ttk.Label(
+            self.fg_options_frame,
+            textvariable=self.fg_options_var,
+        )
+        self.fg_options_label.grid(column=0, row=0, sticky=tk.W)
         # Connection
         self.connection_frame = ttk.Labelframe(
             self.flightgear_tab,
@@ -246,13 +278,71 @@ class SettingsWindow(object):
         self.interval_seconds_label.grid(column=2, row=2, sticky=tk.W)
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.connection_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
+        self.fg_options_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
         # Download tab
         self.download_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.download_tab.columnconfigure(0, weight=10)
         self.notebook.add(self.download_tab, text=_('Download'))
+        # Image services
+        self.image_service_frame = ttk.LabelFrame(
+            self.download_tab,
+            text=_('Image service')
+        )
+        self.image_service_frame.columnconfigure(0, weight=0)
+        self.image_service_frame.columnconfigure(1, weight=10)
+        self.image_service_var = tk.StringVar(
+            self.image_service_frame,
+            value=self.settings.image_service
+        )
+        self.image_service_var.trace('w', self.change_image_service)
+        self.image_service_label = ttk.Label(
+            self.image_service_frame,
+            text=_('Image service:')
+        )
+        self.image_service_entry = ttk.Combobox(
+            self.image_service_frame,
+            values=list(IMAGE_SERVICES.keys()),
+            textvariable=self.image_service_var,
+        )
+        self.image_service_description_var = tk.StringVar(
+            self.image_service_frame,
+            value=IMAGE_SERVICES[self.settings.image_service].description,
+        )
+        self.image_service_description_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_description_var,
+        )
+        self.image_service_area_var = tk.StringVar(
+            self.image_service_frame,
+            value=_('Availability area: {area}').format(
+                area=IMAGE_SERVICES[self.settings.image_service].availability_area
+            )
+        )
+        self.image_service_area_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_area_var,
+        )
+        self.image_service_license_var = tk.StringVar(
+            self.image_service_frame,
+            value=_('Image service license at {link}').format(
+                link=IMAGE_SERVICES[self.settings.image_service].license_link
+            ),
+        )
+        self.image_service_license_label = ttk.Label(
+            self.image_service_frame,
+            textvariable=self.image_service_license_var,
+        )
+        self.image_service_label.grid(column=0, row=0, sticky=tk.E)
+        self.image_service_entry.grid(column=1, row=0, sticky=tk.W)
+        self.image_service_description_label.grid(column=0, row=1, columnspan=2, sticky=tk.W)
+        self.image_service_area_label.grid(column=0, row=2, columnspan=2, sticky=tk.W)
+        self.image_service_license_label.grid(column=0, row=3, columnspan=2, sticky=tk.W)
         # Threading and download range
-        self.download_frame = ttk.LabelFrame(self.download_tab, text=_('Download'), padding=PADDING)
-        self.download_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.download_frame = ttk.LabelFrame(
+            self.download_tab,
+            text=_('Download'),
+            padding=PADDING
+        )
         self.radius_var = tk.IntVar(self.download_frame, value=self.settings.radius)
         self.radius_label = ttk.Label(
             self.download_frame,
@@ -320,6 +410,8 @@ class SettingsWindow(object):
         self.tiles_input.grid(column=1, row=3, sticky=tk.W+tk.E)
         self.threads_label.grid(column=0, row=4, sticky=tk.E)
         self.threads_input.grid(column=1, row=4, sticky=tk.W+tk.E)
+        self.image_service_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.download_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Image tab
         self.image_tab = ttk.Frame(self.notebook, padding=PADDING)
         self.image_tab.rowconfigure(0, weight=10)
@@ -464,6 +556,20 @@ class SettingsWindow(object):
         # Place frames
         self.buttons_frame.grid(column=0, row=3, sticky=tk.E)
 
+        self.port_var.trace('w', self.update_options)
+        self.orthophotos_var.trace('w', self.update_options)
+        self.update_options()
+
+    def update_options(self, *args, **kwargs):
+        self.fg_options_var.set(
+            _('''Start FlightGear with the following parameters:
+            --telnet={port}
+            --fg-scenery={scenery_path}''').format(
+                port=self.port_var.get(),
+                scenery_path=self.orthophotos_var.get(),
+            )
+        )
+
     def format_size(self, res:int) -> str:
         """Formats image size to a readable format."""
         return _('{size} lines').format(size=2**res)
@@ -484,23 +590,48 @@ class SettingsWindow(object):
     def choose_orthophotos_dir(self):
         path = tk.filedialog.askdirectory(
             parent=self.window,
-            title=_('Choose "Orthophotos" directory'),
+            title=_('Choose directory for photoscenery'),
             initialdir=self.orthophotos_var.get(),
         )
         if not path:
             return
         path = Path(path)
         path = path.expanduser()
-        if Path(path).is_dir():
-            if path.name.lower() != 'orthophotos': # Invalid path
-                tk.messagebox.showerror(
-                    title=_('Invalid folder'),
-                    message=_('Please choose a folder named "Orthophotos".')
-                )
-                return
-            if path.name != 'Orthophotos': # Normalize
-                path = path.rename(path.parent / 'Orthophotos')
+        # if Path(path).is_dir():
+        #     if path.name.lower() != 'orthophotos': # Invalid path
+        #         tk.messagebox.showerror(
+        #             title=_('Invalid folder'),
+        #             message=_('Please choose a folder named "Orthophotos".')
+        #         )
+        #         return
+        #     if path.name != 'Orthophotos': # Normalize
+        #         path = path.rename(path.parent / 'Orthophotos')
+        #     self.orthophotos_var.set(path)
+        if (path / 'Orthophotos').is_dir():
             self.orthophotos_var.set(path)
+            return
+        if path.name == 'Orthophotos':
+            self.orthophotos_var.set(path.parent)
+            return
+        if path.name.lower() == 'orthophotos':
+            path = path.rename(path.parent / 'Orthophotos')
+            self.orthophotos_var.set(path.parent)
+            return
+        for item in path.iterdir():
+            if item.is_dir() and item.name.lower() == 'orthophotos':
+                item.rename(item.parent / 'Orthophotos')
+                return
+        (path / 'Orthophotos').mkdir()
+        self.orthophotos_var.set(path)
+
+    def change_image_service(self, *args, **kwargs):
+        self.image_service_description_var.set(IMAGE_SERVICES[self.image_service_var.get()].description)
+        self.image_service_area_var.set(_('Availability area: {area}').format(
+            area=IMAGE_SERVICES[self.image_service_var.get()].availability_area
+        ))
+        self.image_service_license_var.set(_('Image service license at {link}').format(
+            link=IMAGE_SERVICES[self.image_service_var.get()].license_link,
+        ))
 
     def cancel(self):
         self.settings.reload()
@@ -508,7 +639,7 @@ class SettingsWindow(object):
 
     def apply(self):
         self.settings.fgdata_folder = self.fg_path_var.get()
-        self.settings.orthophotos_folder = self.orthophotos_var.get()
+        self.settings.orthophotos_folder = str(Path(self.orthophotos_var.get()) / 'Orthophotos')
         self.settings.host = self.host_var.get()
         try:
             self.settings.port = int(self.port_var.get())
@@ -526,6 +657,7 @@ class SettingsWindow(object):
                     message=_('Invalid value in following interval configuration. Please inform an integer value.'),
             )
             return
+        self.settings.image_service = self.image_service_var.get()
         try:
             self.settings.radius = int(self.radius_var.get())
         except tk.TclError:

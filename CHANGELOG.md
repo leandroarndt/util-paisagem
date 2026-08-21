@@ -1,5 +1,20 @@
 # Útil paisagem changelog
 
+## 0.6.0
+
+- Additional image provider (USGS).
+- Always displays used disk space at the main window.
+- Delete region command at "File" menu.
+- Use scenery folder on the settings window instead of "Orthophotos".
+- Shows FlightGear launch parameters at the settings window.
+- Airport search is performed at FlightGear's `apt.dat.gz` first, and only then
+at Open Street Map.
+- Aircraft position retrieval is now non-blocking.
+
+**Note:** previous "Orthophotos folder" settings are displayed as the
+correspondent scenery folder. This change affects only the user interface
+and no further action is required from the user.
+
 ## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.
@@ -15,9 +30,9 @@ or needing renewal.
 ### 0.5.2
 
 - Fixed issue with incomplete rendering of the settings window on Windows.
-(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+(Reported by [Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
 - Fixed issue with tiles not updating live on Windows.
-(Reported by [Patomoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
+(Reported by [Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440977#p440970))
 - Fixed issue with disk space limit enforcement possibly deleting everything.
 
 ## 0.4.0
@@ -66,7 +81,7 @@ hemisphere.
   - Copy tile index
   - Settings
 - Search with "return" at the search bar and add waypoint on search with "ctrl+return"
-- Created a workaround for the bug [reported by Patamoi on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440849#p440835)
+- Created a workaround for the bug [reported by Patricio on FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533&p=440849#p440835)
 which consisted of babel.numbers.format_decimal throwing babel.core.UnknownLocaleError on windows with locale "spanish_CHILE" (issue #3).
 - Corrected images being pushed south on the northern hemisphere ([reported by lomar and Zakharov at the FlightGear forum](https://forum.flightgear.org/viewtopic.php?f=5&t=44533))
 

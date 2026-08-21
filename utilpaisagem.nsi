@@ -1,7 +1,7 @@
 ﻿!include MUI2.nsh
 
 !define APP_NAME "Util Paisagem"
-!define APP_VERSION "0.5.2"
+!define APP_VERSION "0.6.0"
 !define APP_ICON "resources\images\utilpaisagem.ico"
 !define MUI_ICON "${APP_ICON}"
 !define MUI_UNICON "${APP_ICON}"
@@ -73,8 +73,8 @@ Section "uninstall"
     # Delete "$INSTDIR\uninstall.exe"
  
     # second, remove the link from the start menu
-	Delete "$SMPROGRAMS\Util Paisagem.lnk"
-    Delete "$SMPROGRAMS\Util Paisagem uninstaller.lnk"
+	Delete "$SMPROGRAMS\${APP_NAME}.lnk"
+    Delete "$SMPROGRAMS\${APP_NAME} uninstaller.lnk"
  
     RMDir /r $INSTDIR
 # uninstaller section end
