@@ -522,7 +522,8 @@ class TileManager(object):
             if tile[0] < 0:
                 try:
                     # self.tile_list.pop(self.tile_list.index(abs(tile[0]))) # Fails if put by size reader
-                    self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
+                    if tile[2]:
+                        self.size_queue.put_nowait((abs(tile[0]), -tile[2]))
                 except IndexError:
                     pass # self.read_size_queue() poped it already
                 try:
