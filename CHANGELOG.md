@@ -7,7 +7,8 @@
 - Delete region command at "File" menu.
 - Use scenery folder on the settings window instead of "Orthophotos".
 - Shows FlightGear launch parameters at the settings window.
-- Searches airports at apt.dat first.
+- Airport search is performed at FlightGear's `apt.dat.gz` first, and only then
+at Open Street Map.
 - Aircraft position retrieval is now non-blocking.
 
 **Note:** previous "Orthophotos folder" settings are displayed as the
