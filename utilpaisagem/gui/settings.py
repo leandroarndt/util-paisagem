@@ -1,6 +1,6 @@
 """Settings window and ini file reader."""
 from typing import TYPE_CHECKING, List, Dict
-import math
+import math, webbrowser
 from decimal import Decimal
 from pathlib import Path
 import tkinter as tk
@@ -331,7 +331,11 @@ class SettingsWindow(object):
         self.image_service_license_label = ttk.Label(
             self.image_service_frame,
             textvariable=self.image_service_license_var,
+            cursor='hand2'
         )
+        self.image_service_license_label.bind('<Button-1>', lambda e: webbrowser.open(
+            IMAGE_SERVICES[self.image_service_var.get()].license_link
+        ))
         self.image_service_label.grid(column=0, row=0, sticky=tk.E)
         self.image_service_entry.grid(column=1, row=0, sticky=tk.W)
         self.image_service_description_label.grid(column=0, row=1, columnspan=2, sticky=tk.W)
