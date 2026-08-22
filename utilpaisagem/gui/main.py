@@ -718,8 +718,13 @@ class MainWindow(object):
         if self.fg_airports is not None:
             if len(self.search_var.get()) == 4:
                 airport = self.fg_airports.search_by_id(self.search_var.get())
+                using = 'FlightGear\'s apt.dat.gz'
             else:
-                airport = self.fg_airports.search_by_name(self.search_var.get())
+                try:
+                    airport = self.fg_airports.search_by_name(self.search_var.get())[0]
+                    using = 'FlightGear\'s apt.dat.gz'
+                except IndexError:
+                    airpot = None
         if airport is not None:
             marker = self.map_widget.set_marker(
                 deg_x=airport.latitude, # Don't ask me
@@ -728,6 +733,7 @@ class MainWindow(object):
             )
         else:
             marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
+            using = 'Open Street Maps'
         if isinstance(marker, CanvasPositionMarker):
             self.lat, self.lon = marker.position
             self.lat_var.set(str(self.lat))
@@ -735,10 +741,11 @@ class MainWindow(object):
             self.place_marker(marker)
             self.select_tile(mark=False, set_index=True)
             self.upstream_queue.put_nowait(format_status(
-                _('"{address}" found at {lat},{lon}.').format(
+                _('"{address}" found at {lat},{lon} using {using}.').format(
                     address=self.search_var.get(),
                     lat=self.lat,
-                    lon=self.lon
+                    lon=self.lon,
+                    using=using,
                 ),
                 self
             ))
