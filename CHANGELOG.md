@@ -15,6 +15,15 @@ at Open Street Map.
 correspondent scenery folder. This change affects only the user interface
 and no further action is required from the user.
 
+### 0.6.1
+
+- Fixed search when the input did not correspond to an ICAO code at
+FlightGear's `apt.dat.gz`.
+- Added information on where the search result was found, helping to distinguish
+between an ICAO code recognized by FlightGear or a newer code from Open
+Street Maps.
+- Opens image service license link on mouse click.
+
 ## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.

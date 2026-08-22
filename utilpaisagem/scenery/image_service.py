@@ -140,7 +140,7 @@ class _PNOA(ImageService):
 class _USGS(ImageService):
     def __init__(self):
         self.name = 'USGS'
-        self.description = _('U.S. Geographical Surveys (public domain)')
+        self.description = _('U.S. Geographical Survey (public domain)')
         self.license_link = 'https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits'
         self.availability_area = _('USA')
     
