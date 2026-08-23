@@ -718,11 +718,11 @@ class MainWindow(object):
         if self.fg_airports is not None:
             if len(self.search_var.get()) == 4:
                 airport = self.fg_airports.search_by_id(self.search_var.get())
-                using = 'FlightGear\'s apt.dat.gz'
+                using = _('FlightGear\'s database')
             else:
                 try:
                     airport = self.fg_airports.search_by_name(self.search_var.get())[0]
-                    using = 'FlightGear\'s apt.dat.gz'
+                    using = _('FlightGear\'s database')
                 except IndexError:
                     airpot = None
         if airport is not None:
@@ -733,7 +733,7 @@ class MainWindow(object):
             )
         else:
             marker = self.map_widget.set_address(self.search_var.get(), text=self.search_var.get(), marker=True, command=self.select_marker)
-            using = 'Open Street Maps'
+            using = _('Open Street Maps')
         if isinstance(marker, CanvasPositionMarker):
             self.lat, self.lon = marker.position
             self.lat_var.set(str(self.lat))
