@@ -1,5 +1,10 @@
 # Útil paisagem changelog
 
+## 0.7.0
+
+TODO:
+- Load XML route files.
+
 ## 0.6.0
 
 - Additional image provider (USGS).
