@@ -31,6 +31,9 @@ class MapPolygon(CanvasPolygon):
         if 'fill_color' in kwargs:
             self.fill_color = kwargs['fill_color']
             configs['fill'] = self.fill_color
+        if 'stipple' in kwargs:
+            self.stipple = kwargs['stipple']
+            configs['stipple'] = self.stipple
         if 'border_width' in kwargs:
             self.border_width = kwargs['border_width']
             configs['width'] =self.border_width
