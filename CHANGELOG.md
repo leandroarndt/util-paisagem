@@ -4,6 +4,8 @@
 
 TODO:
 - Load XML route files.
+- Consider download status at tile.py line 454.
+- Don't download ocean tiles.
 
 ## 0.6.0
 
