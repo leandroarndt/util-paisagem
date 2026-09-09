@@ -451,13 +451,15 @@ class Tile(object):
                         self.index,
                         self.coordinates,
                         self.get_path(self.settings.orthophotos_folder) / filename.name,
-                        TileColors.good,
+                        [TileColors.good if errors == 0 else TileColors.failed],
                         str(self.get_path(Path())).split(os.sep),
                     ))
                 except AttributeError:
                     pass
 
         except (URLError, ContentTooShortError) as e:
+            if QUIT.is_set:
+                return
             try:
                 tile_manager_queue.put_nowait((
                     self.index,
