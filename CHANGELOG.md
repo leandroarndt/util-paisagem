@@ -4,8 +4,10 @@
 
 TODO:
 - Load XML route files.
-- Consider download status at tile.py line 454.
 - Don't download ocean tiles.
+
+DONE:
+- Corrected color of tiles downloaded with error on live map update
 
 ## 0.6.0
 
