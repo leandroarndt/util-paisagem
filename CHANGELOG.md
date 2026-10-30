@@ -24,6 +24,10 @@ between an ICAO code recognized by FlightGear or a newer code from Open
 Street Maps.
 - Opens image service license link on mouse click.
 
+### 0.6.2
+
+- Fixed map visualization issue. (Reported by [Miguel on FlightGear forum](https://forum.flightgear.org/viewtopic.php?p=441772#p441772))
+
 ## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.
