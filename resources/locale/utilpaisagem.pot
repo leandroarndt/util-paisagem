@@ -1,0 +1,711 @@
+# Translations template for Útil paisagem.
+# Copyright (C) 2026 Leandro Arndt
+# This file is distributed under the same license as the Útil paisagem
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Útil paisagem VERSION\n"
+"Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
+"POT-Creation-Date: 2026-08-22 20:47-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: utilpaisagem/gui/agents.py:100
+#, python-brace-format
+msgid "Tile {index} added to download queue."
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:150
+msgid "Could not connect to Flightgear."
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:153
+msgid "Sucessfuly connected to Flightgear."
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:163
+msgid "Could not receive coordinates info from Flightgear"
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:169
+#, python-brace-format
+msgid "Error while retrieving coordinates from flightgear (\"{exception}\")"
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:177
+#, python-brace-format
+msgid "Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}"
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:219 utilpaisagem/gui/main.py:404
+msgid "Welcome to Útil paisagem"
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:239
+#, python-brace-format
+msgid "(Remaining tiles: {n}/{total})"
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:248
+#, python-brace-format
+msgid "All {total} tiles have been processed."
+msgstr ""
+
+#: utilpaisagem/gui/agents.py:258
+#, python-brace-format
+msgid "Disk space used: {space} MB."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:136
+msgid "Show orthophotos folder"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:140
+msgid "Show tile image"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:144
+msgid "Delete tile"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:148
+msgid "Delete region"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:153
+msgid "Rescan downloaded tiles"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:157
+msgid "Enforce disk usage limit"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:162
+msgid "Quit"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:167
+msgid "Copy coordinates"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:171
+msgid "Copy tile index"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:176 utilpaisagem/gui/main.py:398
+msgid "Settings"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:181
+msgid "Online manual"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:185
+msgid "Latest release"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:189
+msgid "Found a bug?"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:193
+msgid "Contribute"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:197
+msgid "Donate"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:201
+msgid "File"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:205
+msgid "Edit"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:209
+msgid "Help"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:231
+msgid "Address or ICAO code:"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:235
+msgid "Search"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:244
+msgid "Select tile"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:249 utilpaisagem/gui/main.py:301
+msgid "Add waypoint"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:266
+msgid "Tile index:"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:274
+msgid "Latitude:"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:283
+msgid "Longitude:"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:291
+msgid "Download tile"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:296
+msgid "Download region"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:322
+msgid "Waypoints:"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:333
+msgid "Rename"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:338
+msgid "Remove Waypoint"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:343
+msgid "Up"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:348
+msgid "Down"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:353
+msgid "Download route"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:374 utilpaisagem/gui/main.py:861
+msgid "Follow aircraft"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:379 utilpaisagem/gui/main.py:862
+msgid "Follow aircraft on Flightgear over telnet connection."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:383
+msgid "Center on aircraft"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:388
+msgid "Center map on aircraft and show the corresponding scenery tile."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:443
+msgid "FlightGear airports have been loaded."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:448
+#, python-brace-format
+msgid "FlightGear airports file not found at {path}."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:494
+msgid "Image not found"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:495
+#, python-brace-format
+msgid "No image found for tile {index}."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:505
+msgid "Delete tile?"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:506
+#, python-brace-format
+msgid "Are you sure you want to delete tile {index}?"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:520
+msgid "Delete region?"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:521
+#, python-brace-format
+msgid "Are you sure you want to delete region centered on {lat}, {lon}?"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:744
+#, python-brace-format
+msgid "\"{address}\" found at {lat},{lon} using {using}."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:755
+#, python-brace-format
+msgid "Could not find address {address}."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:855
+msgid "Stop following"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:856
+msgid "Stop following aircraft on FlightGear"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:38
+#, python-brace-format
+msgid "{res} m/px range:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:49 utilpaisagem/gui/settings.py:361
+msgid "Km"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:176
+msgid "Útil paisagem settings"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:188
+msgid "FlightGear"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:190
+msgid "Paths"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:195
+msgid "Path to FlightGear data folder:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:206 utilpaisagem/gui/settings.py:226
+msgid "Choose folder"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:215
+msgid "Path to scenery imagery:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:237
+msgid "FlightGear launch options"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:253
+msgid "FlightGear connection"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:257
+msgid "Host:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:260
+msgid "Port:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:268
+msgid "Interval retrieving aircraft location:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:271
+msgid "seconds"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:285 utilpaisagem/gui/settings.py:347
+msgid "Download"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:289
+msgid "Image service"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:300
+msgid "Image service:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:317 utilpaisagem/gui/settings.py:633
+#, python-brace-format
+msgid "Availability area: {area}"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:327 utilpaisagem/gui/settings.py:636
+#, python-brace-format
+msgid "Image service license at {link}"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:353
+msgid "Download radius:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:365
+msgid "Maximum simultaneous tiles to download:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:377
+msgid "Maximum simultaneous downloads for each tile:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:390
+msgid "Download size:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:400
+msgid "Image file format:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:422
+msgid "Image resolution"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:424
+msgid "Image"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:443
+msgid "Tile management"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:447
+msgid "Tile age"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:453
+msgid "Days until downloading new image for tile:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:462
+msgid "Days before deleting unused tiles:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:474
+msgid "Disk usage"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:480
+msgid "Maximum disk usage in megabytes:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:486
+msgid "Automatically enforce disk usage limit"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:491
+#, python-brace-format
+msgid "Disk space used: {space} MB"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:507
+msgid "Interface"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:511
+msgid "Detail levels"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:516
+msgid "Maximum latitude and longitude range for 1 degree tiles display:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:527
+msgid "Maximum latitude and longitude range for scenery tiles display:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:544
+msgid "Cancel"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:549
+msgid "Apply"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:554
+msgid "Ok"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:569
+#, python-brace-format
+msgid ""
+"Start FlightGear with the following parameters:\n"
+"            --telnet={port}\n"
+"            --fg-scenery={scenery_path}"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:579
+#, python-brace-format
+msgid "{size} lines"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:588
+msgid "Choose FlightGear data directory"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:597
+msgid "Choose directory for photoscenery"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:652 utilpaisagem/gui/settings.py:660
+#: utilpaisagem/gui/settings.py:669 utilpaisagem/gui/settings.py:677
+#: utilpaisagem/gui/settings.py:685 utilpaisagem/gui/settings.py:706
+#: utilpaisagem/gui/settings.py:717 utilpaisagem/gui/settings.py:725
+#: utilpaisagem/gui/settings.py:732 utilpaisagem/gui/settings.py:740
+#: utilpaisagem/gui/settings.py:747
+msgid "Invalid value"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:653
+msgid "Invalid value in port configuration. Please inform an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:661
+msgid ""
+"Invalid value in following interval configuration. Please inform an "
+"integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:670
+msgid ""
+"Invalid value in download radius configuration. Please inform an integer "
+"value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:678
+msgid ""
+"Invalid value in maximum simultaneous tiles configuration. Please inform "
+"an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:686
+msgid ""
+"Invalid value in maximum simultaneous downloads for each tile "
+"configuration. Please inform an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:707
+#, python-brace-format
+msgid ""
+"Invalid distance value in image resolution configuration ({r}). Please "
+"inform an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:708
+#, python-brace-format
+msgid "{res} m/px"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:718
+msgid ""
+"Invalid value in tile renewal age configuration. Please inform an integer"
+" value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:726
+msgid ""
+"Invalid value in tile deletion age configuration. Please inform an "
+"integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:733
+msgid ""
+"Invalid value in disk usage limit configuration. Please inform an integer"
+" value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:741
+msgid ""
+"Invalid value in degree tile visualization configuration. Please inform "
+"an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:748
+msgid ""
+"Invalid value in scenery tile visualization configuration. Please inform "
+"an integer value."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:308
+#, python-brace-format
+msgid "Finished scanning folder \"{folder}\"."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:373
+#, python-brace-format
+msgid "Current disk usage ({space} MB) does not exceed limit ({limit} MB)."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:389
+#, python-brace-format
+msgid ""
+"Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused"
+" tiles."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:410
+#, python-brace-format
+msgid "Finished deleting unused tiles. Current disk usage: {space} MB."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:434
+msgid "Searching for tiles to display"
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:498
+msgid "Finished searching for tiles to display."
+msgstr ""
+
+#: utilpaisagem/gui/tile_manager.py:533
+#, python-brace-format
+msgid "Could not delete tile {index}: not found."
+msgstr ""
+
+#: utilpaisagem/scenery/common.py:30
+msgid "DDS"
+msgstr ""
+
+#: utilpaisagem/scenery/common.py:31
+msgid "PNG"
+msgstr ""
+
+#: utilpaisagem/scenery/common.py:32
+msgid "smallest size"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:109
+msgid "ArcGIS worldwide service under restrictive license"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:111
+msgid "worldwide"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:125
+msgid ""
+"Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
+"(CC-BY 4.0)"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:127
+msgid "Spain"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:143
+msgid "U.S. Geographical Surveys (public domain)"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:145
+msgid "USA"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:157
+msgid "Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung"
+msgstr ""
+
+#: utilpaisagem/scenery/image_service.py:159
+msgid "Bavaria (Deutschland)"
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:98
+#, python-brace-format
+msgid "Dividing tile {index} in {vertical} lines and {horizontal} columns."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:141
+#, python-brace-format
+msgid "Tile {index}: DDS is smaller than optimized PNG."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:149
+#, python-brace-format
+msgid "Tile {index}: optimized PNG is smaller than DDS."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:212
+#, python-brace-format
+msgid ""
+"Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, "
+"{lon_right:.03f}  is not covered by {service_name}"
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:222
+#, python-brace-format
+msgid ""
+"Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not "
+"covered by {service_name}"
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:247
+#, python-brace-format
+msgid "Downloading image {current}/{total} of tile {index}..."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:279
+#, python-brace-format
+msgid "Processing tile {index} ({lat_median}, {lon_median})..."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:299
+msgid "Previously downloaded file has smaller resolution. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:308
+msgid "Failure on previous download. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:318
+#, python-brace-format
+msgid "Tile {index} has not been saved as a {format} file. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:332
+#, python-brace-format
+msgid ""
+"Previous download was not found where expected (\"{p}\"). Downloading "
+"again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:342
+#, python-brace-format
+msgid "Tile {index} has already been downloaded. Skipping."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:354
+#, python-brace-format
+msgid "Failed to check previous download (\"{e}\"). Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:363
+#, python-brace-format
+msgid "Tile {index} needs renewal. Downloading again."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:399
+#, python-brace-format
+msgid "Downloaded tile {index}."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:421
+#, python-brace-format
+msgid "Tile {index}'s photographic scenery placed at {path}."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:431
+#, python-brace-format
+msgid "Tile {self.index}'s photographic scenery could not be saved."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:476 utilpaisagem/scenery/tile.py:491
+#, python-brace-format
+msgid "Error downloading cell {index}[{line}][{cell}]: {e}."
+msgstr ""
+
