@@ -28,6 +28,10 @@ Street Maps.
 
 - Fixed map visualization issue. (Reported by [Miguel on FlightGear forum](https://forum.flightgear.org/viewtopic.php?p=441772#p441772))
 
+### 0.6.3
+
+- French translation by Emmanuel from FlightGear Forum.
+
 ## 0.5.0
 
 - Renews tiles (new image download) after configurable amount of time.
