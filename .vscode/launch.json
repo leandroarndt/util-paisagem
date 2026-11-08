@@ -12,6 +12,7 @@
             "module": "utilpaisagem",
             "env": {
                 "DEBUG": "true",
+                "LANG": "pt_BR.UTF-8",
             },
             "justMyCode": false,
         }
