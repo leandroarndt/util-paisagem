@@ -79,3 +79,11 @@ class FGFP(object):
             self.waypoints.append(self.departure)
         except AttributeError:
             pass
+        try:
+            if self.waypoints[0].ident == self.waypoints[1].ident:
+                self.waypoints.pop(0)
+        except IndexError:
+            pass
+        if len(self.waypoints) > 1:
+            if self.waypoints[-1].ident == self.waypoints[-2].ident:
+                self.waypoints.pop(-1)
