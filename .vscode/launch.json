@@ -12,8 +12,8 @@
             "module": "utilpaisagem",
             "env": {
                 "DEBUG": "true",
-                "LANG": "pt_BR.UTF-8",
             },
+            "envFile": "${workspaceFolder}/variables.env",
             "justMyCode": false,
         }
     ]
