@@ -143,6 +143,7 @@ class MainWindow(object):
             label=_('Clear route'),
             command=self.clear_route,
         )
+        self.file_menu.add_separator()
         self.file_menu.add_command(
             label=_('Show orthophotos folder'),
             command=lambda: show_in_file_manager(str(self.settings.orthophotos_folder)),
