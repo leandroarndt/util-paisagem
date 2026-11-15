@@ -26,6 +26,7 @@ from utilpaisagem.gui.settings import SettingsWindow
 from utilpaisagem.gui.tile_manager import TileManager, TileColors
 from utilpaisagem.gui.upgrader import Upgrader
 from utilpaisagem.airports.aptdat import FGAirports
+from utilpaisagem.flightplan import FlightPlan, FlightPlanError
 
 class MainWindow(object):
     """
@@ -96,10 +97,12 @@ class MainWindow(object):
     waypoint_name_var:tk.StringVar
     waypoint_name_entry:ttk.Entry
     waypoint_rename_button:ttk.Button
-    waypoints_remove_button:tk.Button
-    waypoints_up_button:tk.Button
-    waypoints_down_button:tk.Button
-    download_route_button:tk.Button
+    waypoints_remove_button:ttk.Button
+    waypoints_up_button:ttk.Button
+    waypoints_down_button:ttk.Button
+    load_route_button:ttk.Button
+    clear_route_button:ttk.Button
+    download_route_button:ttk.Button
     follow_button:ttk.Button
     follow_button_tip:Hovertip
     center_on_aircraft_button:ttk.Button
@@ -132,6 +135,14 @@ class MainWindow(object):
         # Menu
         self.menu = tk.Menu(self.window)
         self.file_menu = tk.Menu(self.menu)
+        self.file_menu.add_command(
+            label=_('Load route'),
+            command=self.load_route,
+        )
+        self.file_menu.add_command(
+            label=_('Clear route'),
+            command=self.clear_route,
+        )
         self.file_menu.add_command(
             label=_('Show orthophotos folder'),
             command=lambda: show_in_file_manager(str(self.settings.orthophotos_folder)),
@@ -333,22 +344,32 @@ class MainWindow(object):
             text=_('Rename'),
             command=self.rename_waypoint,
         )
-        self.waypoints_remove_button = tk.Button(
+        self.waypoints_remove_button = ttk.Button(
             self.waypoints_frame,
             text=_('Remove Waypoint'),
             command=self.remove_waypoint,
         )
-        self.waypoints_up_button = tk.Button(
+        self.waypoints_up_button = ttk.Button(
             self.waypoints_frame,
             text=_('Up'),
             command=lambda: self.move_waypoint(-1),
         )
-        self.waypoints_down_button = tk.Button(
+        self.waypoints_down_button = ttk.Button(
             self.waypoints_frame,
             text=_('Down'),
             command=lambda: self.move_waypoint(1),
         )
-        self.download_route_button = tk.Button(
+        self.load_route_button = ttk.Button(
+            self.waypoints_frame,
+            text=_('Load route'),
+            command=self.load_route,
+        )
+        self.clear_route_button = ttk.Button(
+            self.waypoints_frame,
+            text=_('Clear route'),
+            command=self.clear_route,
+        )
+        self.download_route_button = ttk.Button(
             self.waypoints_frame,
             text=_('Download route'),
             command=self.download_route,
@@ -361,9 +382,11 @@ class MainWindow(object):
         self.waypoint_name_entry.grid(column=0, row=2, sticky=tk.W+tk.E)
         self.waypoint_rename_button.grid(column=1, row=2, columnspan=2, sticky=tk.W+tk.E)
         self.waypoints_remove_button.grid(column=0, row=3, sticky=tk.W + tk.E)
-        self.waypoints_up_button.grid(column=1, row=3)
-        self.waypoints_down_button.grid(column=2, row=3)
-        self.download_route_button.grid(column=0, row=4, columnspan=3, sticky=tk.W+tk.E)
+        self.waypoints_up_button.grid(column=1, row=3, sticky=tk.W+tk.E)
+        self.waypoints_down_button.grid(column=2, row=3, sticky=tk.W+tk.E)
+        self.load_route_button.grid(column=0, row=4, sticky=tk.W+tk.E)
+        self.clear_route_button.grid(column=1, row=4, columnspan=2, sticky=tk.W+tk.E)
+        self.download_route_button.grid(column=0, row=5, columnspan=3, sticky=tk.W+tk.E)
         self.waypoints_frame.pack(fill=tk.X)
         # Following
         self.follow_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
@@ -712,6 +735,46 @@ class MainWindow(object):
         self.waypoints_to_var()
         self.create_route()
         self.waypoint_name_var.set('')
+    
+    def clear_route(self):
+        while self.waypoints:
+            marker = self.waypoints.pop()
+            marker.delete()
+        self.waypoints_to_var()
+        self.create_route()
+        self.waypoint_name_var.set('')
+
+    def load_route(self):
+        file = tk.filedialog.askopenfilename(
+            parent=self.window,
+            title=_('Choose route file'),
+            filetypes=(
+                (_('FlightGear flight plan'), '*.fgfp'),
+            )
+        )
+        if not file:
+            return
+        fp = FlightPlan(self.fg_airports)
+        try:
+            fp.open(file)
+        except FlightPlanError:
+            tk.messagebox.showwarning(
+                title=_('Unable to load route'),
+                message=_('No waypoint found at file {file}. Please check its integrity.').format(
+                    file=file
+                )
+            )
+            return
+        self.clear_route()
+        for wp in fp.waypoints:
+            self.place_marker(
+                lat=wp.lat,
+                lon=wp.lon,
+                text=wp.ident,
+            )
+            self.waypoints.append(self.marker)
+        self.waypoints_to_var()
+        self.create_route()
 
     def search(self, *args, **kwargs):
         airport = None
