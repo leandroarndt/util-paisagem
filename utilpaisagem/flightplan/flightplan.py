@@ -25,5 +25,10 @@ class FlightPlan(object):
     def open(self, file:[str|Path], format:str='fgfp'):
         self.waypoints = []
         if format == 'fgfp':
-            fp = FGFP(file)
+            fp = FGFP(file, self.fg_airports)
+            self.waypoints = fp.waypoints
+        if not self.waypoints:
+            raise FlightPlanError(_('Flight plan "{file}" seems to be void!').format(
+                file=file,
+            ))
 
