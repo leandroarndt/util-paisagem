@@ -9,3 +9,5 @@ pyperclip
 show-in-file-manager
 github3.py
 xplane-airports
+numpy
+opencv-python-headless
