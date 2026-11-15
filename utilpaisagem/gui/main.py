@@ -748,7 +748,7 @@ class MainWindow(object):
     def load_route(self):
         file = tk.filedialog.askopenfilename(
             parent=self.window,
-            title=_('Choose route file'),
+            title=_('Choose flight plan'),
             filetypes=(
                 (_('FlightGear flight plan'), '*.fgfp'),
             )
@@ -761,7 +761,7 @@ class MainWindow(object):
         except FlightPlanError:
             tk.messagebox.showwarning(
                 title=_('Unable to load route'),
-                message=_('No waypoint found at file {file}. Please check its integrity.').format(
+                message=_('No waypoint found at file "{file}". Please check its integrity.').format(
                     file=file
                 )
             )
