@@ -1,1 +1,1 @@
-from utilpaisagem.flightplan.flightplan import FlightPlan
+from utilpaisagem.flightplan.flightplan import FlightPlan, FlightPlanError
