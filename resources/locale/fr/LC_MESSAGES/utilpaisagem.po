@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem 0.6\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-11-14 22:24-0300\n"
+"POT-Creation-Date: 2026-11-18 19:40-0300\n"
 "PO-Revision-Date: 2026-11-01 23:00+0100\n"
 "Last-Translator: BARANGER Emmanuel <embaranger@gmail.com>\n"
 "Language: fr\n"
@@ -286,7 +286,7 @@ msgstr "Télécharger une route"
 
 #: utilpaisagem/gui/main.py:764
 #, python-brace-format
-msgid "No waypoint found at file {file}. Please check its integrity."
+msgid "No waypoint found at file \"{file}\". Please check its integrity."
 msgstr ""
 
 #: utilpaisagem/gui/main.py:785 utilpaisagem/gui/main.py:789
@@ -321,174 +321,188 @@ msgstr "Arrêter de suivre l'avion dans FlightGear"
 msgid "{res} m/px range:"
 msgstr "Plage de {res} m/px:"
 
-#: utilpaisagem/gui/settings.py:49 utilpaisagem/gui/settings.py:361
+#: utilpaisagem/gui/settings.py:49 utilpaisagem/gui/settings.py:365
 msgid "Km"
 msgstr "Km"
 
-#: utilpaisagem/gui/settings.py:176
+#: utilpaisagem/gui/settings.py:180
 msgid "Útil paisagem settings"
 msgstr "Paramètres du mode paysage"
 
-#: utilpaisagem/gui/settings.py:188
+#: utilpaisagem/gui/settings.py:192
 msgid "FlightGear"
 msgstr "FlightGear"
 
-#: utilpaisagem/gui/settings.py:190
+#: utilpaisagem/gui/settings.py:194
 msgid "Paths"
 msgstr "Chemins"
 
-#: utilpaisagem/gui/settings.py:195
+#: utilpaisagem/gui/settings.py:199
 msgid "Path to FlightGear data folder:"
 msgstr "Chemin des données de FlightGear"
 
-#: utilpaisagem/gui/settings.py:206 utilpaisagem/gui/settings.py:226
+#: utilpaisagem/gui/settings.py:210 utilpaisagem/gui/settings.py:230
 msgid "Choose folder"
 msgstr "Choisir un dossier"
 
-#: utilpaisagem/gui/settings.py:215
+#: utilpaisagem/gui/settings.py:219
 msgid "Path to scenery imagery:"
 msgstr "Chemin des images du décor:"
 
-#: utilpaisagem/gui/settings.py:237
+#: utilpaisagem/gui/settings.py:241
 msgid "FlightGear launch options"
 msgstr "Options de lancement de FlightGear"
 
-#: utilpaisagem/gui/settings.py:253
+#: utilpaisagem/gui/settings.py:257
 msgid "FlightGear connection"
 msgstr "Connexion avec FlightGear"
 
-#: utilpaisagem/gui/settings.py:257
+#: utilpaisagem/gui/settings.py:261
 msgid "Host:"
 msgstr "Serveur:"
 
-#: utilpaisagem/gui/settings.py:260
+#: utilpaisagem/gui/settings.py:264
 msgid "Port:"
 msgstr "Port:"
 
-#: utilpaisagem/gui/settings.py:268
+#: utilpaisagem/gui/settings.py:272
 msgid "Interval retrieving aircraft location:"
 msgstr "Récupération par intervalles de la position de l'aéronef:"
 
-#: utilpaisagem/gui/settings.py:271
+#: utilpaisagem/gui/settings.py:275
 msgid "seconds"
 msgstr "Secondes"
 
-#: utilpaisagem/gui/settings.py:285 utilpaisagem/gui/settings.py:347
+#: utilpaisagem/gui/settings.py:289 utilpaisagem/gui/settings.py:351
 msgid "Download"
 msgstr "Téléchargement"
 
-#: utilpaisagem/gui/settings.py:289
+#: utilpaisagem/gui/settings.py:293
 msgid "Image service"
 msgstr "Service d’images"
 
-#: utilpaisagem/gui/settings.py:300
+#: utilpaisagem/gui/settings.py:304
 msgid "Image service:"
 msgstr "Service d’images:"
 
-#: utilpaisagem/gui/settings.py:317 utilpaisagem/gui/settings.py:633
+#: utilpaisagem/gui/settings.py:321 utilpaisagem/gui/settings.py:653
 #, python-brace-format
 msgid "Availability area: {area}"
 msgstr "Zone disponible: {area}"
 
-#: utilpaisagem/gui/settings.py:327 utilpaisagem/gui/settings.py:636
+#: utilpaisagem/gui/settings.py:331 utilpaisagem/gui/settings.py:656
 #, python-brace-format
 msgid "Image service license at {link}"
 msgstr "Licence du service d’images disponible sur {link}"
 
-#: utilpaisagem/gui/settings.py:353
+#: utilpaisagem/gui/settings.py:357
 msgid "Download radius:"
 msgstr "Rayon de téléchargement:"
 
-#: utilpaisagem/gui/settings.py:365
+#: utilpaisagem/gui/settings.py:369
 msgid "Maximum simultaneous tiles to download:"
 msgstr "Nombre maximal de tuiles à télécharger simultanément"
 
-#: utilpaisagem/gui/settings.py:377
+#: utilpaisagem/gui/settings.py:381
 msgid "Maximum simultaneous downloads for each tile:"
 msgstr "Nombre maximal de téléchargements simultanés pour chaque tuile:"
 
-#: utilpaisagem/gui/settings.py:390
+#: utilpaisagem/gui/settings.py:394
 msgid "Download size:"
 msgstr "Taille du téléchargement:"
 
-#: utilpaisagem/gui/settings.py:400
+#: utilpaisagem/gui/settings.py:404
 msgid "Image file format:"
 msgstr "Format de fichier image:"
 
-#: utilpaisagem/gui/settings.py:422
+#: utilpaisagem/gui/settings.py:410 utilpaisagem/gui/settings.py:413
+#: utilpaisagem/gui/settings.py:711
+msgid "Yes"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:410 utilpaisagem/gui/settings.py:413
+msgid "No"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:417
+#, fuzzy
+msgid "Download ocean tiles:"
+msgstr "Télécharger la tuile"
+
+#: utilpaisagem/gui/settings.py:442
 msgid "Image resolution"
 msgstr "Résolution des images"
 
-#: utilpaisagem/gui/settings.py:424
+#: utilpaisagem/gui/settings.py:444
 msgid "Image"
 msgstr "Image"
 
-#: utilpaisagem/gui/settings.py:443
+#: utilpaisagem/gui/settings.py:463
 msgid "Tile management"
 msgstr "Gestion des tuiles"
 
-#: utilpaisagem/gui/settings.py:447
+#: utilpaisagem/gui/settings.py:467
 msgid "Tile age"
 msgstr "Age de la tuile"
 
-#: utilpaisagem/gui/settings.py:453
+#: utilpaisagem/gui/settings.py:473
 msgid "Days until downloading new image for tile:"
 msgstr "Jours avant le téléchargement d’une nouvelle image pour la tuile:"
 
-#: utilpaisagem/gui/settings.py:462
+#: utilpaisagem/gui/settings.py:482
 msgid "Days before deleting unused tiles:"
 msgstr "Jours sans utilisation avant la suppression des tuiles:"
 
-#: utilpaisagem/gui/settings.py:474
+#: utilpaisagem/gui/settings.py:494
 msgid "Disk usage"
 msgstr "Utilisation du disque"
 
-#: utilpaisagem/gui/settings.py:480
+#: utilpaisagem/gui/settings.py:500
 msgid "Maximum disk usage in megabytes:"
 msgstr "Utilisation maximale du disque en mégaoctets:"
 
-#: utilpaisagem/gui/settings.py:486
+#: utilpaisagem/gui/settings.py:506
 msgid "Automatically enforce disk usage limit"
 msgstr "Appliquer automatiquement une limite d’utilisation du disque"
 
-#: utilpaisagem/gui/settings.py:491
+#: utilpaisagem/gui/settings.py:511
 #, python-brace-format
 msgid "Disk space used: {space} MB"
 msgstr "Espace disque utilisé: {space} MB"
 
-#: utilpaisagem/gui/settings.py:507
+#: utilpaisagem/gui/settings.py:527
 msgid "Interface"
 msgstr "Interface"
 
-#: utilpaisagem/gui/settings.py:511
+#: utilpaisagem/gui/settings.py:531
 msgid "Detail levels"
 msgstr "Niveau de détails"
 
-#: utilpaisagem/gui/settings.py:516
+#: utilpaisagem/gui/settings.py:536
 msgid "Maximum latitude and longitude range for 1 degree tiles display:"
 msgstr ""
 "Plage maximale de latitude et de longitude pour l'affichage de tuiles de "
 "1°:"
 
-#: utilpaisagem/gui/settings.py:527
+#: utilpaisagem/gui/settings.py:547
 msgid "Maximum latitude and longitude range for scenery tiles display:"
 msgstr ""
 "Plage maximale de latitude et de longitude pour afficher les tuiles de "
 "scénario:"
 
-#: utilpaisagem/gui/settings.py:544
+#: utilpaisagem/gui/settings.py:564
 msgid "Cancel"
 msgstr "Annuler"
 
-#: utilpaisagem/gui/settings.py:549
+#: utilpaisagem/gui/settings.py:569
 msgid "Apply"
 msgstr "Appliquer"
 
-#: utilpaisagem/gui/settings.py:554
+#: utilpaisagem/gui/settings.py:574
 msgid "Ok"
 msgstr "Ok"
 
-#: utilpaisagem/gui/settings.py:569
+#: utilpaisagem/gui/settings.py:589
 #, python-brace-format
 msgid ""
 "Start FlightGear with the following parameters:\n"
@@ -499,35 +513,35 @@ msgstr ""
 "            --telnet={port}\n"
 "            --fg-scenery={scenery_path}"
 
-#: utilpaisagem/gui/settings.py:579
+#: utilpaisagem/gui/settings.py:599
 #, python-brace-format
 msgid "{size} lines"
 msgstr "{size} lignes"
 
-#: utilpaisagem/gui/settings.py:588
+#: utilpaisagem/gui/settings.py:608
 msgid "Choose FlightGear data directory"
 msgstr "Répertoire de données de FlightGear"
 
-#: utilpaisagem/gui/settings.py:597
+#: utilpaisagem/gui/settings.py:617
 msgid "Choose directory for photoscenery"
 msgstr "Répertoire pour les décors photographiques"
 
-#: utilpaisagem/gui/settings.py:652 utilpaisagem/gui/settings.py:660
-#: utilpaisagem/gui/settings.py:669 utilpaisagem/gui/settings.py:677
-#: utilpaisagem/gui/settings.py:685 utilpaisagem/gui/settings.py:706
-#: utilpaisagem/gui/settings.py:717 utilpaisagem/gui/settings.py:725
-#: utilpaisagem/gui/settings.py:732 utilpaisagem/gui/settings.py:740
-#: utilpaisagem/gui/settings.py:747
+#: utilpaisagem/gui/settings.py:672 utilpaisagem/gui/settings.py:680
+#: utilpaisagem/gui/settings.py:689 utilpaisagem/gui/settings.py:697
+#: utilpaisagem/gui/settings.py:705 utilpaisagem/gui/settings.py:727
+#: utilpaisagem/gui/settings.py:738 utilpaisagem/gui/settings.py:746
+#: utilpaisagem/gui/settings.py:753 utilpaisagem/gui/settings.py:761
+#: utilpaisagem/gui/settings.py:768
 msgid "Invalid value"
 msgstr "Valeur non valide"
 
-#: utilpaisagem/gui/settings.py:653
+#: utilpaisagem/gui/settings.py:673
 msgid "Invalid value in port configuration. Please inform an integer value."
 msgstr ""
 "Valeur invalide dans la configuration du port. Veuillez saisir une "
 "valeurentière."
 
-#: utilpaisagem/gui/settings.py:661
+#: utilpaisagem/gui/settings.py:681
 msgid ""
 "Invalid value in following interval configuration. Please inform an "
 "integer value."
@@ -535,7 +549,7 @@ msgstr ""
 "Valeur invalide dans la configuration de l'intervalle de suivi. Veuillez "
 "saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:670
+#: utilpaisagem/gui/settings.py:690
 msgid ""
 "Invalid value in download radius configuration. Please inform an integer "
 "value."
@@ -543,7 +557,7 @@ msgstr ""
 "Valeur invalide dans la configuration du rayon de téléchargement. "
 "Veuillez saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:678
+#: utilpaisagem/gui/settings.py:698
 msgid ""
 "Invalid value in maximum simultaneous tiles configuration. Please inform "
 "an integer value."
@@ -551,7 +565,7 @@ msgstr ""
 "Valeur non valide dans la configuration du nombre maximal de tuiles "
 "simultanées. Veuillez saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:686
+#: utilpaisagem/gui/settings.py:706
 msgid ""
 "Invalid value in maximum simultaneous downloads for each tile "
 "configuration. Please inform an integer value."
@@ -560,7 +574,7 @@ msgstr ""
 "téléchargements simultanés pour chaque tuile. Veuillez saisir une valeur "
 "entière."
 
-#: utilpaisagem/gui/settings.py:707
+#: utilpaisagem/gui/settings.py:728
 #, python-brace-format
 msgid ""
 "Invalid distance value in image resolution configuration ({r}). Please "
@@ -569,12 +583,12 @@ msgstr ""
 "Valeur non valide dans la configuration de la résolution de l'image "
 "({r}). Veuillez saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:708
+#: utilpaisagem/gui/settings.py:729
 #, python-brace-format
 msgid "{res} m/px"
 msgstr "{res} m/px"
 
-#: utilpaisagem/gui/settings.py:718
+#: utilpaisagem/gui/settings.py:739
 msgid ""
 "Invalid value in tile renewal age configuration. Please inform an integer"
 " value."
@@ -582,7 +596,7 @@ msgstr ""
 "Valeur non valide dans la configuration de renouvellement des tuiles. "
 "Veuillez saisir une valeur entière.."
 
-#: utilpaisagem/gui/settings.py:726
+#: utilpaisagem/gui/settings.py:747
 msgid ""
 "Invalid value in tile deletion age configuration. Please inform an "
 "integer value."
@@ -590,7 +604,7 @@ msgstr ""
 "Valeur non valide dans la configuration du temps avant suppression des "
 "tuiles. Veuillez saisir une valeur entière.."
 
-#: utilpaisagem/gui/settings.py:733
+#: utilpaisagem/gui/settings.py:754
 msgid ""
 "Invalid value in disk usage limit configuration. Please inform an integer"
 " value."
@@ -598,7 +612,7 @@ msgstr ""
 "Valeur non valide dans la configuration de la limite d'utilisation du "
 "stockage. Veuillez saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:741
+#: utilpaisagem/gui/settings.py:762
 msgid ""
 "Invalid value in degree tile visualization configuration. Please inform "
 "an integer value."
@@ -606,7 +620,7 @@ msgstr ""
 "Valeur non valide dans la configuration d'affichage des tuiles de 1°. "
 "Veuillez saisir une valeur entière."
 
-#: utilpaisagem/gui/settings.py:748
+#: utilpaisagem/gui/settings.py:769
 msgid ""
 "Invalid value in scenery tile visualization configuration. Please inform "
 "an integer value."
@@ -667,15 +681,15 @@ msgstr "PNG"
 msgid "smallest size"
 msgstr "plus petite taille"
 
-#: utilpaisagem/scenery/image_service.py:109
+#: utilpaisagem/scenery/image_service.py:130
 msgid "ArcGIS worldwide service under restrictive license"
 msgstr "Service ArcGIS à l’échelle mondiale sous licence restrictive"
 
-#: utilpaisagem/scenery/image_service.py:111
+#: utilpaisagem/scenery/image_service.py:132
 msgid "worldwide"
 msgstr "monde entier"
 
-#: utilpaisagem/scenery/image_service.py:125
+#: utilpaisagem/scenery/image_service.py:149
 msgid ""
 "Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
 "(CC-BY 4.0)"
@@ -683,25 +697,25 @@ msgstr ""
 "Plan national d'orthophotographie aérienne, par l'Institut géographique "
 "national (CC-BY 4.0)"
 
-#: utilpaisagem/scenery/image_service.py:127
+#: utilpaisagem/scenery/image_service.py:151
 msgid "Spain"
 msgstr "Espagne"
 
-#: utilpaisagem/scenery/image_service.py:143
+#: utilpaisagem/scenery/image_service.py:170
 msgid "U.S. Geographical Survey (public domain)"
 msgstr "U.S. Geographical Survey (domaine public)"
 
-#: utilpaisagem/scenery/image_service.py:145
+#: utilpaisagem/scenery/image_service.py:172
 msgid "USA"
 msgstr "USA"
 
-#: utilpaisagem/scenery/image_service.py:157
+#: utilpaisagem/scenery/image_service.py:185
 msgid "Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung"
 msgstr ""
 "Données géographiques gratuites de l'administration bavaroise du cadastre"
 " et de la topographie"
 
-#: utilpaisagem/scenery/image_service.py:159
+#: utilpaisagem/scenery/image_service.py:187
 msgid "Bavaria (Deutschland)"
 msgstr "Bavière (Allemagne)"
 
@@ -813,4 +827,7 @@ msgstr "Erreur au téléchargement de la cellule {index}[{line}][{cell}]: {e}."
 
 #~ msgid "Choose route file"
 #~ msgstr "Choisir un dossier"
+
+#~ msgid "No waypoint found at file {file}. Please check its integrity."
+#~ msgstr ""
 
