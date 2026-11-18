@@ -1,10 +1,13 @@
 from typing import List, TYPE_CHECKING
 from xml.etree import ElementTree
+from pathlib import Path
 
 if TYPE_CHECKING:
     from utilpaisagem.airports.aptdat import AptDat
 else:
     class AptDat:
+        pass
+    class FGFP:
         pass
 
 class Airport(object):
