@@ -1,12 +1,10 @@
 # Útil paisagem changelog
 
-## 0.7.0
+## 0.7.0rc1
 
-TODO:
-- Load XML route files.
-- Don't download ocean tiles.
-
-DONE:
+- Load FlightGear XML route files.
+- Make download of ocean tiles optional (they're not really covered by the image service
+providers).
 - Corrected color of tiles downloaded with error on live map update
 
 ## 0.6.0
