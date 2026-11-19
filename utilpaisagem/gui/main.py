@@ -93,7 +93,9 @@ class MainWindow(object):
     waypoints_var:tk.Variable
     waypoints_frame:ttk.Frame
     waypoints_label:ttk.Label
+    waypoints_list_frame:ttk.Frame
     waypoints_list:tk.Listbox
+    waypoints_scroll:ttk.Scrollbar
     waypoint_name_var:tk.StringVar
     waypoint_name_entry:ttk.Entry
     waypoint_rename_button:ttk.Button
@@ -332,11 +334,19 @@ class MainWindow(object):
         self.waypoints_var = tk.Variable(value=self.waypoints)
         self.waypoints_frame = ttk.Frame(self.toolbar_frame, padding=PADDING)
         self.waypoints_label = ttk.Label(self.waypoints_frame, text=_('Waypoints:'))
+        self.waypoints_list_frame = ttk.Frame(self.waypoints_frame)
         self.waypoints_list = tk.Listbox(
-            self.waypoints_frame,
+            self.waypoints_list_frame,
             listvariable=self.waypoints_var,
             # TODO (moves wrongly) selectmode=tk.MULTIPLE,
         )
+        self.waypoints_scroll = ttk.Scrollbar(self.waypoints_list_frame, orient=tk.VERTICAL)
+        self.waypoints_list.config(yscrollcommand=self.waypoints_scroll.set)
+        self.waypoints_scroll.config(command=self.waypoints_list.yview)
+        self.waypoints_list_frame.columnconfigure(0, weight=10)
+        self.waypoints_list_frame.columnconfigure(1, weight=0)
+        self.waypoints_list.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
+        self.waypoints_scroll.grid(column=1, row=0, sticky=tk.N+tk.S)
         self.waypoints_list.bind('<<ListboxSelect>>', self.select_waypoint)
         self.waypoint_name_var = tk.StringVar(self.waypoints_frame)
         self.waypoint_name_entry = ttk.Entry(self.waypoints_frame, textvariable=self.waypoint_name_var)
@@ -379,7 +389,8 @@ class MainWindow(object):
         self.waypoints_frame.columnconfigure(1, weight=1)
         self.waypoints_frame.columnconfigure(2, weight=1)
         self.waypoints_label.grid(column=0, row=0, columnspan=3)
-        self.waypoints_list.grid(column=0, row=1, columnspan=3, sticky=tk.W+tk.E)
+        # self.waypoints_list.grid(column=0, row=1, columnspan=3, sticky=tk.W+tk.E)
+        self.waypoints_list_frame.grid(column=0, row=1, columnspan=3, sticky=tk.W+tk.E)
         self.waypoint_name_entry.grid(column=0, row=2, sticky=tk.W+tk.E)
         self.waypoint_rename_button.grid(column=1, row=2, columnspan=2, sticky=tk.W+tk.E)
         self.waypoints_remove_button.grid(column=0, row=3, sticky=tk.W + tk.E)
