@@ -342,7 +342,7 @@ class Tile(object):
                     raise AssertionError
                 if self.is_old(log, logpath):
                     raise NeedsRenewalError
-                if self.single:
+                if self.single and self.settings.force_single_tile:
                     raise ForcedDownloadError
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
