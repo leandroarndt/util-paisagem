@@ -29,6 +29,7 @@ class Tile(object):
     upstream_queue:Union[Queue|None]
     tile_manager_queue:Union[Queue|None]
     settings:Settings
+    single:bool
 
     def __init__(
         self,
@@ -37,6 +38,7 @@ class Tile(object):
         lon:Number=float('nan'), 
         resolution:int=DOWNLOAD_RES,
         upstream_queue:Union[Queue|None]=None,
+        single=False
     ):
         """
         New Tile object defined by either index or by coordinates.
@@ -57,6 +59,7 @@ class Tile(object):
             raise ValueError(f'Invalid resolution. Should be at least {MIN_RES} and at most {MAX_RES}.')
         
         self.settings = Settings()
+        self.single = single
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(lat={self.coordinates.lat_median}, lon={self.coordinates.lon_median})>'
@@ -206,7 +209,8 @@ class Tile(object):
             upstream_queue(Queue): queue for user communication
             tile_manager_queue(Queue): queue for the TileManager
         """
-        if not image_service.can_download(self.coordinates):
+        if (not image_service.can_download(self.coordinates)) and \
+            not (self.single and self.settings.force_single_tile):
             if self.upstream_queue is None:
                 print(_(
                     'Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, {lon_right:.03f}  is not covered by {service_name}'

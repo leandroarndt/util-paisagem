@@ -885,6 +885,7 @@ class MainWindow(object):
         self.downloader.add_tile(
             self.index,
             resolution=sorted(self.settings.distances.values())[-1],
+            single=True
         )
     
     def download_region(self):

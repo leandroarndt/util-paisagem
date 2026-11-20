@@ -68,6 +68,7 @@ class Settings(object):
         download_res:int = DOWNLOAD_RES
         image_format:str = 'smart'
         download_ocean:bool = False
+        force_single_tile = True
         distances = {
             8: DOWNLOAD_RES + 2,
             20: DOWNLOAD_RES + 1,
@@ -92,6 +93,7 @@ class Settings(object):
     download_res:int = DOWNLOAD_RES
     image_format:str = 'smart'
     download_ocean = False
+    force_single_tile = True
     distances = {
         8: DOWNLOAD_RES + 2,
         20: DOWNLOAD_RES + 1,
@@ -117,6 +119,7 @@ class Settings(object):
         'download_res': _Sections.DOWNLOAD.value,
         'image_format': _Sections.DOWNLOAD.value,
         'download_ocean': _Sections.DOWNLOAD.value,
+        'force_single_tile': _Sections.DOWNLOAD.value,
         'radius': _Sections.RANGE.value,
         'distances': _Sections.RANGE.value,
         'host': _Sections.CONNECTION.value,
