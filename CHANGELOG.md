@@ -7,6 +7,10 @@
 providers).
 - Corrected color of tiles downloaded with error on live map update
 
+## 0.7.0rc2
+- Added scroll bar to waypoints list
+- Optionally force download of single tiles despite being oceanic or already downloaded (defaults to force downloads).
+
 ## 0.6.0
 
 - Additional image provider (USGS).
