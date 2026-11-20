@@ -16,6 +16,9 @@ from utilpaisagem.gui.common import format_status, Settings, TileColors, QUIT, L
 class NeedsRenewalError(Exception):
     pass
 
+class ForcedDownloadError(Exception):
+    pass
+
 class Tile(object):
     """
     Scenery tiles with the corresponding index and coordinates.
@@ -339,6 +342,8 @@ class Tile(object):
                     raise AssertionError
                 if self.is_old(log, logpath):
                     raise NeedsRenewalError
+                if self.single:
+                    raise ForcedDownloadError
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
                 else:
@@ -365,6 +370,15 @@ class Tile(object):
                 else:
                     self.upstream_queue.put_nowait(format_status(
                         _('Tile {index} needs renewal. Downloading again.').format(index=self.index),
+                        self,
+                    ))
+                delete = True
+            except ForcedDownloadError:
+                if self.upstream_queue is None:
+                    print(f'Forced download of tile {self.index}.')
+                else:
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Forced download of tile {index}.').format(index=self.index),
                         self,
                     ))
                 delete = True
