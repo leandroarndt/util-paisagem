@@ -11,6 +11,10 @@ providers).
 - Added scroll bar to waypoints list
 - Optionally force download of single tiles despite being oceanic or already downloaded (defaults to force downloads).
 
+## 0.7.0rc3
+- Solved issue #3 (localization on Windows systems).
+- Translations (currently Portuguese and French) also available on Windows systems.
+
 ## 0.6.0
 
 - Additional image provider (USGS).
