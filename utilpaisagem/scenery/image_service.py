@@ -7,7 +7,7 @@ from collections import OrderedDict
 from urllib.error import URLError, ContentTooShortError
 from utilpaisagem.scenery.common import Coordinates, DOWNLOAD_RES, MIN_RES
 from utilpaisagem.gui.common import Settings
-from utilpaisagem.__main__ import resources_path
+from utilpaisagem.app_info import resources_path
 
 class ImageService(object):
     """
