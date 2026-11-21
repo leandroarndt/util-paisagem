@@ -7,3 +7,6 @@ RC = 2
 
 base_path = Path(__file__).parent.parent
 resources_path = base_path / 'resources'
+
+def string_version():
+    return f'{VERSION}.{SUBVERSION}.{REVISION}{"rc" + str(RC) if RC else ""}'

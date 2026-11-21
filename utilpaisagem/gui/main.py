@@ -16,7 +16,7 @@ from tkintermapview.canvas_polygon import CanvasPolygon
 from tkintermapview.canvas_path  import CanvasPath
 from tkintermapview.canvas_position_marker import CanvasPositionMarker
 from showinfm import show_in_file_manager
-from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path
+from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC, resources_path, string_version
 from utilpaisagem.scenery.common import METER_SIZE
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
@@ -130,7 +130,7 @@ class MainWindow(object):
             tk.PhotoImage(file=resources_path/'images'/'utilpaisagem.png')
         )
         self.window.title(
-            f'Útil paisagem {VERSION}.{SUBVERSION}.{REVISION}{"rc" + str(RC) if RC else ""}'
+            f'Útil paisagem {string_version()}'
         )
         self.window.protocol('WM_DELETE_WINDOW', lambda: self.close())
 
