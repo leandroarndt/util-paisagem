@@ -251,7 +251,12 @@ class MainWindow(object):
         self.search_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.search_button.grid(column=2, row=0)
         # TODO store window size and map coordinates
-        self.map_widget = MapWidget(self.map_frame, width=800, height=600)
+        self.map_widget = MapWidget(
+            self.map_frame,
+            width=800,
+            height=600,
+            user_agent=f'UtilPaisagem/{string_version()}',
+        )
         self.map_widget.set_position(0, 0)
         self.map_widget.set_zoom(0)
         self.map_widget.add_right_click_menu_command(
