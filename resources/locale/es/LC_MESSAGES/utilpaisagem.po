@@ -1,4 +1,4 @@
-+++++# Spanish translations for Útil paisagem.
+# Spanish translations for Útil paisagem.
 # Copyright (C) 2026 Leandro Arndt
 # This file is distributed under the same license as the Útil paisagem
 # project.
@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Útil paisagem 0.6\n"
+"Project-Id-Version: Útil paisagem 0.7\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-08-22 20:47-0300\n"
+"POT-Creation-Date: 2026-11-22 13:13-0300\n"
 "PO-Revision-Date: 2026-11-01 23:00+0100\n"
 "Last-Translator: Michat <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -17,258 +17,294 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: utilpaisagem/flightplan/flightplan.py:31
+#, python-brace-format
+msgid "Flight plan \"{file}\" seems to be void!"
+msgstr ""
 
 # python-brace-format
-#: utilpaisagem/gui/agents.py:100
+#: utilpaisagem/gui/agents.py:101
 #, python-brace-format
 msgid "Tile {index} added to download queue."
 msgstr "Tesela {index} añadida a la cola de descargas."
 
-#: utilpaisagem/gui/agents.py:150
+#: utilpaisagem/gui/agents.py:151
 msgid "Could not connect to Flightgear."
 msgstr "No puede conectar a FlightGear."
 
-#: utilpaisagem/gui/agents.py:153
+#: utilpaisagem/gui/agents.py:154
 msgid "Sucessfuly connected to Flightgear."
 msgstr "Conectado con éxito a FlightGear."
 
-#: utilpaisagem/gui/agents.py:163
+#: utilpaisagem/gui/agents.py:164
 msgid "Could not receive coordinates info from Flightgear"
 msgstr "No puede recibir la información de coordenadas desde FlightGear"
 
-#: utilpaisagem/gui/agents.py:169
+#: utilpaisagem/gui/agents.py:170
 #, python-brace-format
 msgid "Error while retrieving coordinates from flightgear (\"{exception}\")"
-msgstr ""
-"Error al extraer las coordenadas de Flightgear "
-"(\"{exception}\")"
+msgstr "Error al extraer las coordenadas de Flightgear (\"{exception}\")"
 
-#: utilpaisagem/gui/agents.py:177
+#: utilpaisagem/gui/agents.py:178
 #, python-brace-format
 msgid "Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}"
 msgstr "La posición de la aeronave es latitud. {lat:.02f} longitud {lon:.02f}"
 
-#: utilpaisagem/gui/agents.py:219 utilpaisagem/gui/main.py:404
+#: utilpaisagem/gui/agents.py:220 utilpaisagem/gui/main.py:444
 msgid "Welcome to Útil paisagem"
 msgstr "Bienvenido a Útil paisagem"
 
-#: utilpaisagem/gui/agents.py:239
+#: utilpaisagem/gui/agents.py:240
 #, python-brace-format
 msgid "(Remaining tiles: {n}/{total})"
 msgstr "(Teselas restantes: {n}/{total})"
 
-#: utilpaisagem/gui/agents.py:248
+#: utilpaisagem/gui/agents.py:249
 #, python-brace-format
 msgid "All {total} tiles have been processed."
 msgstr "Todas {total} teselas han sido procesadas."
 
-#: utilpaisagem/gui/agents.py:258
+#: utilpaisagem/gui/agents.py:259
 #, python-brace-format
 msgid "Disk space used: {space} MB."
 msgstr "Espacio en disco utilizado: {space} MB"
 
-#: utilpaisagem/gui/main.py:136
+#: utilpaisagem/gui/main.py:141 utilpaisagem/gui/main.py:380
+msgid "Load route"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:145 utilpaisagem/gui/main.py:385
+msgid "Clear route"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:150
 msgid "Show orthophotos folder"
 msgstr "Mostrar la carpeta de ortofotos \"Orthophotos\""
 
-#: utilpaisagem/gui/main.py:140
+#: utilpaisagem/gui/main.py:154
 msgid "Show tile image"
 msgstr "Mostrar imagen de teselas"
 
-#: utilpaisagem/gui/main.py:144
+#: utilpaisagem/gui/main.py:158
 msgid "Delete tile"
 msgstr "Borrar tesela"
 
-#: utilpaisagem/gui/main.py:148
+#: utilpaisagem/gui/main.py:162
 msgid "Delete region"
 msgstr "Borrar la región"
 
-#: utilpaisagem/gui/main.py:153
+#: utilpaisagem/gui/main.py:167
 msgid "Rescan downloaded tiles"
 msgstr "Reescanear las teselas descargadas"
 
-#: utilpaisagem/gui/main.py:157
+#: utilpaisagem/gui/main.py:171
 msgid "Enforce disk usage limit"
 msgstr "Imponer un limite de uso del disco"
 
-#: utilpaisagem/gui/main.py:162
+#: utilpaisagem/gui/main.py:176
 msgid "Quit"
 msgstr "Salir"
 
-#: utilpaisagem/gui/main.py:167
+#: utilpaisagem/gui/main.py:181
 msgid "Copy coordinates"
 msgstr "Copiar las coordenadas"
 
-#: utilpaisagem/gui/main.py:171
+#: utilpaisagem/gui/main.py:185
 msgid "Copy tile index"
 msgstr "Copiar el indice de la tesela"
 
-#: utilpaisagem/gui/main.py:176 utilpaisagem/gui/main.py:398
+#: utilpaisagem/gui/main.py:190 utilpaisagem/gui/main.py:438
 msgid "Settings"
 msgstr "Configuración"
 
-#: utilpaisagem/gui/main.py:181
+#: utilpaisagem/gui/main.py:195
 msgid "Online manual"
 msgstr "Manual en línea"
 
-#: utilpaisagem/gui/main.py:185
+#: utilpaisagem/gui/main.py:199
 msgid "Latest release"
 msgstr "Ultima versión"
 
-#: utilpaisagem/gui/main.py:189
+#: utilpaisagem/gui/main.py:203
 msgid "Found a bug?"
 msgstr "¿Encontraste un error?"
 
-#: utilpaisagem/gui/main.py:193
+#: utilpaisagem/gui/main.py:207
 msgid "Contribute"
 msgstr "Contribuir"
 
-#: utilpaisagem/gui/main.py:197
+#: utilpaisagem/gui/main.py:211
 msgid "Donate"
 msgstr "Donar"
 
-#: utilpaisagem/gui/main.py:201
+#: utilpaisagem/gui/main.py:215
 msgid "File"
 msgstr "Archivo"
 
-#: utilpaisagem/gui/main.py:205
+#: utilpaisagem/gui/main.py:219
 msgid "Edit"
 msgstr "Edición"
 
-#: utilpaisagem/gui/main.py:209
+#: utilpaisagem/gui/main.py:223
 msgid "Help"
 msgstr "Ayuda"
 
-#: utilpaisagem/gui/main.py:231
+#: utilpaisagem/gui/main.py:245
 msgid "Address or ICAO code:"
 msgstr "Dirección o código ICAO:"
 
-#: utilpaisagem/gui/main.py:235
+#: utilpaisagem/gui/main.py:249
 msgid "Search"
 msgstr "Buscar"
 
-#: utilpaisagem/gui/main.py:244
+#: utilpaisagem/gui/main.py:263
 msgid "Select tile"
 msgstr "Sélectionar una tesela"
 
-#: utilpaisagem/gui/main.py:249 utilpaisagem/gui/main.py:301
+#: utilpaisagem/gui/main.py:268 utilpaisagem/gui/main.py:320
 msgid "Add waypoint"
 msgstr "Añadir un punto de paso"
 
-#: utilpaisagem/gui/main.py:266
+#: utilpaisagem/gui/main.py:285
 msgid "Tile index:"
 msgstr "Indice de teselas:"
 
-#: utilpaisagem/gui/main.py:274
+#: utilpaisagem/gui/main.py:293
 msgid "Latitude:"
 msgstr "Latitud:"
 
-#: utilpaisagem/gui/main.py:283
+#: utilpaisagem/gui/main.py:302
 msgid "Longitude:"
 msgstr "Longitud:"
 
-#: utilpaisagem/gui/main.py:291
+#: utilpaisagem/gui/main.py:310
 msgid "Download tile"
 msgstr "Descargar la tesela"
 
-#: utilpaisagem/gui/main.py:296
+#: utilpaisagem/gui/main.py:315
 msgid "Download region"
 msgstr "Descargar la región"
 
-#: utilpaisagem/gui/main.py:322
+#: utilpaisagem/gui/main.py:341
 msgid "Waypoints:"
 msgstr "Puntos de paso:"
 
-#: utilpaisagem/gui/main.py:333
+#: utilpaisagem/gui/main.py:360
 msgid "Rename"
 msgstr "Renombrar"
 
-#: utilpaisagem/gui/main.py:338Télécharger
+#: utilpaisagem/gui/main.py:365
 msgid "Remove Waypoint"
 msgstr "Eliminar punto de paso "
 
-#: utilpaisagem/gui/main.py:343
+#: utilpaisagem/gui/main.py:370
 msgid "Up"
 msgstr "Siguiente"
 
-#: utilpaisagem/gui/main.py:348
+#: utilpaisagem/gui/main.py:375
 msgid "Down"
 msgstr "Anterior"
 
-#: utilpaisagem/gui/main.py:353
+#: utilpaisagem/gui/main.py:390
 msgid "Download route"
 msgstr "Descargar ruta"
 
-#: utilpaisagem/gui/main.py:374 utilpaisagem/gui/main.py:861
+#: utilpaisagem/gui/main.py:414 utilpaisagem/gui/main.py:942
 msgid "Follow aircraft"
 msgstr "Seguir a la aeronave"
 
-#: utilpaisagem/gui/main.py:379 utilpaisagem/gui/main.py:862
+#: utilpaisagem/gui/main.py:419 utilpaisagem/gui/main.py:943
 msgid "Follow aircraft on Flightgear over telnet connection."
 msgstr "Seguir a la aeonave en  FlightGear sobre conexión Telnet."
 
-#: utilpaisagem/gui/main.py:383
+#: utilpaisagem/gui/main.py:423
 msgid "Center on aircraft"
 msgstr "Centrar sobre la aeronave"
 
-#: utilpaisagem/gui/main.py:388
+#: utilpaisagem/gui/main.py:428
 msgid "Center map on aircraft and show the corresponding scenery tile."
 msgstr ""
-"Centrar el mapa sobre la aeronave y mostrar la correspondiente tesela de escenario."
-"correspondante."
+"Centrar el mapa sobre la aeronave y mostrar la correspondiente tesela de "
+"escenario.correspondante."
 
-#: utilpaisagem/gui/main.py:443
+#: utilpaisagem/gui/main.py:483
 msgid "FlightGear airports have been loaded."
 msgstr "Los aeropuertos de FlightGear han sido cargados."
 
-#: utilpaisagem/gui/main.py:448
+#: utilpaisagem/gui/main.py:488
 #, python-brace-format
 msgid "FlightGear airports file not found at {path}."
 msgstr "Archivo de aeropuertos de FlightGear no encontrado en: {path}."
 
-#: utilpaisagem/gui/main.py:494
+#: utilpaisagem/gui/main.py:534
 msgid "Image not found"
 msgstr "Imagen no encontrada"
 
-#: utilpaisagem/gui/main.py:495
+#: utilpaisagem/gui/main.py:535
 #, python-brace-format
 msgid "No image found for tile {index}."
 msgstr "No se han encontrado imágenes de la tesela {index}."
 
-#: utilpaisagem/gui/main.py:505
+#: utilpaisagem/gui/main.py:545
 msgid "Delete tile?"
 msgstr "¿Borrar la tesela?"
 
-#: utilpaisagem/gui/main.py:506
+#: utilpaisagem/gui/main.py:546
 #, python-brace-format
 msgid "Are you sure you want to delete tile {index}?"
 msgstr "¿Estás seguro de querer borrar la tesela {index}?"
 
-#: utilpaisagem/gui/main.py:520
+#: utilpaisagem/gui/main.py:560
 msgid "Delete region?"
 msgstr "¿Borrar la región?"
 
-#: utilpaisagem/gui/main.py:521
+#: utilpaisagem/gui/main.py:561
 #, python-brace-format
 msgid "Are you sure you want to delete region centered on {lat}, {lon}?"
 msgstr "¿Estaś seguro de querer borrar la región comprendida entre: {lat}, {lon}?"
 
-#: utilpaisagem/gui/main.py:744
+#: utilpaisagem/gui/main.py:767
+msgid "Choose flight plan"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:769
+msgid "FlightGear flight plan"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:779
+msgid "Unable to load route"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:780
+#, python-brace-format
+msgid "No waypoint found at file \"{file}\". Please check its integrity."
+msgstr ""
+
+#: utilpaisagem/gui/main.py:801 utilpaisagem/gui/main.py:805
+msgid "FlightGear's database"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:816
+msgid "Open Street Maps"
+msgstr ""
+
+#: utilpaisagem/gui/main.py:824
 #, python-brace-format
 msgid "\"{address}\" found at {lat},{lon} using {using}."
 msgstr "\"{address}\" encontrada en {lat},{lon} usandose {using}."
 
-#: utilpaisagem/gui/main.py:755
+#: utilpaisagem/gui/main.py:835
 #, python-brace-format
 msgid "Could not find address {address}."
 msgstr "No se puede encontrar la dirección {address}."
 
-#: utilpaisagem/gui/main.py:855
+#: utilpaisagem/gui/main.py:936
 msgid "Stop following"
 msgstr "Parar el seguimiento"
 
-#: utilpaisagem/gui/main.py:856
+#: utilpaisagem/gui/main.py:937
 msgid "Stop following aircraft on FlightGear"
 msgstr "Parar el seguimiento de la aeronave en FlightGear"
 
@@ -277,171 +313,193 @@ msgstr "Parar el seguimiento de la aeronave en FlightGear"
 msgid "{res} m/px range:"
 msgstr "Rango de {res} m/px:"
 
-#: utilpaisagem/gui/settings.py:49 utilpaisagem/gui/settings.py:361
+#: utilpaisagem/gui/settings.py:49 utilpaisagem/gui/settings.py:369
 msgid "Km"
 msgstr "Km"
 
-#: utilpaisagem/gui/settings.py:176
+#: utilpaisagem/gui/settings.py:184
 msgid "Útil paisagem settings"
 msgstr "Configuración de Útil paisagem"
 
-#: utilpaisagem/gui/settings.py:188
+#: utilpaisagem/gui/settings.py:196
 msgid "FlightGear"
 msgstr "FlightGear"
 
-#: utilpaisagem/gui/settings.py:190
+#: utilpaisagem/gui/settings.py:198
 msgid "Paths"
 msgstr "Rutas"
 
-#: utilpaisagem/gui/settings.py:195
+#: utilpaisagem/gui/settings.py:203
 msgid "Path to FlightGear data folder:"
 msgstr "Ruta a la carpeta data de FlightGear"
 
-#: utilpaisagem/gui/settings.py:206 utilpaisagem/gui/settings.py:226
+#: utilpaisagem/gui/settings.py:214 utilpaisagem/gui/settings.py:234
 msgid "Choose folder"
 msgstr "Elegir carpeta"
 
-#: utilpaisagem/gui/settings.py:215
+#: utilpaisagem/gui/settings.py:223
 msgid "Path to scenery imagery:"
 msgstr "Ruta a las imágenes de escenario:"
 
-#: utilpaisagem/gui/settings.py:237
+#: utilpaisagem/gui/settings.py:245
 msgid "FlightGear launch options"
 msgstr "Opciones de arranque con FlightGear"
 
-#: utilpaisagem/gui/settings.py:253
+#: utilpaisagem/gui/settings.py:261
 msgid "FlightGear connection"
 msgstr "Conexión con FlightGear"
 
-#: utilpaisagem/gui/settings.py:257
+#: utilpaisagem/gui/settings.py:265
 msgid "Host:"
 msgstr "Servidor:"
 
-#: utilpaisagem/gui/settings.py:260
+#: utilpaisagem/gui/settings.py:268
 msgid "Port:"
 msgstr "Puerto:"
 
-#: utilpaisagem/gui/settings.py:268
+#: utilpaisagem/gui/settings.py:276
 msgid "Interval retrieving aircraft location:"
 msgstr "Intervalo de captación de la posición de la aeronave:"
 
-#: utilpaisagem/gui/settings.py:271
-msgid "seconds"Téléchargement
-msgstr "Segundos"
+#: utilpaisagem/gui/settings.py:279
+msgid "seconds"
+msgstr ""
 
-#: utilpaisagem/gui/settings.py:285 utilpaisagem/gui/settings.py:347
+#: utilpaisagem/gui/settings.py:293 utilpaisagem/gui/settings.py:355
 msgid "Download"
 msgstr "Descarga"
 
-#: utilpaisagem/gui/settings.py:289
+#: utilpaisagem/gui/settings.py:297
 msgid "Image service"
 msgstr "Servicio de imágenes"
 
-#: utilpaisagem/gui/settings.py:300
+#: utilpaisagem/gui/settings.py:308
 msgid "Image service:"
 msgstr "Servicio de imágenes:"
 
-#: utilpaisagem/gui/settings.py:317 utilpaisagem/gui/settings.py:633
+#: utilpaisagem/gui/settings.py:325 utilpaisagem/gui/settings.py:673
 #, python-brace-format
 msgid "Availability area: {area}"
 msgstr "Zona disponible: {area}"
 
-#: utilpaisagem/gui/settings.py:327 utilpaisagem/gui/settings.py:636
+#: utilpaisagem/gui/settings.py:335 utilpaisagem/gui/settings.py:676
 #, python-brace-format
 msgid "Image service license at {link}"
 msgstr "Licencia del sevicio de imágenes disponible en: {link}"
 
-#: utilpaisagem/gui/settings.py:353
+#: utilpaisagem/gui/settings.py:361
 msgid "Download radius:"
 msgstr "Radio de descarga:"
 
-#: utilpaisagem/gui/settings.py:365
+#: utilpaisagem/gui/settings.py:373
 msgid "Maximum simultaneous tiles to download:"
 msgstr "Numero máximo de teselas a cargar simultaneamente"
 
-#: utilpaisagem/gui/settings.py:377
+#: utilpaisagem/gui/settings.py:385
 msgid "Maximum simultaneous downloads for each tile:"
 msgstr "Numero máximo de descargas simultaneas por cada tesela:"
 
-#: utilpaisagem/gui/settings.py:390
+#: utilpaisagem/gui/settings.py:398
 msgid "Download size:"
 msgstr "Tamaño de la descarga:"
 
-#: utilpaisagem/gui/settings.py:400
+#: utilpaisagem/gui/settings.py:408
 msgid "Image file format:"
 msgstr "Formato del archivo de imagen:"
 
-#: utilpaisagem/gui/settings.py:422
+#: utilpaisagem/gui/settings.py:414 utilpaisagem/gui/settings.py:417
+#: utilpaisagem/gui/settings.py:428 utilpaisagem/gui/settings.py:431
+#: utilpaisagem/gui/settings.py:731 utilpaisagem/gui/settings.py:732
+msgid "Yes"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:414 utilpaisagem/gui/settings.py:417
+#: utilpaisagem/gui/settings.py:428 utilpaisagem/gui/settings.py:431
+msgid "No"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:421
+msgid "Download ocean tiles:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:435
+msgid "Force download of single tiles:"
+msgstr ""
+
+#: utilpaisagem/gui/settings.py:462
 msgid "Image resolution"
 msgstr "Résolución de las imagenes"
 
-#: utilpaisagem/gui/settings.py:424
+#: utilpaisagem/gui/settings.py:464
 msgid "Image"
 msgstr "Imagen"
 
-#: utilpaisagem/gui/settings.py:443
+#: utilpaisagem/gui/settings.py:483
 msgid "Tile management"
 msgstr "Gestión de teselas"
 
-#: utilpaisagem/gui/settings.py:447
+#: utilpaisagem/gui/settings.py:487
 msgid "Tile age"
 msgstr "Antigüedad de la tesela"
 
-#: utilpaisagem/gui/settings.py:453
+#: utilpaisagem/gui/settings.py:493
 msgid "Days until downloading new image for tile:"
 msgstr "Dias hasta que se descargue una nueva imagen de la tesela:"
 
-#: utilpaisagem/gui/settings.py:462
+#: utilpaisagem/gui/settings.py:502
 msgid "Days before deleting unused tiles:"
 msgstr "Dias hasta que se borren las teselas no utilizadas:"
 
-#: utilpaisagem/gui/settings.py:474
+#: utilpaisagem/gui/settings.py:514
 msgid "Disk usage"
 msgstr "Uso del disco"
 
-#: utilpaisagem/gui/settings.py:480
+#: utilpaisagem/gui/settings.py:520
 msgid "Maximum disk usage in megabytes:"
 msgstr "Uso máximo del disco en megabytes:"
 
-#: utilpaisagem/gui/settings.py:486
+#: utilpaisagem/gui/settings.py:526
 msgid "Automatically enforce disk usage limit"
 msgstr "Automáticamente aplicar un limite de uso del disco"
 
-#: utilpaisagem/gui/settings.py:491
+#: utilpaisagem/gui/settings.py:531
 #, python-brace-format
 msgid "Disk space used: {space} MB"
 msgstr "Espacio utilizado en disco: {space} MB"
 
-#: utilpaisagem/gui/settings.py:507
+#: utilpaisagem/gui/settings.py:547
 msgid "Interface"
 msgstr "Interfaz"
 
-#: utilpaisagem/gui/settings.py:511"Plage maximale de latitude et de longitude pour l'affichage de tuiles de "
-"1°:"
+#: utilpaisagem/gui/settings.py:551
 msgid "Detail levels"
 msgstr "Nivel de detalle"
 
-#: utilpaisagem/gui/settings.py:516
+#: utilpaisagem/gui/settings.py:556
 msgid "Maximum latitude and longitude range for 1 degree tiles display:"
-msgstr "Rango máximo de latitud y longitud para la visualización de 1 grado en mosaicos:"
+msgstr ""
+"Rango máximo de latitud y longitud para la visualización de 1 grado en "
+"mosaicos:"
 
-#: utilpaisagem/gui/settings.py:527
+#: utilpaisagem/gui/settings.py:567
 msgid "Maximum latitude and longitude range for scenery tiles display:"
-msgstr "Rango máximo de latitud y longitud para la visualización de las teselas de escenario:"
+msgstr ""
+"Rango máximo de latitud y longitud para la visualización de las teselas "
+"de escenario:"
 
-#: utilpaisagem/gui/settings.py:544
+#: utilpaisagem/gui/settings.py:584
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: utilpaisagem/gui/settings.py:549
+#: utilpaisagem/gui/settings.py:589
 msgid "Apply"
 msgstr "Aplicar"
 
-#: utilpaisagem/gui/settings.py:554
+#: utilpaisagem/gui/settings.py:594
 msgid "Ok"
 msgstr "Ok"
 
-#: utilpaisagem/gui/settings.py:569
+#: utilpaisagem/gui/settings.py:609
 #, python-brace-format
 msgid ""
 "Start FlightGear with the following parameters:\n"
@@ -452,42 +510,43 @@ msgstr ""
 "            --telnet={port}\n"
 "            --fg-scenery={scenery_path}"
 
-#: utilpaisagem/gui/settings.py:579
+#: utilpaisagem/gui/settings.py:619
 #, python-brace-format
 msgid "{size} lines"
 msgstr "{size} lignes"
 
-#: utilpaisagem/gui/settings.py:588
+#: utilpaisagem/gui/settings.py:628
 msgid "Choose FlightGear data directory"
 msgstr "Elegir el directorio de FlightGear data"
 
-#: utilpaisagem/gui/settings.py:597
+#: utilpaisagem/gui/settings.py:637
 msgid "Choose directory for photoscenery"
 msgstr "Elegir el directorio para fotoescenario"
 
-#: utilpaisagem/gui/settings.py:652 utilpaisagem/gui/settings.py:660
-#: utilpaisagem/gui/settings.py:669 utilpaisagem/gui/settings.py:677
-#: utilpaisagem/gui/settings.py:685 utilpaisagem/gui/settings.py:706
-#: utilpaisagem/gui/settings.py:717 utilpaisagem/gui/settings.py:725
-#: utilpaisagem/gui/settings.py:732 utilpaisagem/gui/settings.py:740
-#: utilpaisagem/gui/settings.py:747
+#: utilpaisagem/gui/settings.py:692 utilpaisagem/gui/settings.py:700
+#: utilpaisagem/gui/settings.py:709 utilpaisagem/gui/settings.py:717
+#: utilpaisagem/gui/settings.py:725 utilpaisagem/gui/settings.py:748
+#: utilpaisagem/gui/settings.py:759 utilpaisagem/gui/settings.py:767
+#: utilpaisagem/gui/settings.py:774 utilpaisagem/gui/settings.py:782
+#: utilpaisagem/gui/settings.py:789
 msgid "Invalid value"
 msgstr "Valor inválido"
 
-#: utilpaisagem/gui/settings.py:653
+#: utilpaisagem/gui/settings.py:693
 msgid "Invalid value in port configuration. Please inform an integer value."
 msgstr ""
-"Valor inválido en la configuración del puerto. Por favor introduzca un valor entero."
+"Valor inválido en la configuración del puerto. Por favor introduzca un "
+"valor entero."
 
-#: utilpaisagem/gui/settings.py:661
+#: utilpaisagem/gui/settings.py:701
 msgid ""
 "Invalid value in following interval configuration. Please inform an "
 "integer value."
 msgstr ""
-"Valor inválido en la configuración del intervalo de seguimiento. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración del intervalo de seguimiento. Por "
+"favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:670
+#: utilpaisagem/gui/settings.py:710
 msgid ""
 "Invalid value in download radius configuration. Please inform an integer "
 "value."
@@ -495,76 +554,75 @@ msgstr ""
 "Valor inválido en la configuración del radio de descarga. Por favor "
 "introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:678
+#: utilpaisagem/gui/settings.py:718
 msgid ""
 "Invalid value in maximum simultaneous tiles configuration. Please inform "
 "an integer value."
 msgstr ""
-"Valor inválido en la configuración del numero máximo de teselas. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración del numero máximo de teselas. Por "
+"favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:686
+#: utilpaisagem/gui/settings.py:726
 msgid ""
 "Invalid value in maximum simultaneous downloads for each tile "
 "configuration. Please inform an integer value."
 msgstr ""
-"Valor inválido en la configuración del numero máximo de "
-"descargas simultaneas por cada tesela. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración del numero máximo de descargas "
+"simultaneas por cada tesela. Por favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:707
+#: utilpaisagem/gui/settings.py:749
 #, python-brace-format
 msgid ""
 "Invalid distance value in image resolution configuration ({r}). Please "
 "inform an integer value."
 msgstr ""
-"Valor inválido en la configuración de la resolución de la imagen "
-"({r}). Por favor introduzca un valor entero."
+"Valor inválido en la configuración de la resolución de la imagen ({r}). "
+"Por favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:708
+#: utilpaisagem/gui/settings.py:750
 #, python-brace-format
 msgid "{res} m/px"
 msgstr "{res} m/px"
 
-#: utilpaisagem/gui/settings.py:718
+#: utilpaisagem/gui/settings.py:760
 msgid ""
 "Invalid value in tile renewal age configuration. Please inform an integer"
 " value."
 msgstr ""
-"Valor inválido en la configuración de renovación de la antiguedad de la tesela. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración de renovación de la antiguedad de la "
+"tesela. Por favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:726
+#: utilpaisagem/gui/settings.py:768
 msgid ""
 "Invalid value in tile deletion age configuration. Please inform an "
 "integer value."
 msgstr ""
-"Valor inválido en la configuración del tiempo de supresión de teselas. Por favor "
-"introduzca un numero entero."
+"Valor inválido en la configuración del tiempo de supresión de teselas. "
+"Por favor introduzca un numero entero."
 
-#: utilpaisagem/gui/settings.py:733
+#: utilpaisagem/gui/settings.py:775
 msgid ""
 "Invalid value in disk usage limit configuration. Please inform an integer"
 " value."
 msgstr ""
-"Valor inválido en la configuración del limite de uso del disco. Por favor "
-"introduzca un numero entero."
+"Valor inválido en la configuración del limite de uso del disco. Por favor"
+" introduzca un numero entero."
 
-#: utilpaisagem/gui/settings.py:741
+#: utilpaisagem/gui/settings.py:783
 msgid ""
 "Invalid value in degree tile visualization configuration. Please inform "
 "an integer value."
 msgstr ""
-"Valor inválido en la configuración de la visualización de teselas de 1 grado. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración de la visualización de teselas de 1 "
+"grado. Por favor introduzca un valor entero."
 
-#: utilpaisagem/gui/settings.py:748
+#: utilpaisagem/gui/settings.py:790
 msgid ""
 "Invalid value in scenery tile visualization configuration. Please inform "
 "an integer value."
 msgstr ""
-"Valor inválido en la configuración de la visualización de teselas de escenario. Por favor "
-"introduzca un valor entero."
+"Valor inválido en la configuración de la visualización de teselas de "
+"escenario. Por favor introduzca un valor entero."
 
 #: utilpaisagem/gui/tile_manager.py:308
 #, python-brace-format
@@ -574,9 +632,7 @@ msgstr "Escaneo de la carpeta \"{folder}\" terminado."
 #: utilpaisagem/gui/tile_manager.py:373
 #, python-brace-format
 msgid "Current disk usage ({space} MB) does not exceed limit ({limit} MB)."
-msgstr ""
-"Uso actual del disco ({space} MB) no excede el limite "
-"({limit} MB)."
+msgstr "Uso actual del disco ({space} MB) no excede el limite ({limit} MB)."
 
 #: utilpaisagem/gui/tile_manager.py:389
 #, python-brace-format
@@ -584,15 +640,15 @@ msgid ""
 "Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused"
 " tiles."
 msgstr ""
-"El uso del disco ({space} MB) excede el limite ({limit} MB).  "
-"Eliminando las teselas no utilizadas."
+"El uso del disco ({space} MB) excede el limite ({limit} MB).  Eliminando "
+"las teselas no utilizadas."
 
 #: utilpaisagem/gui/tile_manager.py:410
 #, python-brace-format
 msgid "Finished deleting unused tiles. Current disk usage: {space} MB."
 msgstr ""
-"Finzalizado el el borrado de las teselas no utilizadas. Uso actual del disco: "
-"{space} MB."
+"Finzalizado el el borrado de las teselas no utilizadas. Uso actual del "
+"disco: {space} MB."
 
 #: utilpaisagem/gui/tile_manager.py:434
 msgid "Searching for tiles to display"
@@ -619,15 +675,15 @@ msgstr "PNG"
 msgid "smallest size"
 msgstr "El tamaño  más pequeño"
 
-#: utilpaisagem/scenery/image_service.py:109
+#: utilpaisagem/scenery/image_service.py:130
 msgid "ArcGIS worldwide service under restrictive license"
 msgstr "Servicio ArcGIS mundial bajo licencia restrictiva"
 
-#: utilpaisagem/scenery/image_service.py:111
+#: utilpaisagem/scenery/image_service.py:132
 msgid "worldwide"
 msgstr "mundo entero"
 
-#: utilpaisagem/scenery/image_service.py:125
+#: utilpaisagem/scenery/image_service.py:149
 msgid ""
 "Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
 "(CC-BY 4.0)"
@@ -635,127 +691,143 @@ msgstr ""
 "Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
 "(CC-BY 4.0)"
 
-#: utilpaisagem/scenery/image_service.py:127
+#: utilpaisagem/scenery/image_service.py:151
 msgid "Spain"
 msgstr "España"
 
-#: utilpaisagem/scenery/image_service.py:143
+#: utilpaisagem/scenery/image_service.py:170
 msgid "U.S. Geographical Survey (public domain)"
 msgstr "U.S. Geographical Survey (dominio publico)"
 
-#: utilpaisagem/scenery/image_service.py:145
+#: utilpaisagem/scenery/image_service.py:172
 msgid "USA"
 msgstr "USA"
 
-#: utilpaisagem/scenery/image_service.py:157
+#: utilpaisagem/scenery/image_service.py:185
 msgid "Kostenfreie Geodaten der Bayerischen Vermessungsverwaltung"
 msgstr ""
-"Datos geográficos gratuitos de la Administración Catástro Bávara y topografía"
+"Datos geográficos gratuitos de la Administración Catástro Bávara y "
+"topografía"
 
-#: utilpaisagem/scenery/image_service.py:159
+#: utilpaisagem/scenery/image_service.py:187
 msgid "Bavaria (Deutschland)"
 msgstr "Baviera (Alemania)"
 
-#: utilpaisagem/scenery/tile.py:98
+#: utilpaisagem/scenery/tile.py:104
 #, python-brace-format
 msgid "Dividing tile {index} in {vertical} lines and {horizontal} columns."
 msgstr "Tesela de separación {index} en {vertical} lineas y {horizontal} columnas."
 
-#: utilpaisagem/scenery/tile.py:141
+#: utilpaisagem/scenery/tile.py:147
 #, python-brace-format
 msgid "Tile {index}: DDS is smaller than optimized PNG."
-msgstr "Tesela {index}: El archivo DDS es más pequeño que el archivo PNG optimizado."
+msgstr ""
+"Tesela {index}: El archivo DDS es más pequeño que el archivo PNG "
+"optimizado."
 
-#: utilpaisagem/scenery/tile.py:149
+#: utilpaisagem/scenery/tile.py:155
 #, python-brace-format
 msgid "Tile {index}: optimized PNG is smaller than DDS."
-msgstr "Tesela {index}: El archivo PNG optimizado es más pequeño que el archivo DDS."
+msgstr ""
+"Tesela {index}: El archivo PNG optimizado es más pequeño que el archivo "
+"DDS."
 
-#: utilpaisagem/scenery/tile.py:212
+#: utilpaisagem/scenery/tile.py:219
 #, python-brace-format
 msgid ""
 "Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, "
 "{lon_right:.03f}  is not covered by {service_name}"
 msgstr ""
-"El area que va desde {lat_top:.03f}, {lon_left:.03f} hasta {lat_bottom:.03f}, "
-"{lon_right:.03f} no está cubierta por {service_name}"
+"El area que va desde {lat_top:.03f}, {lon_left:.03f} hasta "
+"{lat_bottom:.03f}, {lon_right:.03f} no está cubierta por {service_name}"
 
-#: utilpaisagem/scenery/tile.py:222
+#: utilpaisagem/scenery/tile.py:229
 #, python-brace-format
 msgid ""
 "Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not "
 "covered by {service_name}"
 msgstr ""
-"El area que va desde {lat_top}, {lon_left} hasta {lat_bottom}, {lon_right}, "
-" no está cubierta por {service_name}"
+"El area que va desde {lat_top}, {lon_left} hasta {lat_bottom}, "
+"{lon_right},  no está cubierta por {service_name}"
 
-#: utilpaisagem/scenery/tile.py:247
+#: utilpaisagem/scenery/tile.py:254
 #, python-brace-format
 msgid "Downloading image {current}/{total} of tile {index}..."
 msgstr "Descargando imagen {current}/{total} de la ttesela {index}..."
 
-#: utilpaisagem/scenery/tile.py:279
+#: utilpaisagem/scenery/tile.py:286
 #, python-brace-format
 msgid "Processing tile {index} ({lat_median}, {lon_median})..."
 msgstr "Procesando tesela {index} ({lat_median}, {lon_median})..."
 
-#: utilpaisagem/scenery/tile.py:299
+#: utilpaisagem/scenery/tile.py:306
 msgid "Previously downloaded file has smaller resolution. Downloading again."
-msgstr ""
-"La resolución del archivo anterior es menor . Descargando de nuevo."
+msgstr "La resolución del archivo anterior es menor . Descargando de nuevo."
 
-#: utilpaisagem/scenery/tile.py:308
+#: utilpaisagem/scenery/tile.py:315
 msgid "Failure on previous download. Downloading again."
 msgstr "Fallo de la descarga anterior. Descargando de nuevo."
 
-#: utilpaisagem/scenery/tile.py:318
+#: utilpaisagem/scenery/tile.py:325
 #, python-brace-format
 msgid "Tile {index} has not been saved as a {format} file. Downloading again."
 msgstr ""
-"La tesela {index} nno ha sido guardada como {format}. Descargando de nuevo."
+"La tesela {index} nno ha sido guardada como {format}. Descargando de "
+"nuevo."
 
-#: utilpaisagem/scenery/tile.py:332
+#: utilpaisagem/scenery/tile.py:339
 #, python-brace-format
 msgid ""
 "Previous download was not found where expected (\"{p}\"). Downloading "
 "again."
 msgstr ""
-"La descarga anterior no se ha encontrado donde se esperaba (\"{p}\"). Descargando de nuevo. "
+"La descarga anterior no se ha encontrado donde se esperaba (\"{p}\"). "
+"Descargando de nuevo. "
 
-#: utilpaisagem/scenery/tile.py:342
+#: utilpaisagem/scenery/tile.py:351
 #, python-brace-format
 msgid "Tile {index} has already been downloaded. Skipping."
 msgstr "La tesela {index} ya ha sido descargada. Saltando."
 
-#: utilpaisagem/scenery/tile.py:354
+#: utilpaisagem/scenery/tile.py:363
 #, python-brace-format
 msgid "Failed to check previous download (\"{e}\"). Downloading again."
 msgstr ""
-"Comprobación de la descarga anterior fallida(\"{e}\"). "
-"Descargando de nuevo."
+"Comprobación de la descarga anterior fallida(\"{e}\"). Descargando de "
+"nuevo."
 
-#: utilpaisagem/scenery/tile.py:363
+#: utilpaisagem/scenery/tile.py:372
 #, python-brace-format
 msgid "Tile {index} needs renewal. Downloading again."
 msgstr "La tesela {index} Anecesita renovarse. Descargandola de nuevo."
 
-#: utilpaisagem/scenery/tile.py:399
+#: utilpaisagem/scenery/tile.py:381
+#, python-brace-format
+msgid "Forced download of tile {index}."
+msgstr ""
+
+#: utilpaisagem/scenery/tile.py:417
 #, python-brace-format
 msgid "Downloaded tile {index}."
 msgstr "Tesela {index} descargada."
 
-#: utilpaisagem/scenery/tile.py:421
+#: utilpaisagem/scenery/tile.py:439
 #, python-brace-format
 msgid "Tile {index}'s photographic scenery placed at {path}."
 msgstr "Décor photographique de la tuile {index} placé dans {path}."
 
-#: utilpaisagem/scenery/tile.py:431
+#: utilpaisagem/scenery/tile.py:449
 #, python-brace-format
 msgid "Tile {self.index}'s photographic scenery could not be saved."
-msgstr "El paisaje fotográfico de la tesela {self.index} no ha podido ser guardada."
+msgstr ""
+"El paisaje fotográfico de la tesela {self.index} no ha podido ser "
+"guardada."
 
-#: utilpaisagem/scenery/tile.py:476 utilpaisagem/scenery/tile.py:491
+#: utilpaisagem/scenery/tile.py:496 utilpaisagem/scenery/tile.py:511
 #, python-brace-format
 msgid "Error downloading cell {index}[{line}][{cell}]: {e}."
 msgstr "Error descargando la celda {index}[{line}][{cell}]: {e}."
+
+#~ msgid "seconds\"Téléchargemen"
+#~ msgstr "Segundos"
 
