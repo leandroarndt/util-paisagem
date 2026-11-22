@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Útil paisagem VERSION\n"
+"Project-Id-Version: Útil paisagem 0.7\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-11-20 20:31-0300\n"
+"POT-Creation-Date: 2026-11-22 13:13-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}"
 msgstr ""
 
-#: utilpaisagem/gui/agents.py:220 utilpaisagem/gui/main.py:439
+#: utilpaisagem/gui/agents.py:220 utilpaisagem/gui/main.py:444
 msgid "Welcome to Útil paisagem"
 msgstr ""
 
@@ -69,11 +69,11 @@ msgstr ""
 msgid "Disk space used: {space} MB."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:141 utilpaisagem/gui/main.py:375
+#: utilpaisagem/gui/main.py:141 utilpaisagem/gui/main.py:380
 msgid "Load route"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:145 utilpaisagem/gui/main.py:380
+#: utilpaisagem/gui/main.py:145 utilpaisagem/gui/main.py:385
 msgid "Clear route"
 msgstr ""
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "Copy tile index"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:190 utilpaisagem/gui/main.py:433
+#: utilpaisagem/gui/main.py:190 utilpaisagem/gui/main.py:438
 msgid "Settings"
 msgstr ""
 
@@ -157,150 +157,150 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:258
+#: utilpaisagem/gui/main.py:263
 msgid "Select tile"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:263 utilpaisagem/gui/main.py:315
+#: utilpaisagem/gui/main.py:268 utilpaisagem/gui/main.py:320
 msgid "Add waypoint"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:280
+#: utilpaisagem/gui/main.py:285
 msgid "Tile index:"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:288
+#: utilpaisagem/gui/main.py:293
 msgid "Latitude:"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:297
+#: utilpaisagem/gui/main.py:302
 msgid "Longitude:"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:305
+#: utilpaisagem/gui/main.py:310
 msgid "Download tile"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:310
+#: utilpaisagem/gui/main.py:315
 msgid "Download region"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:336
+#: utilpaisagem/gui/main.py:341
 msgid "Waypoints:"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:355
+#: utilpaisagem/gui/main.py:360
 msgid "Rename"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:360
+#: utilpaisagem/gui/main.py:365
 msgid "Remove Waypoint"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:365
+#: utilpaisagem/gui/main.py:370
 msgid "Up"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:370
+#: utilpaisagem/gui/main.py:375
 msgid "Down"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:385
+#: utilpaisagem/gui/main.py:390
 msgid "Download route"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:409 utilpaisagem/gui/main.py:937
+#: utilpaisagem/gui/main.py:414 utilpaisagem/gui/main.py:942
 msgid "Follow aircraft"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:414 utilpaisagem/gui/main.py:938
+#: utilpaisagem/gui/main.py:419 utilpaisagem/gui/main.py:943
 msgid "Follow aircraft on Flightgear over telnet connection."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:418
+#: utilpaisagem/gui/main.py:423
 msgid "Center on aircraft"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:423
+#: utilpaisagem/gui/main.py:428
 msgid "Center map on aircraft and show the corresponding scenery tile."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:478
+#: utilpaisagem/gui/main.py:483
 msgid "FlightGear airports have been loaded."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:483
+#: utilpaisagem/gui/main.py:488
 #, python-brace-format
 msgid "FlightGear airports file not found at {path}."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:529
+#: utilpaisagem/gui/main.py:534
 msgid "Image not found"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:530
+#: utilpaisagem/gui/main.py:535
 #, python-brace-format
 msgid "No image found for tile {index}."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:540
+#: utilpaisagem/gui/main.py:545
 msgid "Delete tile?"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:541
+#: utilpaisagem/gui/main.py:546
 #, python-brace-format
 msgid "Are you sure you want to delete tile {index}?"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:555
+#: utilpaisagem/gui/main.py:560
 msgid "Delete region?"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:556
+#: utilpaisagem/gui/main.py:561
 #, python-brace-format
 msgid "Are you sure you want to delete region centered on {lat}, {lon}?"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:762
+#: utilpaisagem/gui/main.py:767
 msgid "Choose flight plan"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:764
+#: utilpaisagem/gui/main.py:769
 msgid "FlightGear flight plan"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:774
+#: utilpaisagem/gui/main.py:779
 msgid "Unable to load route"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:775
+#: utilpaisagem/gui/main.py:780
 #, python-brace-format
 msgid "No waypoint found at file \"{file}\". Please check its integrity."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:796 utilpaisagem/gui/main.py:800
+#: utilpaisagem/gui/main.py:801 utilpaisagem/gui/main.py:805
 msgid "FlightGear's database"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:811
+#: utilpaisagem/gui/main.py:816
 msgid "Open Street Maps"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:819
+#: utilpaisagem/gui/main.py:824
 #, python-brace-format
 msgid "\"{address}\" found at {lat},{lon} using {using}."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:830
+#: utilpaisagem/gui/main.py:835
 #, python-brace-format
 msgid "Could not find address {address}."
 msgstr ""
 
-#: utilpaisagem/gui/main.py:931
+#: utilpaisagem/gui/main.py:936
 msgid "Stop following"
 msgstr ""
 
-#: utilpaisagem/gui/main.py:932
+#: utilpaisagem/gui/main.py:937
 msgid "Stop following aircraft on FlightGear"
 msgstr ""
 
