@@ -1,19 +1,15 @@
 # Útil paisagem changelog
 
-## 0.7.0rc1
+## 0.7.0
 
 - Load FlightGear XML route files.
 - Make download of ocean tiles optional (they're not really covered by the image service
 providers).
-- Corrected color of tiles downloaded with error on live map update
-
-## 0.7.0rc2
-- Added scroll bar to waypoints list
 - Optionally force download of single tiles despite being oceanic or already downloaded (defaults to force downloads).
-
-## 0.7.0rc3
+- Added scroll bar to waypoints list
+- Translations (currently Portuguese, French and Spanish) also available on Windows systems.
 - Solved issue #3 (localization on Windows systems).
-- Translations (currently Portuguese and French) also available on Windows systems.
+- Corrected color of tiles downloaded with error on live map update
 
 ## 0.6.0
 
