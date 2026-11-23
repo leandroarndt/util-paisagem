@@ -1,4 +1,3 @@
-# French translations for Útil paisagem.
 # Copyright (C) 2026 Leandro Arndt
 # This file is distributed under the same license as the Útil paisagem
 # project.
@@ -9,16 +8,16 @@ msgstr ""
 "Project-Id-Version: Útil paisagem 0.7\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
 "POT-Creation-Date: 2026-11-20 20:31-0300\n"
-"PO-Revision-Date: 2026-11-22 12:44-0300\n"
+"PO-Revision-Date: 2026-11-23 11:20+0100\n"
 "Last-Translator: BARANGER Emmanuel <embaranger@gmail.com>\n"
 "Language-Team: FR <embaranger@gmail.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
-"X-Generator: Poedit 3.10\n"
+"X-Generator: Poedit 3.8\n"
 
 #: utilpaisagem/flightplan/flightplan.py:31
 #, python-brace-format
@@ -33,7 +32,7 @@ msgstr "Tuile {index} ajoutée à la file de téléchargement."
 
 #: utilpaisagem/gui/agents.py:151
 msgid "Could not connect to Flightgear."
-msgstr "Connection à FlightGear Impossible"
+msgstr "Connection à FlightGear Impossible."
 
 #: utilpaisagem/gui/agents.py:154
 msgid "Sucessfuly connected to Flightgear."
@@ -70,7 +69,7 @@ msgstr "Les {total} tuiles ont été traitées.."
 #: utilpaisagem/gui/agents.py:259
 #, python-brace-format
 msgid "Disk space used: {space} MB."
-msgstr "Espace disque utilisé: {space} MB"
+msgstr "Espace disque utilisé: {space} MB."
 
 #: utilpaisagem/gui/main.py:141 utilpaisagem/gui/main.py:375
 msgid "Load route"
@@ -130,7 +129,7 @@ msgstr "Dernière version"
 
 #: utilpaisagem/gui/main.py:203
 msgid "Found a bug?"
-msgstr "Rapport d'erreur"
+msgstr "Rapport d'erreur ?"
 
 #: utilpaisagem/gui/main.py:207
 msgid "Contribute"
@@ -273,9 +272,8 @@ msgid "FlightGear flight plan"
 msgstr "Plan de vol FlightGear"
 
 #: utilpaisagem/gui/main.py:774
-#, fuzzy
 msgid "Unable to load route"
-msgstr "Télécharger une route"
+msgstr "Impossible de charger la  route"
 
 #: utilpaisagem/gui/main.py:775
 #, python-brace-format
@@ -331,7 +329,7 @@ msgstr "Chemins"
 
 #: utilpaisagem/gui/settings.py:203
 msgid "Path to FlightGear data folder:"
-msgstr "Chemin des données de FlightGear"
+msgstr "Chemin des données de FlightGear:"
 
 #: utilpaisagem/gui/settings.py:214 utilpaisagem/gui/settings.py:234
 msgid "Choose folder"
@@ -363,7 +361,7 @@ msgstr "Récupération par intervalles de la position de l'aéronef:"
 
 #: utilpaisagem/gui/settings.py:279
 msgid "seconds"
-msgstr "Secondes"
+msgstr "secondes"
 
 #: utilpaisagem/gui/settings.py:293 utilpaisagem/gui/settings.py:355
 msgid "Download"
@@ -393,7 +391,7 @@ msgstr "Rayon de téléchargement:"
 
 #: utilpaisagem/gui/settings.py:373
 msgid "Maximum simultaneous tiles to download:"
-msgstr "Nombre maximal de tuiles à télécharger simultanément"
+msgstr "Nombre maximal de tuiles à télécharger simultanément:"
 
 #: utilpaisagem/gui/settings.py:385
 msgid "Maximum simultaneous downloads for each tile:"
@@ -419,14 +417,12 @@ msgid "No"
 msgstr "Non"
 
 #: utilpaisagem/gui/settings.py:421
-#, fuzzy
 msgid "Download ocean tiles:"
-msgstr "Télécharger la tuile"
+msgstr "Télécharger les tuiles d'océan:"
 
 #: utilpaisagem/gui/settings.py:435
-#, fuzzy
 msgid "Force download of single tiles:"
-msgstr "Télécharger la tuile"
+msgstr "Forcer le téléchargement d'une tuile:"
 
 #: utilpaisagem/gui/settings.py:462
 msgid "Image resolution"
@@ -631,7 +627,7 @@ msgstr "Recherche de tuiles à afficher"
 
 #: utilpaisagem/gui/tile_manager.py:498
 msgid "Finished searching for tiles to display."
-msgstr "Recherche de tuiles à afficher terminée"
+msgstr "Recherche de tuiles à afficher terminée."
 
 #: utilpaisagem/gui/tile_manager.py:533
 #, python-brace-format
@@ -761,9 +757,9 @@ msgid "Tile {index} needs renewal. Downloading again."
 msgstr "La tuile {index} A besoin d'être renouvelé. Je la télécharge à nouveau."
 
 #: utilpaisagem/scenery/tile.py:381
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Forced download of tile {index}."
-msgstr "Tuile {index} téléchargée."
+msgstr "Téléchargement forcé de la tuile {index}."
 
 #: utilpaisagem/scenery/tile.py:417
 #, python-brace-format
