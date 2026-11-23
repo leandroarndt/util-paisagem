@@ -15,7 +15,7 @@ Below is a list sorted by contribution category:
 
 ## Bug reporting
 
+- lomar
 - Miguel
 - Patricio
-- lomar
 - Zakharov
