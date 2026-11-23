@@ -128,12 +128,20 @@ class SettingsWindow(object):
     resolution_label:ttk.Label
     resolution_entry:ttk.Combobox
     image_format_var:tk.StringVar
-    image_format_label:tk.Label
+    image_format_label:ttk.Label
     image_format_entry:ttk.Combobox
     threads_var:tk.IntVar
     threads_var:tk.IntVar
-    threads_label:tk.Label
+    threads_label:ttk.Label
     threads_input:ttk.Spinbox
+    download_ocean_options:List
+    download_ocean_var:tk.StringVar
+    download_ocean_label:ttk.Label
+    download_ocean_input:ttk.Combobox
+    force_download_options:List
+    force_download_var:tk.StringVar
+    force_download_label:ttk.Label
+    force_download_input:ttk.Combobox
     image_frame:ttk.LabelFrame
     tile_management_tab:ttk.Frame
     tile_age_frame:ttk.Labelframe
@@ -403,6 +411,34 @@ class SettingsWindow(object):
             values=list(COMPRESSION.keys()),
             textvariable=self.image_format_var
         )
+        self.download_ocean_options = [_('Yes'), _('No')]
+        self.download_ocean_var = tk.StringVar(
+            self.download_frame,
+            value=_('Yes') if self.settings.download_ocean else _('No'),
+        )
+        self.download_ocean_label = ttk.Label(
+            self.download_frame,
+            text=_('Download ocean tiles:')
+        )
+        self.download_ocean_input = ttk.Combobox(
+            self.download_frame,
+            values=self.download_ocean_options,
+            textvariable=self.download_ocean_var,
+        )
+        self.force_download_options = [_('Yes'), _('No')]
+        self.force_download_var = tk.StringVar(
+            self.download_frame,
+            value=_('Yes') if self.settings.force_single_tile else _('No'),
+        )
+        self.force_download_label = ttk.Label(
+            self.download_frame,
+            text=_('Force download of single tiles:')
+        )
+        self.force_download_input = ttk.Combobox(
+            self.download_frame,
+            values=self.force_download_options,
+            textvariable=self.force_download_var,
+        )
         self.radius_label.grid(column=0, row=0, sticky=tk.E)
         self.radius_input.grid(column=1, row=0, sticky=tk.W+tk.E)
         self.radius_km_label.grid(column=2, row=0, sticky=tk.W)
@@ -414,6 +450,10 @@ class SettingsWindow(object):
         self.tiles_input.grid(column=1, row=3, sticky=tk.W+tk.E)
         self.threads_label.grid(column=0, row=4, sticky=tk.E)
         self.threads_input.grid(column=1, row=4, sticky=tk.W+tk.E)
+        self.download_ocean_label.grid(column=0, row=5, sticky=tk.E)
+        self.download_ocean_input.grid(column=1, row=5, sticky=tk.W+tk.E)
+        self.force_download_label.grid(column=0, row=6, sticky=tk.E)
+        self.force_download_input.grid(column=1, row=6, sticky=tk.W+tk.E)
         self.image_service_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.download_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Image tab
@@ -688,6 +728,8 @@ class SettingsWindow(object):
             return
         self.settings.download_res = self.unformat_size(self.resolution_var.get())
         self.settings.image_format = COMPRESSION[self.image_format_var.get()]
+        self.settings.download_ocean = True if self.download_ocean_var.get() == _('Yes') else False
+        self.settings.force_single_tile = True if self.force_download_var.get() == _('Yes') else False
         distances = {}
         max_distance = 0
         try:

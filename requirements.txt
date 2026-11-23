@@ -2,10 +2,12 @@ pillow>=11.2.1
 flightgear_python
 Babel
 appdirs
-tkintermapview @ git+https://github.com/leandroarndt/TkinterMapView/
+tkintermapview
 LatLon23
 pyshortcuts
 pyperclip
 show-in-file-manager
 github3.py
 xplane-airports
+numpy
+opencv-python-headless

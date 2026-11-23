@@ -48,6 +48,7 @@ if __name__ == '__main__':
     (dest / 'resources').mkdir()
     resources = [(data_files('resources/images', ['*.png',]))]
     resources.append((data_files('resources/images', ['*.ico',])))
+    resources.append((data_files('resources/world_data', ['*.tif',])))
     for folder in Path('resources/locale').iterdir():
         if folder.is_dir():
             resources.append((data_files(f'resources/locale/{folder.name}/LC_MESSAGES', ['*.mo'])))

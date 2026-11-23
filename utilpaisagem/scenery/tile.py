@@ -16,6 +16,9 @@ from utilpaisagem.gui.common import format_status, Settings, TileColors, QUIT, L
 class NeedsRenewalError(Exception):
     pass
 
+class ForcedDownloadError(Exception):
+    pass
+
 class Tile(object):
     """
     Scenery tiles with the corresponding index and coordinates.
@@ -29,6 +32,7 @@ class Tile(object):
     upstream_queue:Union[Queue|None]
     tile_manager_queue:Union[Queue|None]
     settings:Settings
+    single:bool
 
     def __init__(
         self,
@@ -37,6 +41,7 @@ class Tile(object):
         lon:Number=float('nan'), 
         resolution:int=DOWNLOAD_RES,
         upstream_queue:Union[Queue|None]=None,
+        single=False
     ):
         """
         New Tile object defined by either index or by coordinates.
@@ -57,6 +62,7 @@ class Tile(object):
             raise ValueError(f'Invalid resolution. Should be at least {MIN_RES} and at most {MAX_RES}.')
         
         self.settings = Settings()
+        self.single = single
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(lat={self.coordinates.lat_median}, lon={self.coordinates.lon_median})>'
@@ -206,7 +212,8 @@ class Tile(object):
             upstream_queue(Queue): queue for user communication
             tile_manager_queue(Queue): queue for the TileManager
         """
-        if not image_service.can_download(self.coordinates):
+        if (not image_service.can_download(self.coordinates)) and \
+            not (self.single and self.settings.force_single_tile):
             if self.upstream_queue is None:
                 print(_(
                     'Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, {lon_right:.03f}  is not covered by {service_name}'
@@ -335,6 +342,8 @@ class Tile(object):
                     raise AssertionError
                 if self.is_old(log, logpath):
                     raise NeedsRenewalError
+                if self.single and self.settings.force_single_tile:
+                    raise ForcedDownloadError
                 if self.upstream_queue is None:
                     print(f'Tile {self.index} has already been downloaded. Skipping.')
                 else:
@@ -361,6 +370,15 @@ class Tile(object):
                 else:
                     self.upstream_queue.put_nowait(format_status(
                         _('Tile {index} needs renewal. Downloading again.').format(index=self.index),
+                        self,
+                    ))
+                delete = True
+            except ForcedDownloadError:
+                if self.upstream_queue is None:
+                    print(f'Forced download of tile {self.index}.')
+                else:
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Forced download of tile {index}.').format(index=self.index),
                         self,
                     ))
                 delete = True
@@ -451,13 +469,15 @@ class Tile(object):
                         self.index,
                         self.coordinates,
                         self.get_path(self.settings.orthophotos_folder) / filename.name,
-                        TileColors.good,
+                        [TileColors.good if errors == 0 else TileColors.failed],
                         str(self.get_path(Path())).split(os.sep),
                     ))
                 except AttributeError:
                     pass
 
         except (URLError, ContentTooShortError) as e:
+            if QUIT.is_set:
+                return
             try:
                 tile_manager_queue.put_nowait((
                     self.index,

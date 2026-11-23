@@ -90,11 +90,12 @@ class Downloader(object):
                 thread.start()
             self._wait_download()
 
-    def add_tile(self, index, resolution=DOWNLOAD_RES):
+    def add_tile(self, index, resolution=DOWNLOAD_RES, single=False):
         self.download_queue.put_nowait(Tile(
             index,
             resolution=resolution,
             upstream_queue=self.upstream_queue,
+            single=single
         ))
         self.upstream_queue.put_nowait(format_status(
             _('Tile {index} added to download queue.').format(index=index),
