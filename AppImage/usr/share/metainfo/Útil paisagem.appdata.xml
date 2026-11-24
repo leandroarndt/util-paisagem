@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>Útil paisagem</id>
-	<metadata_license>BSD-3-Clause</metadata_license>
+	<id>utilpaisagem</id>
+	<metadata_license>CC-BY-SA-4.0</metadata_license>
 	<project_license>BSD-3-Clause</project_license>
 	<name>Útil paisagem</name>
 	<summary>Photoscenery tool for FlightGear</summary>
 	<description>
-		<p>Útil paisagem is a photographic scenery tool for FlightGear flight simulator. It retrieves satellite images from the web and writes it down in a way that FlightGear can use it.</p>
+		<p>Útil paisagem is a photographic scenery tool for FlightGear flight simulator. It retrieves satellite images from the web and writes it down in a form that FlightGear can use it.</p>
 	</description>
-	<launchable type="desktop-id">Útil paisagem.desktop</launchable>
+	<launchable type="desktop-id">utilpaisagem.desktop</launchable>
 	<url type="homepage">https://github.com/leandroarndt/util-paisagem</url>
 	<screenshots>
 		<screenshot type="default">
@@ -16,6 +16,6 @@
 		</screenshot>
 	</screenshots>
 	<provides>
-		<id>Útil paisagem.desktop</id>
+		<id>utilpaisagem.desktop</id>
 	</provides>
 </component>
