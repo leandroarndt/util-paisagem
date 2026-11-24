@@ -18,7 +18,7 @@ chmod +x appimagetool-x86_64.AppImage
 echo "Creating AppDir..."
 mkdir -p build/AppDir/usr/bin
 echo "Copying files from AppImage..."
-cp AppImage/* build/AppDir
+cp -r AppImage/* build/AppDir
 echo "Copying Útil paisagem internals..."
 cp -r dist/utilpaisagem/_internal/ build/AppDir/usr/bin/
 echo "Copying executable..."
@@ -29,6 +29,5 @@ echo "Moving zsync file..."
 mv Util_paisagem-x86_64.AppImage.zsync dist
 echo "Deleting build directory..."
 rm -r build/AppDir
-rm -r build/utilpaisagem
 echo "Deleting appimagetool..."
 rm appimagetool-x86_64.AppImage
