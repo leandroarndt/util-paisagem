@@ -2,6 +2,6 @@
 Type=Application
 Name=Útil paisagem
 Comment=Photoscenery tool for FlightGear
-Exec=utilpaisagem
+Exec=Util_paisagem
 Icon=utilpaisagem
 Categories=Game;
