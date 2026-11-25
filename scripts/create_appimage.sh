@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Execute from repository's base dir
+
 set -e
 
 echo "Deleting old files..."
