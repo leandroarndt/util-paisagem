@@ -12,7 +12,10 @@ a = Analysis(
         ('README.md', '.'),
         ('LICENSE', '.'),
     ],
-    hiddenimports=['PIL._tkinter_finder'],
+    hiddenimports=[
+        'PIL._tkinter_finder',
+        'win32com.shell.shellcon',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
