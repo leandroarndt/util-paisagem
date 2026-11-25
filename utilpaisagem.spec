@@ -4,7 +4,12 @@ a = Analysis(
     ['run.py'],
     pathex=[],
     binaries=[],
-    datas=[('resources', 'resources')],
+    datas=[
+        ('resources/locale', 'resources/locale'),
+        ('resources/images/*.png', 'resources/images'),
+        ('resources/images/*.ico', 'resources/images'),
+        ('resources/world_data', 'resources/world_data')
+    ],
     hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
@@ -20,7 +25,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='utilpaisagem',
+    name='Util_paisagem',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
