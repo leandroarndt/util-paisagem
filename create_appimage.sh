@@ -15,14 +15,23 @@ fi
 echo "Downloading latest appimagetool..."
 wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
-echo "Creating AppDir..."
-mkdir -p build/AppDir/usr/bin
-echo "Copying files from AppImage..."
-cp -r AppImage/* build/AppDir
-echo "Copying Útil paisagem internals..."
-cp -r dist/utilpaisagem/_internal/ build/AppDir/usr/bin/
-echo "Copying executable..."
-cp dist/utilpaisagem/utilpaisagem build/AppDir/usr/bin/
+echo "Downloading latest quick-sharun.sh"
+wget https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh
+chmod +x quick-sharun.sh
+echo "Wrapping libraries with quick sharun..." 
+DESKTOP=AppImage/Util_paisagem.desktop ICON=AppImage/utilpaisagem.png OUTPUT_APPIMAGE=0 DEPLOY_GLIBC=1 APPDIR=build/AppDir \
+USE_HOST_DRIVERS=1 ./quick-sharun.sh dist/utilpaisagem/utilpaisagem
+echo "Copying Útil paisagem internals to AppDir..."
+cp -r dist/utilpaisagem/_internal/ build/AppDir/shared/bin
+echo "Copying Útil paisagem meta info to Appdir..."
+mkdir -p build/Appdir/usr/share/metainfo/
+cp AppImage/usr/share/metainfo/Útil\ paisagem.appdata.xml build/Appdir/usr/share/metainfo/
+# echo "Creating AppDir..."
+# mkdir -p build/AppDir/usr/bin
+# echo "Copying files from AppImage..."
+# cp -r AppImage/* build/AppDir
+# echo "Copying executable..."
+# cp dist/utilpaisagem/utilpaisagem build/AppDir/usr/bin/
 echo "Creating AppImage..."
 ARCH=x86_64 ./appimagetool-x86_64.AppImage -u "gh-releases-zsync|leandroarndt|util-paisagem|latest|Util_paisagem-x86_64.AppImage.zsync" build/AppDir dist/Util_paisagem-x86_64.AppImage
 echo "Moving zsync file..."
@@ -31,3 +40,5 @@ echo "Deleting build directory..."
 rm -r build/AppDir
 echo "Deleting appimagetool..."
 rm appimagetool-x86_64.AppImage
+echo "Deleting quick sharun script..."
+rm quick-sharun.sh
