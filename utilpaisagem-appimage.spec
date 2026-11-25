@@ -5,10 +5,12 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('resources/locale', 'resources/locale'),
+        ('resources/locale/es/LC_MESSAGES/*.mo', 'resources/locale/es/LC_MESSAGES'),
+        ('resources/locale/fr/LC_MESSAGES/*.mo', 'resources/locale/fr/LC_MESSAGES'),
+        ('resources/locale/pt/LC_MESSAGES/*.mo', 'resources/locale/pt/LC_MESSAGES'),
         ('resources/images/*.png', 'resources/images'),
         ('resources/images/*.ico', 'resources/images'),
-        ('resources/world_data', 'resources/world_data')
+        ('resources/world_data/*.tif', 'resources/world_data')
     ],
     hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
@@ -45,5 +47,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='utilpaisagem',
+    name='utilpaisagem-appimage',
 )
