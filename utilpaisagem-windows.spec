@@ -5,10 +5,12 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('resources/locale/*/LC_MESSAGES/*.mo', 'resources/locale'),
+        ('resources/locale/', 'resources/locale'),
         ('resources/images/*.png', 'resources/images'),
         ('resources/images/*.ico', 'resources/images'),
-        ('resources/world_data', 'resources/world_data')
+        ('resources/world_data', 'resources/world_data'),
+        ('README.md', '.'),
+        ('LICENSE', '.'),
     ],
     hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
