@@ -34,14 +34,9 @@ Section
     # set the installation directory as the destination for the following actions
     SetOutPath $INSTDIR
 
-    File /r dist\nsis\*.*
+    File /r dist\utilpaisagem-windows\*.*
 
-    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\pythonw.exe" "run.py" "$INSTDIR\resources\images\utilpaisagem.ico"; 0 SW_SHOWMINIMIZED
-    CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.exe" "" "$INSTDIR\resources\images\utilpaisagem.ico"
-    ; CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.bat" "" "$INSTDIR\resources\images\utilpaisagem.ico" 0 SW_SHOWMINIMIZED
-    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\Get the latest version.lnk" "https://github.com/leandroarndt/util-paisagem/releases/latest" "" "$INSTDIR\resources\images\utilpaisagem.ico"
-    ; CreateShortcut "$SMPROGRAMS\${APP_NAME}\Using ${APP_NAME}.lnk" "https://github.com/leandroarndt/util-paisagem/wiki/usage" "" "$INSTDIR\resources\images\utilpaisagem.ico"
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\Util_paisagem.exe" "" "$INSTDIR\resources\images\utilpaisagem.ico"
  
     # create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
