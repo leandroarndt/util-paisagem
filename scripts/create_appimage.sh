@@ -27,7 +27,7 @@ echo "Copying Útil paisagem internals to AppDir..."
 cp -r dist/utilpaisagem-appimage/_internal/ build/AppDir/shared/bin
 echo "Copying Útil paisagem meta info to Appdir..."
 mkdir -p build/Appdir/usr/share/metainfo/
-cp AppImage/usr/share/metainfo/Útil\ paisagem.appdata.xml build/Appdir/usr/share/metainfo/
+cp AppImage/usr/share/metainfo/io.github.leandroarndt.Util_paisagem.metainfo.xml build/Appdir/usr/share/metainfo/
 echo "Creating AppImage..."
 ARCH=x86_64 ./appimagetool-x86_64.AppImage -u "gh-releases-zsync|leandroarndt|util-paisagem|latest|Util_paisagem-x86_64.AppImage.zsync" build/AppDir dist/Util_paisagem-x86_64.AppImage
 echo "Moving zsync file..."
