@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.leandroarndt.Util_paisagem</id>
+
+  <suggests>org.flightgear.FlightGear</suggests>
+  
+  <name>Útil paisagem</name>
+  <summary>Photoscenery tool for FlightGear</summary>
+  <summary xml:lang="pt_BR">Cenários fotográficos para o FlightGear</summary>
+  
+  <metadata_license>CC-BY-SA-4.0</metadata_license>
+  <project_license>BSD-3-Clause</project_license>
+  
+  <description>
+    <p>
+      Útil paisagem is a photographic scenery tool for FlightGear flight simulator.
+	  It retrieves satellite images from the web and writes it down in a way that
+	  FlightGear can use it.
+    </p>
+
+	<p xml:lang="pt_BR">
+	  Útil paisagem é uma ferramenta de cenários fotográficos para o simulador de voo
+	  FlightGear. Ele baixa imagens de satélite da Internet e as armazena de uma forma
+	  que o FlightGear possa usá-las.
+	</p>
+  </description>
+  
+  <releases>
+	<release version="0.7.0" date="2026-11-23">
+		<description>
+			<ul>Load FlightGear XML route files.</ul>
+			<ul>Make download of ocean tile's optional (they're not really covered by
+			the image service providers).</ul>
+			<ul>Optionally force download of single tiles despite being oceanic or
+			already downloaded (defaults to force downloads).</ul>
+			<ul>Added scroll bar to waypoints list.</ul>
+			<ul>Translations (currently Portuguese, French and Spanish) also available
+			on Windows systems.</ul>
+			<ul>Solved issue #3 (localization on Windows systems).</ul>
+			<ul>Corrected color of tiles downloaded with error on live map update.</ul>
+
+			<ul xml:lang="pt_BR">Carrega planos de voo do FlightGear no formato XML.</ul>
+			<ul xml:lang="pt_BR">Torna opcional o dwonload de ladrilhos oceânicos
+			(eles não são realmente cobertos pelos serviços de imagem).</ul>
+			<ul xml:lang="pt_BR">Opcionalmente força o download de ladrilhos individuais,
+			mesmo que sejam oceânicos ou já tenham sido baixados (por padrão, força o
+			download).</ul>
+			<ul xml:lang="pt_BR">Barra de rolagem adicionada à lista de pontos de
+			referência.</ul>
+			<ul xml:lang="pt_BR">Traduções (atualmente para português, francês e castelhano)
+			também disponíveis em sistemas Windows.</ul>
+			<ul xml:lang="pt_BR">Resolvida a questão nº 3 (textos locais em sistemas
+			Windows).</ul>
+			<ul xml:lang="pt_BR">Corrigida a cor de ladrilhos baixados com erro ao
+			atualizar o mapa ao vivo.</ul>
+		</description>
+	</release>
+  </releases>
+
+  </url type="homepage">https://github.com/leandroarndt/util-paisagem</url>
+  </url type="help">https://github.com/leandroarndt/util-paisagem/wiki</url>
+  </url type="bugtracker">https://github.com/leandroarndt/util-paisagem/issues</url>
+  </url type="donation">https://buymeacoffee.com/leandro.a</url>
+
+  <content_rating type="oars-1.0" />
+
+  <launchable type="desktop-id">Util_paisagem.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/wiki/leandroarndt/util-paisagem/images/util-paisagem-route.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/wiki/leandroarndt/util-paisagem/images/util-paisagem-settings.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/wiki/leandroarndt/util-paisagem/images/Screenshots/SBCT.png</image>
+    </screenshot>
+  </screenshots>
+
+  <developer id="io.github.leandroarndt">
+	<name>Leandro Arndt</name>
+  </developer>
+</component>
