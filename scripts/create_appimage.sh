@@ -14,6 +14,11 @@ fi
 if [ -e "build/AppDir" ]; then
     rm -r build/AppDir
 fi
+if [ -e "dist/utilpaisagem-appimage" ]; then
+    rm -r dist/utilpaisagem-appimage
+fi
+echo "Building Linux distributable..."
+pyinstaller utilpaisagem-appimage.spec
 echo "Downloading latest appimagetool..."
 wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
@@ -38,3 +43,5 @@ echo "Deleting appimagetool..."
 rm appimagetool-x86_64.AppImage
 echo "Deleting quick sharun script..."
 rm quick-sharun.sh
+echo "Deleting Linux distributable..."
+rm -r dist/utilpaisagem-appimage
