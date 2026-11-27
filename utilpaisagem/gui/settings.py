@@ -837,6 +837,7 @@ class SettingsWindow(object):
                 title=_('Invalid value'),
                 message=_('Invalid value in scenery tile visualization configuration. Please inform an integer value.')
             )
+        self.settings.download_translations = self.translations_var.get()
     
     def apply_and_close(self):
         self.apply()
