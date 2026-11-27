@@ -1,7 +1,7 @@
-import locale
-#locale.setlocale(locale.LC_ALL, '')
 from threading import Event
+from numbers import Number
 # format_status
+import locale
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
 from babel.core import UnknownLocaleError
@@ -111,6 +111,10 @@ class Settings(object):
         deletion_age:int = 90
         max_disk_usage:int = 5 GB
         auto_clean:bool = True
+        detail_degree:Number = 30
+        detail_tile:Number = 3
+        detail_zero:Number = 0
+        download_translations:bool = True
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -137,9 +141,10 @@ class Settings(object):
     deletion_age:int = 90
     max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
     auto_clean:bool = True
-    detail_degree = 30
-    detail_tile = 3
-    detail_zero = 0
+    detail_degree:Number = 30
+    detail_tile:Number = 3
+    detail_zero:Number = 0
+    download_translations:bool = True
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -163,6 +168,7 @@ class Settings(object):
         'auto_clean': _Sections.TILE_MANAGEMENT.value,
         'detail_degree': _Sections.INTERFACE.value,
         'detail_tile': _Sections.INTERFACE.value,
+        'download_translations': _Sections.INTERFACE.value,
     }
 
     def __getattribute__(self, name):

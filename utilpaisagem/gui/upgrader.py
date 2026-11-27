@@ -7,7 +7,7 @@ from github3.repos import Repository
 from github3.repos.release import Release
 from github3.exceptions import NotFoundError
 from utilpaisagem.app_info import string_version, translations_path
-from utilpaisagem.gui.common import format_status
+from utilpaisagem.gui.common import format_status, Settings
 
 class Tag(object):
     """Comparable tags"""
@@ -100,6 +100,7 @@ class Upgrader(object):
     current:Tag
     newest:Release
     upstream_queue:Queue
+    settings:Settings
     
     def __init__(self, upstream_queue:Queue, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,6 +108,7 @@ class Upgrader(object):
         self.current = Tag(
             f'v{string_version()}'
         )
+        self.settings = Settings()
         try:
             self.github = GitHub()
             self.repository = self.github.repository('leandroarndt', 'util-paisagem')
@@ -157,47 +159,53 @@ class Upgrader(object):
                 webbrowser.open(self.newest.html_url)
 
         # Check for translation updates
-        try:
-            current = self.repository.release_from_tag(f'v{string_version()}')
-        except NotFoundError:
-            self.upstream_queue.put_nowait(format_status(
-                _('Could not find current release for current version ({string_version}).').format(
-                    string_version=string_version(),
-                ),
-                self,
-            ))
-            return
-        assets = current.assets()
-        for a in assets:
-            if a.name == 'translations.zip':
-                if (translations_path.parent / 'translations.sha').exists():
-                    with open(translations_path.parent / 'translations.sha', 'r') as digest:
-                        if a.digest == digest.read():
-                            self.upstream_queue.put_nowait(format_status(
-                                _('Most recent translations already installed.'),
-                                self,
-                            ))
-                            return
+        if self.settings.download_translations:
+            try:
+                current = self.repository.release_from_tag(f'v{string_version()}')
+            except NotFoundError:
                 self.upstream_queue.put_nowait(format_status(
-                    _('Downloading most recent translations...'),
+                    _('Could not find current release for current version ({string_version}).').format(
+                        string_version=string_version(),
+                    ),
                     self,
                 ))
-                r = requests.get(a.browser_download_url)
-                if r.status_code == 200:
-                    with tempfile.TemporaryFile('wb+') as temp:
-                        temp.write(r.content)
-                        ziptemp = ZipFile(temp)
-                        ziptemp.extractall(translations_path)
+                return
+            assets = current.assets()
+            for a in assets:
+                if a.name == 'translations.zip':
+                    if (translations_path.parent / 'translations.sha').exists():
+                        with open(translations_path.parent / 'translations.sha', 'r') as digest:
+                            if a.digest == digest.read():
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Most recent translations already installed.'),
+                                    self,
+                                ))
+                                return
                     self.upstream_queue.put_nowait(format_status(
-                        _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                        _('Downloading most recent translations...'),
                         self,
                     ))
-                    with open(translations_path.parent / 'translations.sha', 'w') as digest:
-                        digest.write(a.digest)
-                else:
-                    self.upstream_queue.put_nowait(format_status(
-                        _('Could not download new translations. Request returned code {code}.').format(
-                            code=r.status_code,
-                        ),
-                        self,
-                    ))
+                    r = requests.get(a.browser_download_url)
+                    if r.status_code == 200:
+                        with tempfile.TemporaryFile('wb+') as temp:
+                            temp.write(r.content)
+                            ziptemp = ZipFile(temp)
+                            ziptemp.extractall(translations_path)
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                            self,
+                        ))
+                        with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                            digest.write(a.digest)
+                    else:
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Could not download new translations. Request returned code {code}.').format(
+                                code=r.status_code,
+                            ),
+                            self,
+                        ))
+        else:
+            self.upstream_queue.put_nowait(format_status(
+                _('Skipping check for new translations due to user preferences.'),
+                self,
+            ))
