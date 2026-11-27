@@ -15,11 +15,13 @@ providers).
 
 **TODO:**
 
-- Expose connection timeout.
-- Expose additional interval after failed attempt to retrieve aircraft position.
-- Download new transaltions.
+- Download new translations.
 
 **DONE:**
+
+- Configurable connection timeout.
+- Next attempt to get aircraft position after a failure is made at the same interval as
+if it was successfull.
 
 ## 0.6.0
 
