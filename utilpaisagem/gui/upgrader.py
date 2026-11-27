@@ -1,11 +1,12 @@
 from tkinter import messagebox
-import webbrowser
+import webbrowser, requests, tempfile
+from zipfile import ZipFile
 from queue import Queue
 from github3 import GitHub
 from github3.repos import Repository
 from github3.repos.release import Release
 from github3.exceptions import NotFoundError
-from utilpaisagem.app_info import string_version
+from utilpaisagem.app_info import string_version, translations_path
 from utilpaisagem.gui.common import format_status
 
 class Tag(object):
@@ -169,5 +170,34 @@ class Upgrader(object):
         assets = current.assets()
         for a in assets:
             if a.name == 'translations.zip':
-                print(a.digest)
-        
+                if (translations_path.parent / 'translations.sha').exists():
+                    with open(translations_path.parent / 'translations.sha', 'r') as digest:
+                        if a.digest == digest.read():
+                            self.upstream_queue.put_nowait(format_status(
+                                _('Most recent translations already installed.'),
+                                self,
+                            ))
+                            return
+                self.upstream_queue.put_nowait(format_status(
+                    _('Downloading most recent translations...'),
+                    self,
+                ))
+                r = requests.get(a.browser_download_url)
+                if r.status_code == 200:
+                    with tempfile.TemporaryFile('wb+') as temp:
+                        temp.write(r.content)
+                        ziptemp = ZipFile(temp)
+                        ziptemp.extractall(translations_path)
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                        self,
+                    ))
+                    with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                        digest.write(a.digest)
+                else:
+                    self.upstream_queue.put_nowait(format_status(
+                        _('Could not download new translations. Request returned code {code}.').format(
+                            code=r.status_code,
+                        ),
+                        self,
+                    ))
