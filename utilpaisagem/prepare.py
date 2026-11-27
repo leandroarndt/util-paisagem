@@ -15,7 +15,7 @@ if translation_path.exists() and not translation_path.is_dir():
     os.unlink(translation_path)
 if not translation_path.exists:
     translation_path.mkdir(parents=True)
-if not (translation_path / 'version.txt').exists():
+if not (translation_path.parent / 'translation.sha').exists():
     shutil.copytree(resources_path / 'locale', translation_path, dirs_exist_ok=True)
 
 # Activate translations
