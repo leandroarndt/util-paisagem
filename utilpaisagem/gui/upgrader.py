@@ -114,14 +114,14 @@ class Upgrader(object):
             self.repository = self.github.repository('leandroarndt', 'util-paisagem')
         except ForbiddenError as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Github forbide connection ({e}).').format(e=e),
+                _('Github forbide connection ("{e}").').format(e=e),
                 self,
             ))
             self.github = None
             self.repository = None
         except Exception as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Could not connect to Github ({e}).').format(e=e),
+                _('Could not connect to Github ("{e}").').format(e=e),
                 self,
             ))
             self.github = None
@@ -138,12 +138,12 @@ class Upgrader(object):
             releases = self.repository.releases()
         except ForbiddenError as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Github forbide access to release list ({e}).').format(e=e),
+                _('Github forbide access to release list ("{e}").').format(e=e),
                 self,
             ))
         except Exception as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Could not retrieve releases from Github ({e}).').format(e=e),
+                _('Could not retrieve releases from Github ("{e}").').format(e=e),
                 self,
             ))
             return
@@ -172,12 +172,12 @@ class Upgrader(object):
                     webbrowser.open(self.newest.html_url)
         except ForbiddenError as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Github forbade retrieving information on a release ({e}).').format(e),
+                _('Github forbade retrieving information on a release ("{e}").').format(e),
                 self,
             ))
         except Exception as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Could not retrieve release info from Github ({e}).').format(e),
+                _('Could not retrieve release info from Github ("{e}").').format(e),
                 self,
             ))
 
@@ -194,12 +194,12 @@ class Upgrader(object):
                 ))
             except ForbiddenError as e:
                 self.upstream_queue.put_nowait(format_status(
-                    _('Github forbade getting information for current release ({e}).').format(e),
+                    _('Github forbade getting information for current release ("{e}").').format(e),
                     self,
                 ))
             except Exception as e:
                 self.upstream_queue.put_nowait(format_status(
-                    _('Could not connect to Github ({e}).').format(e),
+                    _('Could not connect to Github ("{e}").').format(e),
                     self,
                 ))
             else:
@@ -219,33 +219,15 @@ class Upgrader(object):
                                 _('Downloading most recent translations...'),
                                 self,
                             ))
-                            r = requests.get(a.browser_download_url)
-                            if r.status_code == 200:
-                                with tempfile.TemporaryFile('wb+') as temp:
-                                    temp.write(r.content)
-                                    ziptemp = ZipFile(temp)
-                                    ziptemp.extractall(translations_path)
-                                self.upstream_queue.put_nowait(format_status(
-                                    _('Translations updated. Will take effect after Útil paisagem restarts.'),
-                                    self,
-                                ))
-                                with open(translations_path.parent / 'translations.sha', 'w') as digest:
-                                    digest.write(a.digest)
-                            else:
-                                self.upstream_queue.put_nowait(format_status(
-                                    _('Could not download new translations. Request returned code {code}.').format(
-                                        code=r.status_code,
-                                    ),
-                                    self,
-                                ))
+                            self.update_translations(a)
                 except ForbiddenError as e:
                     self.upstream_queue.put_nowait(format_status(
-                        _('Github forbade accessing information on release asset ({e}).').format(e=e),
+                        _('Github forbade accessing information on release asset ("{e}").').format(e=e),
                         self
                     ))
                 except Exception as e:
                     self.upstream_queue.put_nowait(format_status(
-                        _('Could not retrieve information on release asset ({e}).').format(e=e),
+                        _('Could not retrieve information on release asset ("{e}").').format(e=e),
                         self
                     ))
         else:
@@ -253,3 +235,32 @@ class Upgrader(object):
                 _('Skipping check for new translations due to user preferences.'),
                 self,
             ))
+
+    def update_translations(self, asset=None):
+        """Downloads and install translations from Github asset."""
+        if asset is None:
+            url = f'https://github.com/leandroarndt/util-paisagem/releases/download/v{string_version()}/translations.zip'
+        else:
+            url = asset.browser_download_url
+        r = requests.get(url)
+        if r.status_code == 200:
+            with tempfile.TemporaryFile('wb+') as temp:
+                temp.write(r.content)
+                ziptemp = ZipFile(temp)
+                ziptemp.extractall(translations_path)
+            self.upstream_queue.put_nowait(format_status(
+                _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                self,
+            ))
+            if asset is not None:
+                with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                    digest.write(asset.digest)
+        else:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not download new translations. Request returned code {code}.').format(
+                    code=r.status_code,
+                ),
+                self,
+            ))
+
+        
