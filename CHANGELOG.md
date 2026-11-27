@@ -11,6 +11,16 @@ providers).
 - Solved issue #3 (localization on Windows systems).
 - Corrected color of tiles downloaded with error on live map update
 
+### 0.7.1
+
+**TODO:**
+
+- Expose connection timeout.
+- Expose additional interval after failed attempt to retrieve aircraft position.
+- Download new transaltions.
+
+**DONE:**
+
 ## 0.6.0
 
 - Additional image provider (USGS).
