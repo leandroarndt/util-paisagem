@@ -5,11 +5,11 @@ from threading import Thread
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from pathlib import Path
-from queue import Queue
+from queue import Queue 
 from LatLon23 import LatLon
 from flightgear_python.fg_if import TelnetConnection
 from flightgear_python.fg_util import FGConnectionError, FGCommunicationError
-from babel.numbers import format_decimal, format_number, parse_decimal, parse_number, NumberFormatError
+from babel.numbers import format_decimal, format_number, NumberFormatError
 from PIL import Image, ImageTk
 from utilpaisagem.gui.map_widget import MapWidget
 from tkintermapview.canvas_polygon import CanvasPolygon
@@ -21,7 +21,7 @@ from utilpaisagem.scenery.common import METER_SIZE
 from utilpaisagem.scenery.download_manager import DownloadManager
 from utilpaisagem.scenery.tile import Tile
 from utilpaisagem.gui.agents import Follower, UpstreamReader, Downloader
-from utilpaisagem.gui.common import format_status, Settings, QUIT, PADDING, LOCALE
+from utilpaisagem.gui.common import format_status, validate_float, validate_int, Settings, QUIT, PADDING, LOCALE
 from utilpaisagem.gui.settings import SettingsWindow
 from utilpaisagem.gui.tile_manager import TileManager, TileColors
 from utilpaisagem.gui.upgrader import Upgrader
@@ -570,33 +570,6 @@ class MainWindow(object):
     def scan_tiles(self):
         find_tiles = Thread(target=self.tile_manager.find_great_tiles)
         find_tiles.start()
-
-    # Validation
-    def validate_float(self, input:str):
-        """
-        Validates a floating point number and returns it as a float.
-        Raises error if not possible both using float() and using babel.numbers.parse_decimal().
-
-        Arguments:
-            input(str): text to validate and convert
-        """
-        try:
-            return float(input)
-        except ValueError:
-            return float(parse_decimal(input, locale=LOCALE))
-
-    def validate_int(self, input:str):
-        """
-        Validates an integer number and returns it as an integer.
-        Raises error if not possible both using int() and using babel.numbers.parse_number().
-
-        Arguments:
-            input(str): text to validate and convert
-        """
-        try:
-            return int(input)
-        except ValueError:
-            return parse_number(input, locale=LOCALE)
         
     def float_input_focus_out(self, what:str, event:tk.Event):
         what_var = {
@@ -604,7 +577,7 @@ class MainWindow(object):
             'lon': self.lon_var,
         }
         try:
-            value = self.validate_float(what_var[what].get())
+            value = validate_float(what_var[what].get())
             if what == 'lat' and not (-90 <= value <= 90):
                 what_var[what].set(str(self.lat))
                 return
@@ -623,7 +596,7 @@ class MainWindow(object):
             'index': self.index_var,
         }
         try:
-            value = self.validate_int(what_var[what].get())
+            value = validate_int(what_var[what].get())
             self.__dict__[what] = value
         except NumberFormatError:
             what_var[what].set(str(self.__dict__[what]))

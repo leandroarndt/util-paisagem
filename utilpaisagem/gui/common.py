@@ -5,6 +5,7 @@ from threading import Event
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
 from babel.core import UnknownLocaleError
+from babel.numbers import parse_decimal, parse_number
 # Settings
 import configparser, ast, appdirs
 from pathlib import Path
@@ -25,6 +26,34 @@ except UnknownLocaleError:
 
 def format_status(text:str, obj) -> str:
     return f'{format_datetime(datetime.now(), format='short', locale=LOCALE)} ({obj.__class__.__name__}): {text}'
+
+# Input validation
+
+def validate_float(text:str):
+    """
+    Validates a floating point number and returns it as a float.
+    Raises error if not possible both using float() and using babel.numbers.parse_decimal().
+
+    Arguments:
+        text(str): text to validate and convert
+    """
+    try:
+        return float(text)
+    except ValueError:
+        return float(parse_decimal(text, locale=LOCALE))
+
+def validate_int(text:str):
+    """
+    Validates an integer number and returns it as an integer.
+    Raises error if not possible both using int() and using babel.numbers.parse_number().
+
+    Arguments:
+        text(str): text to validate and convert
+    """
+    try:
+        return int(text)
+    except ValueError:
+        return parse_number(text, locale=LOCALE)
 
 # App-wide events
 
