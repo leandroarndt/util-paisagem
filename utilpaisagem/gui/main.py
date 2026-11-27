@@ -39,6 +39,7 @@ class MainWindow(object):
     settings:Settings
     tile_manager:TileManager
     fg_airports:FGAirports
+    upgrader:Upgrader
 
     # Threading things
     upstream_queue:Queue # Processing status
@@ -170,6 +171,11 @@ class MainWindow(object):
         self.file_menu.add_command(
             label=_('Enforce disk usage limit'),
             command=lambda: self.tile_manager.enforce_storage_limits(),
+        )
+        self.file_menu.add_separator()
+        self.file_menu.add_command(
+            label=_('Update translations'),
+            command=self.update_translations,
         )
         self.file_menu.add_separator()
         self.file_menu.add_command(
@@ -516,8 +522,8 @@ class MainWindow(object):
 
         self.window.deiconify()
 
-        upgrader = Upgrader(upstream_queue=self.upstream_queue)
-        upgrade_thread = Thread(target=upgrader.run)
+        self.upgrader = Upgrader(upstream_queue=self.upstream_queue)
+        upgrade_thread = Thread(target=self.upgrader.run)
         upgrade_thread.start()
 
     # Menu commands
@@ -916,6 +922,10 @@ class MainWindow(object):
             self.follow_button_tip.text = _('Follow aircraft on Flightgear over telnet connection.')
             if isinstance(self.aircraft, CanvasPositionMarker):
                 self.aircraft.change_icon(self.greyed_aircraft_icon)
+
+    def update_translations(self):
+        translations_thread = Thread(target=self.upgrader.update_translations)
+        translations_thread.start()
 
     def close(self): # Tries to close nicely
         if hasattr(self, 'following_queue'):
