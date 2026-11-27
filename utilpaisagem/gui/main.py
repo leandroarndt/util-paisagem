@@ -516,7 +516,7 @@ class MainWindow(object):
 
         self.window.deiconify()
 
-        upgrader = Upgrader()
+        upgrader = Upgrader(upstream_queue=self.upstream_queue)
         upgrade_thread = Thread(target=upgrader.run)
         upgrade_thread.start()
 

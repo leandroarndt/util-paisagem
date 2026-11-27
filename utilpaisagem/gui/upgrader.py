@@ -1,5 +1,6 @@
 from tkinter import messagebox
 import webbrowser
+from queue import Queue
 from github3 import GitHub
 from github3.repos import Repository
 from github3.repos.release import Release
@@ -95,9 +96,11 @@ class Upgrader(object):
     repository:Repository
     current:Tag
     newest:Release
+    upstream_queue:Queue
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, upstream_queue:Queue, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.upstream_queue = upstream_queue
         self.current = Tag(
             f'v{string_version()}'
         )
@@ -105,14 +108,14 @@ class Upgrader(object):
             self.anonymous = GitHub()
             self.repository = self.anonymous.repository('leandroarndt', 'util-paisagem')
         except:
-            print('Could not connect to Github.')
+            self.upstream_queue.put_nowait(_('Could not connect to Github.'))
     
     def run(self):
         print(f'Running version {self.current}')
         try:
             releases = self.repository.releases()
         except:
-            print('Could not retrieve releases from Github.')
+            self.upstream_queue.put_nowait(_('Could not retrieve releases from Github.'))
             return
         newest_tag = Tag('v0.0.0')
         for r in releases:
@@ -120,9 +123,9 @@ class Upgrader(object):
                 newest_tag = Tag(r.tag_name)
                 self.newest = r
         if self.current >= newest_tag:
-            print('Newest version already installed.')
+            self.upstream_queue.put_nowait(_('Newest version already installed.'))
         else:
-            print(f'Found new version {newest_tag}.')
+            self.upstream_queue(_('Found new version {newest_tag}.').format(newest_tag=newest_tag))
             if messagebox.askokcancel(
                 title=_('New version found!'),
                 message=_(
