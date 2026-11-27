@@ -77,6 +77,7 @@ class Settings(object):
         host:str = 'localhost'
         port:int = 5000
         following_interval:int = 10000
+        connection_timeout:float = 1.0
         renewal_age:int = 365
         deletion_age:int = 90
         max_disk_usage:int = 5 GB
@@ -102,6 +103,7 @@ class Settings(object):
     host:str = 'localhost'
     port:int = 5000
     following_interval:int = 10000
+    connection_timeout:float = 1.0
     renewal_age:int = 365
     deletion_age:int = 90
     max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
@@ -125,6 +127,7 @@ class Settings(object):
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
         'following_interval': _Sections.CONNECTION.value,
+        'connection_timeout': _Sections.CONNECTION.value,
         'renewal_age': _Sections.TILE_MANAGEMENT.value,
         'deletion_age': _Sections.TILE_MANAGEMENT.value,
         'max_disk_usage': _Sections.TILE_MANAGEMENT.value,

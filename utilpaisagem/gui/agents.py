@@ -141,7 +141,11 @@ class Follower(object):
         self.upstream_queue = upstream_queue
         self.downstream_queue = downstream_queue
         self.download_manager = download_manager
-        self.connection = TelnetConnection(self.settings.host, self.settings.port, rx_timeout_s=1.0)
+        self.connection = TelnetConnection(
+            self.settings.host,
+            self.settings.port,
+            rx_timeout_s=self.settings.connection_timeout
+        )
         self.lat = 0.0
         self.lon = 0.0
 
@@ -164,20 +168,18 @@ class Follower(object):
                     format_status(_('Could not receive coordinates info from Flightgear'), self)
                 )
                 self.main_window.place_aircraft(self.lat, self.lon, active=False)
-                self.main_window.window.after(self.settings.following_interval*10, self.follow)
             except Exception as e:
                 self.upstream_queue.put_nowait(
                     format_status(_('Error while retrieving coordinates from flightgear ("{exception}")').format(exception=e), self)
                 )
                 self.main_window.place_aircraft(self.lat, self.lon, active=False)
-                self.main_window.window.after(self.settings.following_interval*10, self.follow)
             else:
                 self.download_manager.recenter(lat=self.lat, lon=self.lon) # Update download manager center
                 self.main_window.place_aircraft(self.lat, self.lon, active=True)
                 self.upstream_queue.put_nowait(
                     format_status(_('Aircraft position is latitude {lat:.02f}, longitude {lon:.02f}').format(lat=self.lat, lon=self.lon), self)
                 )
-                self.main_window.window.after(self.settings.following_interval, self.follow)
+            self.main_window.window.after(self.settings.following_interval, self.follow)
         if not self.downstream_queue.is_shutdown: # If the following has not been canceled
             thread = Thread(target=get_pos)
             thread.start()
