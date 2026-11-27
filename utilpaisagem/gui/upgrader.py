@@ -4,7 +4,9 @@ from queue import Queue
 from github3 import GitHub
 from github3.repos import Repository
 from github3.repos.release import Release
+from github3.exceptions import NotFoundError
 from utilpaisagem.app_info import string_version
+from utilpaisagem.gui.common import format_status
 
 class Tag(object):
     """Comparable tags"""
@@ -92,7 +94,7 @@ class Tag(object):
 class Upgrader(object):
     """Blocking package upgrader. Should be run in another process.
     """
-    anonymous:GitHub
+    github:GitHub
     repository:Repository
     current:Tag
     newest:Release
@@ -105,17 +107,30 @@ class Upgrader(object):
             f'v{string_version()}'
         )
         try:
-            self.anonymous = GitHub()
-            self.repository = self.anonymous.repository('leandroarndt', 'util-paisagem')
+            self.github = GitHub()
+            self.repository = self.github.repository('leandroarndt', 'util-paisagem')
         except:
-            self.upstream_queue.put_nowait(_('Could not connect to Github.'))
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not connect to Github.'),
+                self,
+            ))
+            self.github = None
+            self.repository = None
     
     def run(self):
+        if self.github is None:
+            return
+
         print(f'Running version {self.current}')
+
+        # Check for Útil paisagem upgrades
         try:
             releases = self.repository.releases()
         except:
-            self.upstream_queue.put_nowait(_('Could not retrieve releases from Github.'))
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not retrieve releases from Github.'),
+                self,
+            ))
             return
         newest_tag = Tag('v0.0.0')
         for r in releases:
@@ -123,9 +138,15 @@ class Upgrader(object):
                 newest_tag = Tag(r.tag_name)
                 self.newest = r
         if self.current >= newest_tag:
-            self.upstream_queue.put_nowait(_('Newest version already installed.'))
+            self.upstream_queue.put_nowait(format_status(
+                _('Newest version already installed.'),
+                self,
+            ))
         else:
-            self.upstream_queue(_('Found new version {newest_tag}.').format(newest_tag=newest_tag))
+            self.upstream_queue(format_status(
+                _('Found new version {newest_tag}.').format(newest_tag=newest_tag),
+                self,
+            ))
             if messagebox.askokcancel(
                 title=_('New version found!'),
                 message=_(
@@ -133,3 +154,20 @@ class Upgrader(object):
                 ).format(newest_tag=newest_tag)
             ):
                 webbrowser.open(self.newest.html_url)
+
+        # Check for translation updates
+        try:
+            current = self.repository.release_from_tag(f'v{string_version()}')
+        except NotFoundError:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not find current release for current version ({string_version}).').format(
+                    string_version=string_version(),
+                ),
+                self,
+            ))
+            return
+        assets = current.assets()
+        for a in assets:
+            if a.name == 'translations.zip':
+                print(a.digest)
+        
