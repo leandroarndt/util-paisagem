@@ -3,7 +3,7 @@ import webbrowser
 from github3 import GitHub
 from github3.repos import Repository
 from github3.repos.release import Release
-from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC
+from utilpaisagem.app_info import string_version
 
 class Tag(object):
     """Comparable tags"""
@@ -99,7 +99,7 @@ class Upgrader(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current = Tag(
-            f'v{VERSION}.{SUBVERSION}.{REVISION}{f"rc{RC}" if RC else ""}'
+            f'v{string_version()}'
         )
     
     def run(self):
