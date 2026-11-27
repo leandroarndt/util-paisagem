@@ -114,7 +114,7 @@ class Upgrader(object):
             self.repository = self.github.repository('leandroarndt', 'util-paisagem')
         except ForbiddenError as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Github forbide connection ("{e}").').format(e=e),
+                _('Github forbade connection ("{e}").').format(e=e),
                 self,
             ))
             self.github = None
@@ -138,7 +138,7 @@ class Upgrader(object):
             releases = self.repository.releases()
         except ForbiddenError as e:
             self.upstream_queue.put_nowait(format_status(
-                _('Github forbide access to release list ("{e}").').format(e=e),
+                _('Github forbade access to release list ("{e}").').format(e=e),
                 self,
             ))
         except Exception as e:
