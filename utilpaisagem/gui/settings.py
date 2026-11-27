@@ -170,6 +170,9 @@ class SettingsWindow(object):
     detail_tile_var:tk.IntVar
     detail_tile_label:ttk.Label
     detail_tile_entry:ttk.Spinbox
+    ux_frame:ttk.LabelFrame
+    translations_var:tk.BooleanVar
+    translations_input:ttk.Checkbutton
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -569,6 +572,7 @@ class SettingsWindow(object):
         self.detail_frame = ttk.LabelFrame(
             self.interface_tab,
             text=_('Detail levels'),
+            padding=PADDING,
         )
         self.detail_degree_var = tk.IntVar(self.detail_frame, value=self.settings.detail_degree)
         self.detail_degree_label = ttk.Label(
@@ -596,7 +600,23 @@ class SettingsWindow(object):
         self.detail_degree_entry.grid(column=1, row=0, sticky=tk.W)
         self.detail_tile_label.grid(column=0, row=1, sticky=tk.E)
         self.detail_tile_entry.grid(column=1, row=1, sticky=tk.W)
+        self.ux_frame = ttk.LabelFrame(
+            self.interface_tab,
+            text=_('User experience'),
+            padding=PADDING,
+        )
+        self.translations_var = tk.BooleanVar(
+            self.ux_frame,
+            value=self.settings.download_translations
+        )
+        self.translations_input = ttk.Checkbutton(
+            self.ux_frame,
+            text=_('Automatically download new translations.'),
+            variable=self.translations_var,
+        )
+        self.translations_input.grid(column=0, row=0, sticky=tk.W)
         self.detail_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.ux_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
