@@ -101,12 +101,15 @@ class Upgrader(object):
         self.current = Tag(
             f'v{string_version()}'
         )
+        try:
+            self.anonymous = GitHub()
+            self.repository = self.anonymous.repository('leandroarndt', 'util-paisagem')
+        except:
+            print('Could not connect to Github.')
     
     def run(self):
         print(f'Running version {self.current}')
         try:
-            self.anonymous = GitHub()
-            self.repository = self.anonymous.repository('leandroarndt', 'util-paisagem')
             releases = self.repository.releases()
         except:
             print('Could not retrieve releases from Github.')
@@ -121,7 +124,9 @@ class Upgrader(object):
         else:
             print(f'Found new version {newest_tag}.')
             if messagebox.askokcancel(
-                title='New version found!',
-                message=f'There is a new Útil paisagem version available ({newest_tag}). Open download page?'
+                title=_('New version found!'),
+                message=_(
+                    'There is a new Útil paisagem version available ({newest_tag}). Open download page?'
+                ).format(newest_tag=newest_tag)
             ):
                 webbrowser.open(self.newest.html_url)
