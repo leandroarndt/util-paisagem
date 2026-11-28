@@ -183,101 +183,92 @@ class Upgrader(object):
 
         # Check for translation updates
         if self.settings.download_translations:
-            try:
-                current = self.repository.release_from_tag(f'v{string_version()}')
-            except NotFoundError:
-                self.upstream_queue.put_nowait(format_status(
-                    _('Could not find release for current version ({string_version}).').format(
-                        string_version=string_version(),
-                    ),
-                    self,
-                ))
-            except ForbiddenError as e:
-                self.upstream_queue.put_nowait(format_status(
-                    _('Github forbade getting information for current release ("{e}").').format(e),
-                    self,
-                ))
-            except Exception as e:
-                self.upstream_queue.put_nowait(format_status(
-                    _('Could not connect to Github ("{e}").').format(e),
-                    self,
-                ))
-            else:
-                try:
-                    assets = current.assets()
-                    for a in assets:
-                        if a.name == 'translations.zip':
-                            if (translations_path.parent / 'translations.sha').exists():
-                                with open(translations_path.parent / 'translations.sha', 'r') as digest:
-                                    if a.digest == digest.read():
-                                        self.upstream_queue.put_nowait(format_status(
-                                            _('Most recent translations already installed.'),
-                                            self,
-                                        ))
-                                        return
-                            self.upstream_queue.put_nowait(format_status(
-                                _('Downloading most recent translations...'),
-                                self,
-                            ))
-                            self.update_translations(a)
-                except ForbiddenError as e:
-                    self.upstream_queue.put_nowait(format_status(
-                        _('Github forbade accessing information on release asset ("{e}").').format(e=e),
-                        self
-                    ))
-                except Exception as e:
-                    self.upstream_queue.put_nowait(format_status(
-                        _('Could not retrieve information on release asset ("{e}").').format(e=e),
-                        self
-                    ))
+            self.update_translations()   
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Skipping check for new translations due to user preferences.'),
                 self,
             ))
 
-    def update_translations(self, asset=None):
+    def update_translations(self):
         """Downloads and install translations from Github asset."""
-        if asset is None:
-            url = f'https://github.com/leandroarndt/util-paisagem/releases/download/v{string_version()}/translations.zip'
-        else:
-            url = asset.browser_download_url
-        r = requests.get(url)
-        if r.status_code == 200:
-            try:
-                with tempfile.TemporaryFile('wb+') as temp:
-                    if asset is not None:
-                        if hashlib.sha256(r.content).hexdigest() != asset.digest[4:]:
-                            raise AssertionError
-                    temp.write(r.content)
-                    ziptemp = ZipFile(temp)
-                    shutil.rmtree(translations_path)
-                    ziptemp.extractall(translations_path.parent)
-                self.upstream_queue.put_nowait(format_status(
-                    _('Translations updated. Will take effect after Útil paisagem restarts.'),
-                    self,
-                ))
-                with open(translations_path.parent / 'translations.sha', 'w') as digest:
-                    if asset is not None:
-                        digest.write(asset.digest)
-                    else:
-                        digest.truncate()
-            except AssertionError:
-                self.upstream_queue.put_nowait(format_status(
-                    _('Download hash does not match translations asset hash.'),
-                    self,
-                ))
-            except Exception as e:
-                self.upstream_queue.put_nowait(format_status(
-                    _('Could not download or extract translations ("{e}").').format(e=e),
-                    self,
-                ))
-        else:
+        try:
+            current = self.repository.release_from_tag(f'v{string_version()}')
+        except NotFoundError:
             self.upstream_queue.put_nowait(format_status(
-                _('Could not download new translations. Request returned code {code}.').format(
-                    code=r.status_code,
+                _('Could not find release for current version ({string_version}).').format(
+                    string_version=string_version(),
                 ),
                 self,
             ))
-
+        except ForbiddenError as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Github forbade getting information for current release ("{e}").').format(e),
+                self,
+            ))
+        except Exception as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not connect to Github ("{e}").').format(e),
+                self,
+            ))
+        else:
+            try:
+                assets = current.assets()
+                for a in assets:
+                    if a.name == 'translations.zip':
+                        if (translations_path.parent / 'translations.sha').exists():
+                            with open(translations_path.parent / 'translations.sha', 'r') as digest:
+                                if a.digest == digest.read():
+                                    self.upstream_queue.put_nowait(format_status(
+                                        _('Most recent translations already installed.'),
+                                        self,
+                                    ))
+                                    return
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Downloading most recent translations...'),
+                            self,
+                        ))
+                        r = requests.get(a.browser_download_url)
+                        if r.status_code == 200:
+                            try:
+                                with tempfile.TemporaryFile('wb+') as temp:
+                                    if hashlib.sha256(r.content).hexdigest() != a.digest[7:]:
+                                        raise AssertionError
+                                    temp.write(r.content)
+                                    ziptemp = ZipFile(temp)
+                                    shutil.rmtree(translations_path)
+                                    ziptemp.extractall(translations_path.parent)
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                                    self,
+                                ))
+                                with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                                    digest.write(a.digest)
+                            except AssertionError:
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Download hash does not match translations asset hash.'),
+                                    self,
+                                ))
+                            except Exception as e:
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Could not download or extract translations ("{e}").').format(e=e),
+                                    self,
+                                ))
+                        else:
+                            self.upstream_queue.put_nowait(format_status(
+                                _('Could not download new translations. Request returned code {code}.').format(
+                                    code=r.status_code,
+                                ),
+                                self,
+                            ))
+            except ForbiddenError as e:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Github forbade accessing information on release asset ("{e}").').format(e=e),
+                    self
+                ))
+            except Exception as e:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Could not retrieve information on release asset ("{e}").').format(e=e),
+                    self
+                ))
         
