@@ -13,15 +13,10 @@ providers).
 
 ### 0.7.1
 
-**TODO:**
-
-- Download new translations.
-
-**DONE:**
-
-- Configurable connection timeout.
+- Configurable connection timeout with FlightGear.
 - Next attempt to get aircraft position after a failure is made at the same interval as
 if it was successfull.
+- New translations are downloaded automatically or from the "File" menu (defaults to automatic translations download).
 
 ## 0.6.0
 
