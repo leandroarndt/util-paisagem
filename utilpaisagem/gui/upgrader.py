@@ -1,5 +1,5 @@
 from tkinter import messagebox
-import webbrowser, requests, tempfile
+import webbrowser, requests, tempfile, shutil
 from zipfile import ZipFile
 from queue import Queue
 from github3 import GitHub
@@ -160,7 +160,7 @@ class Upgrader(object):
                 ))
             else:
                 self.upstream_queue(format_status(
-                    _('Found new version {newest_tag}.').format(newest_tag=newest_tag),
+                    _('Found new version: {newest_tag}.').format(newest_tag=newest_tag),
                     self,
                 ))
                 if messagebox.askokcancel(
@@ -247,14 +247,17 @@ class Upgrader(object):
             with tempfile.TemporaryFile('wb+') as temp:
                 temp.write(r.content)
                 ziptemp = ZipFile(temp)
-                ziptemp.extractall(translations_path)
+                shutil.rmtree(translations_path)
+                ziptemp.extractall(translations_path.parent)
             self.upstream_queue.put_nowait(format_status(
                 _('Translations updated. Will take effect after Útil paisagem restarts.'),
                 self,
             ))
-            if asset is not None:
-                with open(translations_path.parent / 'translations.sha', 'w') as digest:
+            with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                if asset is not None:
                     digest.write(asset.digest)
+                else:
+                    digest.truncate()
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Could not download new translations. Request returned code {code}.').format(
