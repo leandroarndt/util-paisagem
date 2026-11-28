@@ -1,5 +1,5 @@
 from tkinter import messagebox
-import webbrowser, requests, tempfile, shutil
+import webbrowser, requests, tempfile, shutil, hashlib
 from zipfile import ZipFile
 from queue import Queue
 from github3 import GitHub
@@ -244,20 +244,34 @@ class Upgrader(object):
             url = asset.browser_download_url
         r = requests.get(url)
         if r.status_code == 200:
-            with tempfile.TemporaryFile('wb+') as temp:
-                temp.write(r.content)
-                ziptemp = ZipFile(temp)
-                shutil.rmtree(translations_path)
-                ziptemp.extractall(translations_path.parent)
-            self.upstream_queue.put_nowait(format_status(
-                _('Translations updated. Will take effect after Útil paisagem restarts.'),
-                self,
-            ))
-            with open(translations_path.parent / 'translations.sha', 'w') as digest:
-                if asset is not None:
-                    digest.write(asset.digest)
-                else:
-                    digest.truncate()
+            try:
+                with tempfile.TemporaryFile('wb+') as temp:
+                    if asset is not None:
+                        if hashlib.sha256(r.content).hexdigest() != asset.digest[4:]:
+                            raise AssertionError
+                    temp.write(r.content)
+                    ziptemp = ZipFile(temp)
+                    shutil.rmtree(translations_path)
+                    ziptemp.extractall(translations_path.parent)
+                self.upstream_queue.put_nowait(format_status(
+                    _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                    self,
+                ))
+                with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                    if asset is not None:
+                        digest.write(asset.digest)
+                    else:
+                        digest.truncate()
+            except AssertionError:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Download hash does not match translations asset hash.'),
+                    self,
+                ))
+            except Exception as e:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Could not download or extract translations ("{e}").').format(e=e),
+                    self,
+                ))
         else:
             self.upstream_queue.put_nowait(format_status(
                 _('Could not download new translations. Request returned code {code}.').format(
