@@ -8,18 +8,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem 0.7\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-11-27 20:50-0300\n"
-"PO-Revision-Date: 2026-11-27 21:00-0300\n"
-"Last-Translator: Leandro Arndt <utilpaisagem.locale@visaocatolica.com.br>\n"
-"Language-Team: pt <utilpaisagem.locale@visaocatolica.com.br>\\nPlural-Forms: "
-"nplurals=2; plural=(n != 1);\n"
+"POT-Creation-Date: 2026-11-28 12:18-0300\n"
+"PO-Revision-Date: 2026-11-27 21:43-0300\n"
+"Last-Translator: Leandro Arndt <utilpaisagem.locale@visaocatolica.com.br>"
+"\n"
 "Language: pt\n"
+"Language-Team: pt <utilpaisagem.locale@visaocatolica.com.br>\\nPlural-"
+"Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
-"X-Generator: Poedit 3.10\n"
 
 #: utilpaisagem/flightplan/flightplan.py:31
 #, python-brace-format
@@ -492,7 +492,8 @@ msgstr "Amplitude máxima de latitude e longitude para mostar ladrilhos de 1°:"
 #: utilpaisagem/gui/settings.py:591
 msgid "Maximum latitude and longitude range for scenery tiles display:"
 msgstr ""
-"Amplitude máxima de latitude e longitude para mostrar ladrilhos do cenário:"
+"Amplitude máxima de latitude e longitude para mostrar ladrilhos do "
+"cenário:"
 
 #: utilpaisagem/gui/settings.py:605
 msgid "User experience"
@@ -550,54 +551,57 @@ msgstr "Valor inválido"
 #: utilpaisagem/gui/settings.py:733
 msgid "Invalid value in port configuration. Please inform an integer value."
 msgstr ""
-"Valor inválido na configuração da porta. Por favor, informe um valor inteiro."
+"Valor inválido na configuração da porta. Por favor, informe um valor "
+"inteiro."
 
 #: utilpaisagem/gui/settings.py:741
 msgid ""
-"Invalid value in following interval configuration. Please inform an integer "
-"value."
+"Invalid value in following interval configuration. Please inform an "
+"integer value."
 msgstr ""
-"Valor inválido na configuração do intervalo de acompanhamento. Por favor, "
-"informe um valor inteiro."
+"Valor inválido na configuração do intervalo de acompanhamento. Por favor,"
+" informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:749
 msgid ""
-"Invalid value in connection timeout configuration. Please inform a numeric "
-"value."
+"Invalid value in connection timeout configuration. Please inform a "
+"numeric value."
 msgstr ""
-"Valor inválido na configuração da porta. Por favor, informe um valor inteiro."
+"Valor inválido na configuração da porta. Por favor, informe um valor "
+"inteiro."
 
 #: utilpaisagem/gui/settings.py:758
 msgid ""
-"Invalid value in download radius configuration. Please inform an integer value."
+"Invalid value in download radius configuration. Please inform an integer "
+"value."
 msgstr ""
-"Valor inválido na configuração do raio de download. Por favor, informe um valor "
-"inteiro."
+"Valor inválido na configuração do raio de download. Por favor, informe um"
+" valor inteiro."
 
 #: utilpaisagem/gui/settings.py:766
 msgid ""
-"Invalid value in maximum simultaneous tiles configuration. Please inform an "
-"integer value."
+"Invalid value in maximum simultaneous tiles configuration. Please inform "
+"an integer value."
 msgstr ""
-"Valor inválido na configuração do número máximo de ladrilhos simultâneos. Por "
-"favor, informe um valor inteiro."
+"Valor inválido na configuração do número máximo de ladrilhos simultâneos."
+" Por favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:774
 msgid ""
-"Invalid value in maximum simultaneous downloads for each tile configuration. "
-"Please inform an integer value."
+"Invalid value in maximum simultaneous downloads for each tile "
+"configuration. Please inform an integer value."
 msgstr ""
-"Valor inválido na configuração do número máximo de downloads simultâneos para "
-"cada ladrilho. Por favor, informe um valor inteiro."
+"Valor inválido na configuração do número máximo de downloads simultâneos "
+"para cada ladrilho. Por favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:797
 #, python-brace-format
 msgid ""
-"Invalid distance value in image resolution configuration ({r}). Please inform "
-"an integer value."
+"Invalid distance value in image resolution configuration ({r}). Please "
+"inform an integer value."
 msgstr ""
-"Valor inválido na configuração da resolução da imagem ({r}). Por favor,informe "
-"um valor inteiro."
+"Valor inválido na configuração da resolução da imagem ({r}). Por "
+"favor,informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:798
 #, python-brace-format
@@ -606,41 +610,43 @@ msgstr "{res} m/px"
 
 #: utilpaisagem/gui/settings.py:808
 msgid ""
-"Invalid value in tile renewal age configuration. Please inform an integer value."
+"Invalid value in tile renewal age configuration. Please inform an integer"
+" value."
 msgstr ""
-"Valor inválido na configuração de renovação de ladrilhos. Por favor, informe um "
-"valor inteiro."
+"Valor inválido na configuração de renovação de ladrilhos. Por favor, "
+"informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:816
 msgid ""
-"Invalid value in tile deletion age configuration. Please inform an integer "
-"value."
+"Invalid value in tile deletion age configuration. Please inform an "
+"integer value."
 msgstr ""
-"Valor inválido na configuração da idade de remoção de ladrilho. Por favor, "
-"informe um valor inteiro."
+"Valor inválido na configuração da idade de remoção de ladrilho. Por "
+"favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:823
 msgid ""
-"Invalid value in disk usage limit configuration. Please inform an integer value."
+"Invalid value in disk usage limit configuration. Please inform an integer"
+" value."
 msgstr ""
-"Valor inválido na configuração do limite de uso do armazenamento. Por favor, "
-"informe um valor inteiro."
+"Valor inválido na configuração do limite de uso do armazenamento. Por "
+"favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:831
 msgid ""
-"Invalid value in degree tile visualization configuration. Please inform an "
-"integer value."
+"Invalid value in degree tile visualization configuration. Please inform "
+"an integer value."
 msgstr ""
-"Valor inválido na configuração de visualização de ladrilhos de 1°. Por favor, "
-"informe um valor inteiro."
+"Valor inválido na configuração de visualização de ladrilhos de 1°. Por "
+"favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/settings.py:838
 msgid ""
-"Invalid value in scenery tile visualization configuration. Please inform an "
-"integer value."
+"Invalid value in scenery tile visualization configuration. Please inform "
+"an integer value."
 msgstr ""
-"Valor inválido na configuração de visualização de ladrilhos do cenário. Por "
-"favor, informe um valor inteiro."
+"Valor inválido na configuração de visualização de ladrilhos do cenário. "
+"Por favor, informe um valor inteiro."
 
 #: utilpaisagem/gui/tile_manager.py:308
 #, python-brace-format
@@ -655,17 +661,18 @@ msgstr "Utilização atual do disco ({space} MB) não excede o limite ({limit} M
 #: utilpaisagem/gui/tile_manager.py:389
 #, python-brace-format
 msgid ""
-"Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused tiles."
+"Disk space usage ({space} MB) exceeds limit ({limit} MB). Deleting unused"
+" tiles."
 msgstr ""
-"Utilização do disco ({space} MB) excede o limite ({limit} MB). Deletando  "
-"ladrilhos não utilizados."
+"Utilização do disco ({space} MB) excede o limite ({limit} MB). Deletando"
+"  ladrilhos não utilizados."
 
 #: utilpaisagem/gui/tile_manager.py:410
 #, python-brace-format
 msgid "Finished deleting unused tiles. Current disk usage: {space} MB."
 msgstr ""
-"Concluída a limpeza de ladrilhos não utilizados. Espaço de armazenamento usado: "
-"{space} MB."
+"Concluída a limpeza de ladrilhos não utilizados. Espaço de armazenamento "
+"usado: {space} MB."
 
 #: utilpaisagem/gui/tile_manager.py:434
 msgid "Searching for tiles to display"
@@ -685,7 +692,7 @@ msgstr "Não foi possível deletar o ladrilho {index}: não encontrado."
 msgid "Github forbade connection (\"{e}\")."
 msgstr "Conexão proibida pelo Github (\"{e}\")."
 
-#: utilpaisagem/gui/upgrader.py:124 utilpaisagem/gui/upgrader.py:202
+#: utilpaisagem/gui/upgrader.py:124 utilpaisagem/gui/upgrader.py:211
 #, python-brace-format
 msgid "Could not connect to Github (\"{e}\")."
 msgstr "Não foi possível conectar ao Github (\"{e}\")"
@@ -706,7 +713,7 @@ msgstr "Tradução mais recente já instalada."
 
 #: utilpaisagem/gui/upgrader.py:163
 #, python-brace-format
-msgid "Found new version {newest_tag}."
+msgid "Found new version: {newest_tag}."
 msgstr "Nova versão encontrada: {newest_tag}."
 
 #: utilpaisagem/gui/upgrader.py:167
@@ -716,11 +723,11 @@ msgstr "Nova versão encontrada!"
 #: utilpaisagem/gui/upgrader.py:169
 #, python-brace-format
 msgid ""
-"There is a new Útil paisagem version available ({newest_tag}). Open download "
-"page?"
+"There is a new Útil paisagem version available ({newest_tag}). Open "
+"download page?"
 msgstr ""
-"Há uma nova versão de Útil paisagem disponível ({newest_tag}). Abrir a página "
-"de download?"
+"Há uma nova versão de Útil paisagem disponível ({newest_tag}). Abrir a "
+"página de download?"
 
 #: utilpaisagem/gui/upgrader.py:175
 #, python-brace-format
@@ -732,49 +739,59 @@ msgstr "Github proibiu a recuperação de informações em uma versão (\"{e}\")
 msgid "Could not retrieve release info from Github (\"{e}\")."
 msgstr "Não foi possível obter informações de lançamento do Github (\"{e}\")."
 
-#: utilpaisagem/gui/upgrader.py:190
+#: utilpaisagem/gui/upgrader.py:189
+msgid "Skipping check for new translations due to user preferences."
+msgstr "Busca por novas traduções não realizada devido às preferências do usuário."
+
+#: utilpaisagem/gui/upgrader.py:199
 #, python-brace-format
 msgid "Could not find release for current version ({string_version})."
 msgstr "Lançamento não encontrado para a versão atual ({string_version})."
 
-#: utilpaisagem/gui/upgrader.py:197
+#: utilpaisagem/gui/upgrader.py:206
 #, python-brace-format
 msgid "Github forbade getting information for current release (\"{e}\")."
 msgstr ""
-"Github proibiu a obtenção de informações sobre sobre a versão atual (\"{e}\")."
+"Github proibiu a obtenção de informações sobre sobre a versão atual "
+"(\"{e}\")."
 
-#: utilpaisagem/gui/upgrader.py:214
+#: utilpaisagem/gui/upgrader.py:223
 msgid "Most recent translations already installed."
 msgstr "Traduções mais recentes já instaladas."
 
-#: utilpaisagem/gui/upgrader.py:219
+#: utilpaisagem/gui/upgrader.py:228
 msgid "Downloading most recent translations..."
 msgstr "Baixando as traduções mais recentes..."
 
-#: utilpaisagem/gui/upgrader.py:225
+#: utilpaisagem/gui/upgrader.py:242
+msgid "Translations updated. Will take effect after Útil paisagem restarts."
+msgstr "Traduções atualizadas. Terão efeito após reiniciar o Útil paisagem."
+
+#: utilpaisagem/gui/upgrader.py:251
+msgid "Download hash does not match translations asset hash."
+msgstr "Hash do arquivo baixado não corresponde ao do arquivo de tradução."
+
+#: utilpaisagem/gui/upgrader.py:256
+#, python-brace-format
+msgid "Could not download or extract translations (\"{e}\")."
+msgstr "Não foi possível baixar novas traduções (\"{e}\")."
+
+#: utilpaisagem/gui/upgrader.py:261
+#, python-brace-format
+msgid "Could not download new translations. Request returned code {code}."
+msgstr ""
+"Não foi possível baixar novas traduções. A requisição retornou o código "
+"{code}."
+
+#: utilpaisagem/gui/upgrader.py:268
 #, python-brace-format
 msgid "Github forbade accessing information on release asset (\"{e}\")."
 msgstr "Github proibiu o acesso a informações sobre um ativo de versão (\"{e}\")."
 
-#: utilpaisagem/gui/upgrader.py:230
+#: utilpaisagem/gui/upgrader.py:273
 #, python-brace-format
 msgid "Could not retrieve information on release asset (\"{e}\")."
 msgstr "Nã foi possível obter informações sobre ativo de versão (\"{e}\")."
-
-#: utilpaisagem/gui/upgrader.py:235
-msgid "Skipping check for new translations due to user preferences."
-msgstr ""
-"Busca por novas traduções não realizada devido às preferências do usuário."
-
-#: utilpaisagem/gui/upgrader.py:252
-msgid "Translations updated. Will take effect after Útil paisagem restarts."
-msgstr "Traduções atualizadas. Terão efeito após reiniciar o Útil paisagem."
-
-#: utilpaisagem/gui/upgrader.py:260
-#, python-brace-format
-msgid "Could not download new translations. Request returned code {code}."
-msgstr ""
-"Não foi possível baixar novas traduções. A requisição retornou o código {code}."
 
 #: utilpaisagem/scenery/common.py:30
 msgid "DDS"
@@ -798,11 +815,11 @@ msgstr "mundo inteiro"
 
 #: utilpaisagem/scenery/image_service.py:149
 msgid ""
-"Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional (CC-BY "
-"4.0)"
+"Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
+"(CC-BY 4.0)"
 msgstr ""
-"Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional (CC-BY "
-"4.0)"
+"Plan Nacional de Ortofotografía Aérea by Instituto Geográfico Nacional "
+"(CC-BY 4.0)"
 
 #: utilpaisagem/scenery/image_service.py:151
 msgid "Spain"
@@ -845,17 +862,17 @@ msgid ""
 "Area from {lat_top:.03f}, {lon_left:.03f} to {lat_bottom:.03f}, "
 "{lon_right:.03f}  is not covered by {service_name}"
 msgstr ""
-"A área de {lat_top:.03f}, {lon_left:.03f} a {lat_bottom:.03f}, {lon_right:.03f} "
-"não é coberta por {service_name}"
+"A área de {lat_top:.03f}, {lon_left:.03f} a {lat_bottom:.03f}, "
+"{lon_right:.03f} não é coberta por {service_name}"
 
 #: utilpaisagem/scenery/tile.py:229
 #, python-brace-format
 msgid ""
-"Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not covered by "
-"{service_name}"
+"Area from {lat_top}, {lon_left} to {lat_bottom}, {lon_right} is not "
+"covered by {service_name}"
 msgstr ""
-"A área de {lat_top}, {lon_left} a {lat_bottom}, {lon_right} não é coberta por "
-"{service_name}"
+"A área de {lat_top}, {lon_left} a {lat_bottom}, {lon_right} não é coberta"
+" por {service_name}"
 
 #: utilpaisagem/scenery/tile.py:254
 #, python-brace-format
@@ -883,9 +900,11 @@ msgstr "Ladrilho {index} não foi salvo no formato {format}. Baixando novamente.
 #: utilpaisagem/scenery/tile.py:339
 #, python-brace-format
 msgid ""
-"Previous download was not found where expected (\"{p}\"). Downloading again."
+"Previous download was not found where expected (\"{p}\"). Downloading "
+"again."
 msgstr ""
-"Arquivo anterior não encontrado onde esperado (\"{p}\"). Baixando novamente."
+"Arquivo anterior não encontrado onde esperado (\"{p}\"). Baixando "
+"novamente."
 
 #: utilpaisagem/scenery/tile.py:351
 #, python-brace-format
@@ -896,7 +915,8 @@ msgstr "Ladrilho {index} já foi baixado. Pulando."
 #, python-brace-format
 msgid "Failed to check previous download (\"{e}\"). Downloading again."
 msgstr ""
-"Não foi possível verificar o download anterior (\"{e}\"). Baixando novamente."
+"Não foi possível verificar o download anterior (\"{e}\"). Baixando "
+"novamente."
 
 #: utilpaisagem/scenery/tile.py:372
 #, python-brace-format
@@ -927,3 +947,4 @@ msgstr "Cenário fotográfico do ladrilho {self.index} não pôde ser salvo."
 #, python-brace-format
 msgid "Error downloading cell {index}[{line}][{cell}]: {e}."
 msgstr "Erro baixando célula {index}[{line}][{cell}]: {e}."
+

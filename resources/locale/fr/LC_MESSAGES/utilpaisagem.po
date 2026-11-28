@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Útil paisagem 0.7\n"
 "Report-Msgid-Bugs-To: utilpaisagem.locale@visaocatolica.com.br\n"
-"POT-Creation-Date: 2026-11-27 20:50-0300\n"
+"POT-Creation-Date: 2026-11-28 12:18-0300\n"
 "PO-Revision-Date: 2026-11-23 11:20+0100\n"
 "Last-Translator: BARANGER Emmanuel <embaranger@gmail.com>\n"
 "Language: fr\n"
@@ -699,7 +699,7 @@ msgstr "Impossible de supprimer la tuile {index}: non trouvée."
 msgid "Github forbade connection (\"{e}\")."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:124 utilpaisagem/gui/upgrader.py:202
+#: utilpaisagem/gui/upgrader.py:124 utilpaisagem/gui/upgrader.py:211
 #, fuzzy, python-brace-format
 msgid "Could not connect to Github (\"{e}\")."
 msgstr "Connection à FlightGear Impossible."
@@ -720,7 +720,7 @@ msgstr ""
 
 #: utilpaisagem/gui/upgrader.py:163
 #, python-brace-format
-msgid "Found new version {newest_tag}."
+msgid "Found new version: {newest_tag}."
 msgstr ""
 
 #: utilpaisagem/gui/upgrader.py:167
@@ -744,45 +744,54 @@ msgstr ""
 msgid "Could not retrieve release info from Github (\"{e}\")."
 msgstr "Impossible de recevoir les informations de coordonnées depuis FlightGear"
 
-#: utilpaisagem/gui/upgrader.py:190
+#: utilpaisagem/gui/upgrader.py:189
+msgid "Skipping check for new translations due to user preferences."
+msgstr ""
+
+#: utilpaisagem/gui/upgrader.py:199
 #, python-brace-format
 msgid "Could not find release for current version ({string_version})."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:197
+#: utilpaisagem/gui/upgrader.py:206
 #, python-brace-format
 msgid "Github forbade getting information for current release (\"{e}\")."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:214
+#: utilpaisagem/gui/upgrader.py:223
 msgid "Most recent translations already installed."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:219
+#: utilpaisagem/gui/upgrader.py:228
 msgid "Downloading most recent translations..."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:225
+#: utilpaisagem/gui/upgrader.py:242
+msgid "Translations updated. Will take effect after Útil paisagem restarts."
+msgstr ""
+
+#: utilpaisagem/gui/upgrader.py:251
+msgid "Download hash does not match translations asset hash."
+msgstr ""
+
+#: utilpaisagem/gui/upgrader.py:256
+#, fuzzy, python-brace-format
+msgid "Could not download or extract translations (\"{e}\")."
+msgstr "Connection à FlightGear Impossible."
+
+#: utilpaisagem/gui/upgrader.py:261
+#, python-brace-format
+msgid "Could not download new translations. Request returned code {code}."
+msgstr ""
+
+#: utilpaisagem/gui/upgrader.py:268
 #, python-brace-format
 msgid "Github forbade accessing information on release asset (\"{e}\")."
 msgstr ""
 
-#: utilpaisagem/gui/upgrader.py:230
+#: utilpaisagem/gui/upgrader.py:273
 #, python-brace-format
 msgid "Could not retrieve information on release asset (\"{e}\")."
-msgstr ""
-
-#: utilpaisagem/gui/upgrader.py:235
-msgid "Skipping check for new translations due to user preferences."
-msgstr ""
-
-#: utilpaisagem/gui/upgrader.py:252
-msgid "Translations updated. Will take effect after Útil paisagem restarts."
-msgstr ""
-
-#: utilpaisagem/gui/upgrader.py:260
-#, python-brace-format
-msgid "Could not download new translations. Request returned code {code}."
 msgstr ""
 
 #: utilpaisagem/scenery/common.py:30
@@ -954,4 +963,7 @@ msgstr "Erreur au téléchargement de la cellule {index}[{line}][{cell}]: {e}."
 #~ "Aucun point de passage trouvé dans "
 #~ "le fichier {file}. Veuillez vérifier "
 #~ "l'intégrité."
+
+#~ msgid "Found new version {newest_tag}."
+#~ msgstr ""
 
