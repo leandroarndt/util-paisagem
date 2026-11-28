@@ -244,6 +244,8 @@ class Upgrader(object):
                                 ))
                                 with open(translations_path.parent / 'translations.sha', 'w') as digest:
                                     digest.write(a.digest)
+                                with open(translations_path.parent / 'translations.version', 'w') as version:
+                                    version.write(string_version())
                             except AssertionError:
                                 self.upstream_queue.put_nowait(format_status(
                                     _('Download hash does not match translations asset hash.'),
