@@ -1,10 +1,11 @@
-import locale
-#locale.setlocale(locale.LC_ALL, '')
 from threading import Event
+from numbers import Number
 # format_status
+import locale
 from datetime import datetime
 from babel.dates import LOCALTZ, format_datetime
 from babel.core import UnknownLocaleError
+from babel.numbers import parse_decimal, parse_number
 # Settings
 import configparser, ast, appdirs
 from pathlib import Path
@@ -25,6 +26,34 @@ except UnknownLocaleError:
 
 def format_status(text:str, obj) -> str:
     return f'{format_datetime(datetime.now(), format='short', locale=LOCALE)} ({obj.__class__.__name__}): {text}'
+
+# Input validation
+
+def validate_float(text:str):
+    """
+    Validates a floating point number and returns it as a float.
+    Raises error if not possible both using float() and using babel.numbers.parse_decimal().
+
+    Arguments:
+        text(str): text to validate and convert
+    """
+    try:
+        return float(text)
+    except ValueError:
+        return float(parse_decimal(text, locale=LOCALE))
+
+def validate_int(text:str):
+    """
+    Validates an integer number and returns it as an integer.
+    Raises error if not possible both using int() and using babel.numbers.parse_number().
+
+    Arguments:
+        text(str): text to validate and convert
+    """
+    try:
+        return int(text)
+    except ValueError:
+        return parse_number(text, locale=LOCALE)
 
 # App-wide events
 
@@ -77,10 +106,15 @@ class Settings(object):
         host:str = 'localhost'
         port:int = 5000
         following_interval:int = 10000
+        connection_timeout:float = 1.0
         renewal_age:int = 365
         deletion_age:int = 90
         max_disk_usage:int = 5 GB
         auto_clean:bool = True
+        detail_degree:Number = 30
+        detail_tile:Number = 3
+        detail_zero:Number = 0
+        download_translations:bool = True
     """
     _file:Path
     _settings:configparser.ConfigParser
@@ -102,13 +136,15 @@ class Settings(object):
     host:str = 'localhost'
     port:int = 5000
     following_interval:int = 10000
+    connection_timeout:float = 1.0
     renewal_age:int = 365
     deletion_age:int = 90
     max_disk_usage:int = 5 * 1024 ** 3 # 5 GB
     auto_clean:bool = True
-    detail_degree = 30
-    detail_tile = 3
-    detail_zero = 0
+    detail_degree:Number = 30
+    detail_tile:Number = 3
+    detail_zero:Number = 0
+    download_translations:bool = True
         
     _key_section = {
         'fgdata_folder': _Sections.PATH.value,
@@ -125,12 +161,14 @@ class Settings(object):
         'host': _Sections.CONNECTION.value,
         'port': _Sections.CONNECTION.value,
         'following_interval': _Sections.CONNECTION.value,
+        'connection_timeout': _Sections.CONNECTION.value,
         'renewal_age': _Sections.TILE_MANAGEMENT.value,
         'deletion_age': _Sections.TILE_MANAGEMENT.value,
         'max_disk_usage': _Sections.TILE_MANAGEMENT.value,
         'auto_clean': _Sections.TILE_MANAGEMENT.value,
         'detail_degree': _Sections.INTERFACE.value,
         'detail_tile': _Sections.INTERFACE.value,
+        'download_translations': _Sections.INTERFACE.value,
     }
 
     def __getattribute__(self, name):

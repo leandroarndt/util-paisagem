@@ -6,8 +6,8 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from babel.numbers import format_decimal
-from utilpaisagem.gui.common import Settings, PADDING, LOCALE
+from babel.numbers import format_decimal, NumberFormatError
+from utilpaisagem.gui.common import validate_float, validate_int, Settings, PADDING, LOCALE
 from utilpaisagem.scenery.common import RESOLUTIONS, COMPRESSION
 from utilpaisagem.scenery.image_service import IMAGE_SERVICES
 
@@ -101,6 +101,10 @@ class SettingsWindow(object):
     interval_label:ttk.Label
     interval_input:ttk.Entry
     interval_seconds_label:ttk.Label
+    timeout_var:tk.IntVar
+    timeout_label:ttk.Label
+    timeout_input:ttk.Entry
+    timeout_seconds_label:ttk.Label
     fg_options_frame:ttk.Labelframe
     fg_options_var:tk.StringVar
     fg_options_label:ttk.Label
@@ -166,6 +170,9 @@ class SettingsWindow(object):
     detail_tile_var:tk.IntVar
     detail_tile_label:ttk.Label
     detail_tile_entry:ttk.Spinbox
+    ux_frame:ttk.LabelFrame
+    translations_var:tk.BooleanVar
+    translations_input:ttk.Checkbutton
     buttons_frame:ttk.Frame
     ok_button:ttk.Button
     apply_button:ttk.Button
@@ -277,6 +284,19 @@ class SettingsWindow(object):
         )
         self.interval_input = ttk.Entry(self.connection_frame, textvariable=self.interval_var)
         self.interval_seconds_label = ttk.Label(self.connection_frame, text=_('seconds'))
+        self.timeout_var = tk.StringVar(
+            self.connection_frame,
+            value=format_decimal(
+                Decimal(self.settings.connection_timeout).quantize(Decimal('1.0')), 
+                locale=LOCALE,
+            ),
+        )
+        self.timeout_label = ttk.Label(
+            self.connection_frame,
+            text=_('Connection timeout:'),
+        )
+        self.timeout_input = ttk.Entry(self.connection_frame, textvariable=self.timeout_var)
+        self.timeout_seconds_label = ttk.Label(self.connection_frame, text=_('seconds'))
         self.host_label.grid(column=0, row=0, sticky=tk.E)
         self.host_input.grid(column=1, row=0, sticky=tk.W)
         self.port_label.grid(column=0, row=1, sticky=tk.E)
@@ -284,6 +304,9 @@ class SettingsWindow(object):
         self.interval_label.grid(column=0, row=2, sticky=tk.E)
         self.interval_input.grid(column=1, row=2, sticky=tk.W)
         self.interval_seconds_label.grid(column=2, row=2, sticky=tk.W)
+        self.timeout_label.grid(column=0, row=3, sticky=tk.E)
+        self.timeout_input.grid(column=1, row=3, sticky=tk.W)
+        self.timeout_seconds_label.grid(column=2, row=3, sticky=tk.W)
         self.path_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
         self.connection_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         self.fg_options_frame.grid(column=0, row=2, sticky=tk.W+tk.E)
@@ -549,6 +572,7 @@ class SettingsWindow(object):
         self.detail_frame = ttk.LabelFrame(
             self.interface_tab,
             text=_('Detail levels'),
+            padding=PADDING,
         )
         self.detail_degree_var = tk.IntVar(self.detail_frame, value=self.settings.detail_degree)
         self.detail_degree_label = ttk.Label(
@@ -576,7 +600,23 @@ class SettingsWindow(object):
         self.detail_degree_entry.grid(column=1, row=0, sticky=tk.W)
         self.detail_tile_label.grid(column=0, row=1, sticky=tk.E)
         self.detail_tile_entry.grid(column=1, row=1, sticky=tk.W)
+        self.ux_frame = ttk.LabelFrame(
+            self.interface_tab,
+            text=_('User experience'),
+            padding=PADDING,
+        )
+        self.translations_var = tk.BooleanVar(
+            self.ux_frame,
+            value=self.settings.download_translations
+        )
+        self.translations_input = ttk.Checkbutton(
+            self.ux_frame,
+            text=_('Automatically download new translations.'),
+            variable=self.translations_var,
+        )
+        self.translations_input.grid(column=0, row=0, sticky=tk.W)
         self.detail_frame.grid(column=0, row=0, sticky=tk.W+tk.E)
+        self.ux_frame.grid(column=0, row=1, sticky=tk.W+tk.E)
         # Buttons
         self.buttons_frame = ttk.Frame(self.window, padding=PADDING)
         self.cancel_button = ttk.Button(
@@ -701,6 +741,14 @@ class SettingsWindow(object):
                     message=_('Invalid value in following interval configuration. Please inform an integer value.'),
             )
             return
+        try:
+            self.settings.connection_timeout = validate_float(self.timeout_input.get())
+        except NumberFormatErrorq:
+            tk.messagebox.showerror(
+                    title=_('Invalid value'),
+                    message=_('Invalid value in connection timeout configuration. Please inform a numeric value.'),
+            )
+            return
         self.settings.image_service = self.image_service_var.get()
         try:
             self.settings.radius = int(self.radius_var.get())
@@ -789,6 +837,7 @@ class SettingsWindow(object):
                 title=_('Invalid value'),
                 message=_('Invalid value in scenery tile visualization configuration. Please inform an integer value.')
             )
+        self.settings.download_translations = self.translations_var.get()
     
     def apply_and_close(self):
         self.apply()

@@ -26,6 +26,23 @@
   </description>
   
   <releases>
+	<release version="0.7.1" date="2026-11-28">
+		<description>
+			<ul>Configurable connection timeout with FlightGear.</ul>
+			<ul>Next attempt to get aircraft position after a failure is made at the
+			same interval as if it was successfull.</ul>
+			<ul>New translations are downloaded automatically or from the "File" menu
+			(defaults to automatic translations download).</ul>
+
+
+			<ul xml:lang="pt_BR">Tempo limite de conexão com o FlightGear configurável.</ul>
+			<ul xml:lang="pt_BR">Tentativa seguinte de de obter a posição da aeronave
+			após falha passa a ser feita após o mesmo intervalo que se houvesse sucesso.</ul>
+			<ul xml:lang="pt_BR">Novas traduções são baixadas automaticament ou a partir
+			do menu "Arquivo" (por padrão, são baixadas automaticamente).</ul>
+		</description>
+	</release>
+
 	<release version="0.7.0" date="2026-11-23">
 		<description>
 			<ul>Load FlightGear XML route files.</ul>

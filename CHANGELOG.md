@@ -11,6 +11,13 @@ providers).
 - Solved issue #3 (localization on Windows systems).
 - Corrected color of tiles downloaded with error on live map update
 
+### 0.7.1
+
+- Configurable connection timeout with FlightGear.
+- Next attempt to get aircraft position after a failure is made at the same interval as
+if it was successfull.
+- New translations are downloaded automatically or from the "File" menu (defaults to automatic translations download).
+
 ## 0.6.0
 
 - Additional image provider (USGS).

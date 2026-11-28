@@ -1,9 +1,13 @@
 from tkinter import messagebox
-import webbrowser
+import webbrowser, requests, tempfile, shutil, hashlib
+from zipfile import ZipFile
+from queue import Queue
 from github3 import GitHub
 from github3.repos import Repository
 from github3.repos.release import Release
-from utilpaisagem.app_info import VERSION, SUBVERSION, REVISION, RC
+from github3.exceptions import NotFoundError, ForbiddenError
+from utilpaisagem.app_info import string_version, translations_path
+from utilpaisagem.gui.common import format_status, Settings
 
 class Tag(object):
     """Comparable tags"""
@@ -91,37 +95,182 @@ class Tag(object):
 class Upgrader(object):
     """Blocking package upgrader. Should be run in another process.
     """
-    anonymous:GitHub
+    github:GitHub
     repository:Repository
     current:Tag
     newest:Release
+    upstream_queue:Queue
+    settings:Settings
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, upstream_queue:Queue, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.upstream_queue = upstream_queue
         self.current = Tag(
-            f'v{VERSION}.{SUBVERSION}.{REVISION}{f"rc{RC}" if RC else ""}'
+            f'v{string_version()}'
         )
+        self.settings = Settings()
+        try:
+            self.github = GitHub()
+            self.repository = self.github.repository('leandroarndt', 'util-paisagem')
+        except ForbiddenError as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Github forbade connection ("{e}").').format(e=e),
+                self,
+            ))
+            self.github = None
+            self.repository = None
+        except Exception as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not connect to Github ("{e}").').format(e=e),
+                self,
+            ))
+            self.github = None
+            self.repository = None
     
     def run(self):
+        if self.github is None:
+            return
+
         print(f'Running version {self.current}')
+
+        # Check for Útil paisagem upgrades
         try:
-            self.anonymous = GitHub()
-            self.repository = self.anonymous.repository('leandroarndt', 'util-paisagem')
             releases = self.repository.releases()
-        except:
-            print('Could not retrieve releases from Github.')
+        except ForbiddenError as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Github forbade access to release list ("{e}").').format(e=e),
+                self,
+            ))
+        except Exception as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not retrieve releases from Github ("{e}").').format(e=e),
+                self,
+            ))
             return
         newest_tag = Tag('v0.0.0')
-        for r in releases:
-            if Tag(r.tag_name) > newest_tag:
-                newest_tag = Tag(r.tag_name)
-                self.newest = r
-        if self.current >= newest_tag:
-            print('Newest version already installed.')
+        try:
+            for r in releases:
+                if Tag(r.tag_name) > newest_tag:
+                    newest_tag = Tag(r.tag_name)
+                    self.newest = r
+            if self.current >= newest_tag:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Newest version already installed.'),
+                    self,
+                ))
+            else:
+                self.upstream_queue(format_status(
+                    _('Found new version: {newest_tag}.').format(newest_tag=newest_tag),
+                    self,
+                ))
+                if messagebox.askokcancel(
+                    title=_('New version found!'),
+                    message=_(
+                        'There is a new Útil paisagem version available ({newest_tag}). Open download page?'
+                    ).format(newest_tag=newest_tag)
+                ):
+                    webbrowser.open(self.newest.html_url)
+        except ForbiddenError as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Github forbade retrieving information on a release ("{e}").').format(e),
+                self,
+            ))
+        except Exception as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not retrieve release info from Github ("{e}").').format(e),
+                self,
+            ))
+
+        # Check for translation updates
+        if self.settings.download_translations:
+            self.update_translations()   
         else:
-            print(f'Found new version {newest_tag}.')
-            if messagebox.askokcancel(
-                title='New version found!',
-                message=f'There is a new Útil paisagem version available ({newest_tag}). Open download page?'
-            ):
-                webbrowser.open(self.newest.html_url)
+            self.upstream_queue.put_nowait(format_status(
+                _('Skipping check for new translations due to user preferences.'),
+                self,
+            ))
+
+    def update_translations(self):
+        """Downloads and install translations from Github asset."""
+        try:
+            current = self.repository.release_from_tag(f'v{string_version()}')
+        except NotFoundError:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not find release for current version ({string_version}).').format(
+                    string_version=string_version(),
+                ),
+                self,
+            ))
+        except ForbiddenError as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Github forbade getting information for current release ("{e}").').format(e),
+                self,
+            ))
+        except Exception as e:
+            self.upstream_queue.put_nowait(format_status(
+                _('Could not connect to Github ("{e}").').format(e),
+                self,
+            ))
+        else:
+            try:
+                assets = current.assets()
+                for a in assets:
+                    if a.name == 'translations.zip':
+                        if (translations_path.parent / 'translations.sha').exists():
+                            with open(translations_path.parent / 'translations.sha', 'r') as digest:
+                                if a.digest == digest.read():
+                                    self.upstream_queue.put_nowait(format_status(
+                                        _('Most recent translations already installed.'),
+                                        self,
+                                    ))
+                                    return
+                        self.upstream_queue.put_nowait(format_status(
+                            _('Downloading most recent translations...'),
+                            self,
+                        ))
+                        r = requests.get(a.browser_download_url)
+                        if r.status_code == 200:
+                            try:
+                                with tempfile.TemporaryFile('wb+') as temp:
+                                    if hashlib.sha256(r.content).hexdigest() != a.digest[7:]:
+                                        raise AssertionError
+                                    temp.write(r.content)
+                                    ziptemp = ZipFile(temp)
+                                    shutil.rmtree(translations_path)
+                                    ziptemp.extractall(translations_path.parent)
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Translations updated. Will take effect after Útil paisagem restarts.'),
+                                    self,
+                                ))
+                                with open(translations_path.parent / 'translations.sha', 'w') as digest:
+                                    digest.write(a.digest)
+                                with open(translations_path.parent / 'translations.version', 'w') as version:
+                                    version.write(string_version())
+                            except AssertionError:
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Download hash does not match translations asset hash.'),
+                                    self,
+                                ))
+                            except Exception as e:
+                                self.upstream_queue.put_nowait(format_status(
+                                    _('Could not download or extract translations ("{e}").').format(e=e),
+                                    self,
+                                ))
+                        else:
+                            self.upstream_queue.put_nowait(format_status(
+                                _('Could not download new translations. Request returned code {code}.').format(
+                                    code=r.status_code,
+                                ),
+                                self,
+                            ))
+            except ForbiddenError as e:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Github forbade accessing information on release asset ("{e}").').format(e=e),
+                    self
+                ))
+            except Exception as e:
+                self.upstream_queue.put_nowait(format_status(
+                    _('Could not retrieve information on release asset ("{e}").').format(e=e),
+                    self
+                ))
+        
